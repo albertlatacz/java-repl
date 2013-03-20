@@ -18,7 +18,7 @@ public class EvaluationContextTest {
     public void shouldReturnResultByKey() {
         Result result = result("key1", "value1");
         EvaluationContext context = emptyContext()
-                .add(expression("", "", ""), result);
+                .addEvaluation(expression("", "", ""), result);
 
         assertThat(context.resultByKey("key1"), equalTo(some(result("key1", "value1"))));
         assertThat(context.resultByKey("invalidKey"), equalTo(Option.<Result>none()));

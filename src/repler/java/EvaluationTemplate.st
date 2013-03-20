@@ -2,6 +2,7 @@ import java.util.*;
 import java.math.*;
 import static java.lang.Math.*;
 $imports$
+$newImport$
 
 public class $className$ extends repler.java.EvaluationTemplate {
     public Object \$eval() {

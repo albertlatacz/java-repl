@@ -83,10 +83,10 @@ public class REPL {
             if (result != null) {
                 String nextVar = context.nextVal();
                 System.out.println(nextVar + " = " + result);
-                context = context.add(expression(expr, className, sources), result(nextVar, result));
+                context = context.addEvaluation(expression(expr, className, sources), result(nextVar, result));
             }
         } catch (Exception e) {
-            context = context.add(expression(expr, className, sources), result(context.nextVal()));
+            context = context.addEvaluation(expression(expr, className, sources), result(context.nextVal()));
             return some(pair(-1000, e.getMessage()));
         }
 
