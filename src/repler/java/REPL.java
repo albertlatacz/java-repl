@@ -4,6 +4,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.funclate.stringtemplate.StringTemplateFunclate;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 
 import javax.tools.JavaCompiler;
@@ -17,6 +18,9 @@ import java.net.URLClassLoader;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.URLs.toURL;
@@ -35,30 +39,39 @@ public class REPL {
     }
 
     public void evaluate(String expr) {
-        String className = randomIdentifier(getClass().getSimpleName());
-        File outputJavaFile = file(outputDirectory, className + ".java");
+        Option<Result> results = context.resultByKey(expr);
+        if(!results.isEmpty()) {
+            System.out.println(results.get().getValue());
+            return;
+        }
 
+        Option<Pair<Integer, String>> error = compileAndRun(expr, true);
+        if(!error.equals(none())) {
+            error = compileAndRun(expr, false);
+        }
+
+        if(!error.equals(none())) {
+            System.err.println(error.get().second());
+        }
+    }
+
+    private Option<Pair<Integer, String>> compileAndRun(String expr, boolean asAssignment) {
+        String className = randomIdentifier(getClass().getSimpleName());
         String sources = renderClass(model()
+                .add("isAssignment", asAssignment)
                 .add("className", className)
                 .add("context", contextModel())
-                .add("expression", "$ = " + expr));
-        Files.write(sources.getBytes(), outputJavaFile);
+                .add("expression", expr));
+        File outputJavaFile = file(outputDirectory, className + ".java");
 
         try {
+            Files.write(sources.getBytes(), outputJavaFile);
+
             OutputStream errors = new ByteArrayOutputStream();
+            int errorCode = javaCompiler.run(null, null, errors, outputJavaFile.getCanonicalPath());
 
-            int error = javaCompiler.run(null, null, errors, outputJavaFile.getCanonicalPath());
-            if (error != 0) {
-                className = randomIdentifier(getClass().getSimpleName());
-                outputJavaFile = file(outputDirectory, className + ".java");
-                sources = renderClass(model()
-                        .add("className", className)
-                        .add("context", contextModel())
-                        .add("expression", expr));
-                Files.write(sources.getBytes(), outputJavaFile);
-
-                javaCompiler.run(null, null, errors, outputJavaFile.getCanonicalPath());
-            }
+            if (errorCode != 0)
+                return some(pair(errorCode, errors.toString()));
 
             Class<?> expressionClass = classLoader.loadClass(className);
             Object expressionInstance = expressionClass.newInstance();
@@ -74,12 +87,11 @@ public class REPL {
             }
         } catch (Exception e) {
             context = context.add(expression(expr, className, sources), result(context.nextVal()));
-            e.printStackTrace();
+            return some(pair(-1000, e.getMessage()));
         }
+
+        return none();
     }
-
-
-
 
     private Object contextModel() {
         return model()
@@ -101,27 +113,10 @@ public class REPL {
     private static String renderClass(Model model) {
         try {
             return new StringTemplateFunclate(REPL.class)
-                    .get("template")
+                    .get("EvaluationTemplate")
                     .render(model);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-    public static abstract class $Context {
-        private EvaluationContext context;
-
-        public final void $init(EvaluationContext context) {
-            this.context = context;
-        }
-
-        @SuppressWarnings("unchecked")
-        public final <T> T $val(final String key) {
-            return (T) context.resultByKey(key).get().getValue();
-        }
-
-        public abstract Object $eval();
-    }
-
-
 }
