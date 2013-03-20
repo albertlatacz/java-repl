@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <macrodef name="embed.libs">
+        <sequential>
+            <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+                     classpathref="all.dependancies"/>
+            <property name="release.no.libs.jar" value="${artifacts}/${release.name}-nolibs.jar"/>
+            <jarjar jarfile="${release.no.libs.jar}">
+                <zipfileset src="${release.jar.path}"/>
+            </jarjar>
+            <delete file="${release.jar.path}"/>
+            <move file="${release.no.libs.jar}" tofile="${release.jar.path}"/>
+        </sequential>
+    </macrodef>
+
+	<macrodef name="compile.and.jar">
+        <attribute name="src"/>
+        <attribute name="jar"/>
+        <attribute name="classpathref"/>
+        <attribute name="version"/>
+        <attribute name="classes" default="@{jar}.classes"/>
+
+        <sequential>
+            <mkdir dir="@{classes}"/>
+            <javac srcdir="@{src}" destdir="@{classes}" classpathref="@{classpathref}"
+                   target="1.6" source="1.6" debug="true"
+                   includeantruntime="false" encoding="UTF-8">
+            </javac>
+            <copy todir="@{classes}">
+                <fileset dir="@{src}">
+                    <exclude name="**/*.java"/>
+                </fileset>
+            </copy>
+
+            <property name="manifest" value="@{jar}.mf"/>
+            <manifest file="${manifest}">
+                <attribute name="Built-By" value="${user.name}"/>
+                <section name="${ant.project.name}">
+                    <attribute name="Specification-Title" value="${ant.project.name}"/>
+                    <attribute name="Specification-Version" value="@{version}"/>
+                    <attribute name="Specification-Vendor" value="${ant.project.name}"/>
+                    <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                    <attribute name="Implementation-Version" value="@{version}"/>
+                    <attribute name="Implementation-Vendor" value="${ant.project.name}"/>
+                </section>
+            </manifest>
+
+            <jar destfile="@{jar}" basedir="@{classes}" manifest="${manifest}"/>
+
+            <delete file="$manifest"/>
+            <delete dir="@{classes}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="test">
+        <attribute name="jar"/>
+        <attribute name="reports"/>
+        <attribute name="classpathref"/>
+
+        <sequential>
+            <mkdir dir="@{reports}"/>
+            <property name="unzipped.jar" value="@{reports}.unzipped.jar"/>
+            <mkdir dir="${unzipped.jar}"/>
+            <unzip dest="${unzipped.jar}" src="@{jar}"/>
+            <junit printsummary="no" fork="on" failureproperty="failed" forkmode="once">
+                <sysproperty key="yatspec.output.dir" value="@{reports}"/>
+                <!--<jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"/>-->
+                <classpath refid="@{classpathref}"/>
+                <formatter type="xml"/>
+                <batchtest todir="@{reports}">
+                    <fileset dir="${unzipped.jar}">
+                        <include name="**/*Test.class"/>
+                        <exclude name="**/*$*"/>
+                    </fileset>
+                </batchtest>
+            </junit>
+
+            <delete dir="${unzipped.jar}"/>
+            <fail message="Tests failed" if="failed"/>
+        </sequential>
+    </macrodef>
+
+</project>
