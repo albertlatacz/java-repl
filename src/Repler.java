@@ -18,6 +18,11 @@ public class Repler {
                 exit(0);
             }
 
+            if (line.equals("src")) {
+                System.out.println(javaREPL.context().getEvaluations().head().first().getClassSource());
+                continue;
+            }
+
             if (!line.isEmpty()) {
                 javaREPL.evaluate(line);
             }

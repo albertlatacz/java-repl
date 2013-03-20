@@ -1,92 +1,44 @@
 package repler.java;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 
 import java.util.List;
 
+import static com.googlecode.totallylazy.Callables.second;
+import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.equalTo;
-import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static repler.java.Result.functions.key;
 
 public final class EvaluationContext {
-    private final Sequence<Result> results;
+    private final Sequence<Pair<Expression, Result>> evaluations;
 
-    private EvaluationContext(Sequence<Result> results) {
-        this.results = sequence(results);
+    private EvaluationContext(Sequence<Pair<Expression, Result>> evaluations) {
+        this.evaluations = evaluations;
     }
 
-    public static EvaluationContext empty() {
-        return new EvaluationContext(Sequences.<Result>empty());
+    public static EvaluationContext emptyContext() {
+        return new EvaluationContext(Sequences.<Pair<Expression, Result>>empty());
     }
 
     public List<Result> getResults() {
-        return results.toList();
+        return evaluations.map(Callables.<Result>second()).toList();
     }
 
-    public Result resultByKey(final String key) {
-        return results.find(where(Result.key(), equalTo(key))).get();
+    public Sequence<Pair<Expression, Result>> getEvaluations() {
+        return evaluations;
     }
 
-    public EvaluationContext evaluationContext(Result result) {
-        return new EvaluationContext(results.cons(result));
+    public String nextVal() {
+        return "res" + evaluations.size();
     }
 
-    public static class Result {
-        private final Task task;
-        private final String key;
-        private final Object value;
-
-        Result(Task task, String key, Object value) {
-            this.task = task;
-            this.key = key;
-            this.value = value;
-        }
-
-        public Task getTask() {
-            return task;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public static Function1<Result, String> key() {
-            return new Function1<Result, String>() {
-                public String call(Result result) throws Exception {
-                    return result.key;
-                }
-            };
-        }
+    public Option<Result> resultByKey(final String key) {
+        return evaluations.find(where(Callables.<Result>second().then(key()), equalTo(key))).map(Callables.<Result>second());
     }
 
-    public static class Task {
-        private final String expression;
-        private final String className;
-        private final String source;
-
-        Task(String expression, String className, String source) {
-            this.expression = expression;
-            this.className = className;
-            this.source = source;
-        }
-
-        public String getExpression() {
-            return expression;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public String getSource() {
-            return source;
-        }
+    public EvaluationContext add(Expression expression, Result result) {
+        return new EvaluationContext(evaluations.cons(pair(expression, result)));
     }
+
 }

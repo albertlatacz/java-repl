@@ -4,14 +4,15 @@ import static java.lang.Math.*;
 
 $imports$
 
-public class $className$ extends repler.java.REPL.Context{
-    public Object eval() {
-        $context.results: {result | $result.value.class.canonicalName$ $result.key$ = \$val("$result.key$"); // $result.key$ = $result.task.expression$
+public class $className$ extends repler.java.REPL.\$Context{
+    public Object \$eval() {
+        $_$        $context.evaluations: { evaluation |
+        $evaluation.result.type$ $evaluation.result.key$ = \$val("$evaluation.result.key$"); // $evaluation.result.key$ = $evaluation.expression$
         }$
 
         Object \$ = null;
 
-        $expression$;
+        $_$        $expression$;
 
         return \$;
 
