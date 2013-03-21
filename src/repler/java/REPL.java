@@ -2,10 +2,7 @@ package repler.java;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.funclate.stringtemplate.StringTemplateFunclate;
-import com.googlecode.totallylazy.Files;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.*;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -17,10 +14,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import static com.googlecode.funclate.Model.persistent.model;
+import static com.googlecode.totallylazy.Either.left;
+import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
-import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.URLs.toURL;
@@ -38,24 +35,21 @@ public class REPL {
         return context;
     }
 
-    public void evaluate(String expr) {
-        Option<Result> results = context.resultByKey(expr);
-        if(!results.isEmpty()) {
-            System.out.println(results.get().getValue());
-            return;
+    public Either<? extends Throwable, Result> evaluate(String expr) {
+        Option<Result> result = context.resultByKey(expr);
+        if(!result.isEmpty()) {
+            return right(result.get());
         }
 
-        Option<? extends Throwable> error = evaluate(expr, true);
-        if(!error.equals(none()) && error.get() instanceof ExpressionCompilationException) {
-            error = evaluate(expr, false);
+        Either<? extends Throwable, Result> resultEither = evaluate(expr, true);
+        if(resultEither.isLeft() && resultEither.left() instanceof ExpressionCompilationException) {
+            resultEither = evaluate(expr, false);
         }
 
-        if(!error.equals(none())) {
-            unwrapException(error.get()).printStackTrace(System.err);
-        }
+        return resultEither;
     }
 
-    private Option<? extends Throwable> evaluate(String expr, boolean asAssignment) {
+    private Either<? extends Throwable, Result> evaluate(String expr, boolean asAssignment) {
         String className = randomIdentifier(getClass().getSimpleName());
         String sources = renderClass(model()
                 .add("isAssignment", asAssignment)
@@ -75,22 +69,23 @@ public class REPL {
 
             expressionClass.getMethod("$init", EvaluationContext.class).invoke(expressionInstance, context);
 
-            Object result = expressionClass.getMethod("$eval").invoke(expressionInstance);
+            Object resultObject = expressionClass.getMethod("$eval").invoke(expressionInstance);
 
-            if (result != null) {
+            if (resultObject != null) {
                 String nextVar = context.nextVal();
-                System.out.println(nextVar + " = " + result);
-                context = context.addEvaluation(expression(expr, className, sources), result(nextVar, result));
+                Result result = result(nextVar, resultObject);
+                context = context.addEvaluation(expression(expr, className, sources), result);
+                return right(result);
             }
         } catch (Throwable e) {
             context = context.addEvaluation(expression(expr, className, sources), result(context.nextVal()));
-            return some(e);
+            return left(unwrapException(e));
         } finally {
             outputJavaFile.delete();
             outputClassFile.delete();
         }
 
-        return none();
+        return right(null);
     }
 
     private void compile(String path) throws ExpressionCompilationException {
@@ -118,7 +113,6 @@ public class REPL {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
 
-
     private static String renderClass(Model model) {
         try {
             return new StringTemplateFunclate(REPL.class)
@@ -136,17 +130,4 @@ public class REPL {
         return e;
     }
 
-    public static class ExpressionCompilationException extends Exception {
-        private final int code;
-
-        private ExpressionCompilationException(int code, String message) {
-            super(message);
-            this.code = code;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-    }
 }

@@ -1,7 +1,4 @@
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.*;
 import repler.java.Expression;
 import repler.java.REPL;
 import repler.java.Result;
@@ -76,7 +73,7 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> showLastSource(final REPL repl) {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                Option<Pair<Expression,Result>> lastEvaluation = repl.context().getEvaluations().headOption();
+                Option<Pair<Expression, Result>> lastEvaluation = repl.context().getEvaluations().headOption();
                 if (lastEvaluation.equals(none())) {
                     System.out.println("No source");
                 } else {
@@ -91,7 +88,14 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> evaluate(final REPL repl) {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                repl.evaluate(line);
+                Either<? extends Throwable, Result> result = repl.evaluate(line);
+                if (result.isLeft()) {
+                    result.left().printStackTrace(System.err);
+                } else {
+                    if (result.right() != null) {
+                        System.out.println(result.right().getKey() + " = " + result.right().getValue());
+                    }
+                }
                 return null;
             }
         };
@@ -102,14 +106,20 @@ public class Repler {
 
             public void evaluateExample(String example) {
                 System.out.println("Evaluating example: " + example);
-                repl.evaluate(example);
+                evaluate(repl).apply(example);
             }
 
             public Function1<String, Void> call(String line) throws Exception {
                 switch (sequence(line.split(" ")).second()) {
-                    case "loop": evaluateExample("for (int i = 0 ; i < 10 ; i++) {System.out.println(\"i = \" + i);}");break;
-                    case "exp": evaluateExample("throw new RuntimeException()");break;
-                    case "array": evaluateExample("new Integer[][]{{1,2,3}, {4,5,6}}");break;
+                    case "loop":
+                        evaluateExample("for (int i = 0 ; i < 10 ; i++) {System.out.println(\"i = \" + i);}");
+                        break;
+                    case "exp":
+                        evaluateExample("throw new RuntimeException()");
+                        break;
+                    case "array":
+                        evaluateExample("new Integer[][]{{1,2,3}, {4,5,6}}");
+                        break;
                 }
                 return null;
             }
