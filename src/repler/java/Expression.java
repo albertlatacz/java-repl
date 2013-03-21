@@ -1,5 +1,7 @@
 package repler.java;
 
+import com.googlecode.totallylazy.Function1;
+
 public class Expression {
     private final String source;
     private final String className;
@@ -45,5 +47,13 @@ public class Expression {
                 (source != null && source.equals(((Expression) other).source)) &&
                 (className != null && className.equals(((Expression) other).className)) &&
                 (classSource != null && classSource.equals(((Expression) other).classSource));
+    }
+
+    public static Function1<Expression, String> classSource() {
+        return new Function1<Expression, String>() {
+            public String call(Expression expression) throws Exception {
+                return expression.getClassSource();
+            }
+        };
     }
 }

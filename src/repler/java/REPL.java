@@ -18,6 +18,8 @@ import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.URLs.toURL;
@@ -25,23 +27,24 @@ import static repler.java.Expression.expression;
 import static repler.java.Result.result;
 
 public class REPL {
+
     private final File outputDirectory = temporaryDirectory(getClass().getSimpleName());
+
     private final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
     private final ClassLoader classLoader = new URLClassLoader(new URL[]{toURL().apply(outputDirectory)});
-
     private EvaluationContext context = EvaluationContext.emptyContext();
 
     public EvaluationContext context() {
         return context;
     }
 
-    public Either<? extends Throwable, Result> evaluate(String expr) {
+    public Either<? extends Throwable, Option<Result>> evaluate(String expr) {
         Option<Result> result = context.resultByKey(expr);
         if(!result.isEmpty()) {
-            return right(result.get());
+            return right(some(result.get()));
         }
 
-        Either<? extends Throwable, Result> resultEither = evaluate(expr, true);
+        Either<? extends Throwable, Option<Result>> resultEither = evaluate(expr, true);
         if(resultEither.isLeft() && resultEither.left() instanceof ExpressionCompilationException) {
             resultEither = evaluate(expr, false);
         }
@@ -49,7 +52,7 @@ public class REPL {
         return resultEither;
     }
 
-    private Either<? extends Throwable, Result> evaluate(String expr, boolean asAssignment) {
+    private Either<? extends Throwable, Option<Result>> evaluate(String expr, boolean asAssignment) {
         String className = randomIdentifier(getClass().getSimpleName());
         String sources = renderClass(model()
                 .add("isAssignment", asAssignment)
@@ -75,7 +78,7 @@ public class REPL {
                 String nextVar = context.nextVal();
                 Result result = result(nextVar, resultObject);
                 context = context.addEvaluation(expression(expr, className, sources), result);
-                return right(result);
+                return right(some(result));
             }
         } catch (Throwable e) {
             context = context.addEvaluation(expression(expr, className, sources), result(context.nextVal()));
@@ -85,7 +88,7 @@ public class REPL {
             outputClassFile.delete();
         }
 
-        return right(null);
+        return right(emptyResult());
     }
 
     private void compile(String path) throws ExpressionCompilationException {
@@ -123,11 +126,15 @@ public class REPL {
         }
     }
 
-    private static Throwable unwrapException(Throwable e) {
+    public static Throwable unwrapException(Throwable e) {
         if (e instanceof InvocationTargetException)
             return unwrapException(((InvocationTargetException) e).getTargetException());
 
         return e;
+    }
+
+    public static Option<Result> emptyResult() {
+        return none();
     }
 
 }

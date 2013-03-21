@@ -31,6 +31,11 @@ public final class EvaluationContext {
         return evaluations;
     }
 
+    public Option<Pair<Expression, Result>> getLastEvaluation() {
+        Option<Pair<Expression, Result>> pairs = evaluations.headOption();
+        return pairs;
+    }
+
     public Sequence<Expression> getImports() {
         return imports;
     }

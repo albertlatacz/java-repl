@@ -1,20 +1,22 @@
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Callables;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Rules;
 import repler.java.Expression;
 import repler.java.REPL;
 import repler.java.Result;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 
-import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Predicates.always;
-import static com.googlecode.totallylazy.Predicates.equalTo;
-import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Callables.toString;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.System.exit;
+import static repler.java.Expression.classSource;
 
 public class Repler {
 
@@ -73,30 +75,36 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> showLastSource(final REPL repl) {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                Option<Pair<Expression, Result>> lastEvaluation = repl.context().getEvaluations().headOption();
-                if (lastEvaluation.equals(none())) {
-                    System.out.println("No source");
-                } else {
-                    System.out.println(lastEvaluation.get().first().getClassSource());
-                }
+                repl.context()
+                        .getLastEvaluation()
+                        .map(Callables.<Expression>first().then(classSource()).then(printlnToOut()));
 
                 return null;
             }
+
+
         };
     }
+
 
     private static Function1<String, Function1<String, Void>> evaluate(final REPL repl) {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                Either<? extends Throwable, Result> result = repl.evaluate(line);
-                if (result.isLeft()) {
-                    result.left().printStackTrace(System.err);
-                } else {
-                    if (result.right() != null) {
-                        System.out.println(result.right().getKey() + " = " + result.right().getValue());
-                    }
-                }
+                repl.evaluate(line).map(printError(), printResult());
                 return null;
+            }
+
+            private Function1<Object, Void> printError() {
+                return printlnToErr();
+            }
+
+            private Function1<Option<Result>, Void> printResult() {
+                return new Function1<Option<Result>, Void>() {
+                    public Void call(Option<Result> result) throws Exception {
+                        result.map(toString.then(printlnToOut()));
+                        return null;
+                    }
+                };
             }
         };
     }
@@ -133,4 +141,26 @@ public class Repler {
             }
         };
     }
+
+    private static Function1<Object, Void> printlnToOut() {
+        return printlnTo(System.out);
+    }
+
+    private static Function1<Object, Void> printlnToErr() {
+        return printlnTo(System.err);
+    }
+
+    private static Function1<Object, Void> printlnTo(final PrintStream stream) {
+        return new Function1<Object, Void>() {
+            public Void call(Object toPrint) throws Exception {
+                if (toPrint instanceof Throwable)
+                    ((Throwable) toPrint).printStackTrace(stream);
+                else
+                    stream.println(toPrint);
+                return null;
+            }
+        };
+    }
+
+
 }
