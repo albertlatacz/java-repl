@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Strings.blank;
@@ -33,10 +34,11 @@ public class Repler {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
-                .addLast(equalTo("exit").or(equalTo(null)), exitApplication())
+                .addLast(equalTo("exit"), exitApplication())
                 .addLast(equalTo("help"), showHelp())
                 .addLast(equalTo("src"), showLastSource(repl))
-                .addLast(not(blank()), evaluate(repl));
+                .addLast(not(blank()), evaluate(repl))
+                .addLast(always(), noAction());
         do {
             System.out.print(">> ");
             rules.apply(console.readLine());
@@ -46,7 +48,7 @@ public class Repler {
 
     private static Function1<String, Function1<String, Void>> exitApplication() {
         return new Function1<String, Function1<String, Void>>() {
-            public Function1<String, Void> call(String s) throws Exception {
+            public Function1<String, Void> call(String line) throws Exception {
                 exit(0);
                 return null;
             }
@@ -55,7 +57,7 @@ public class Repler {
 
     private static Function1<String, Function1<String, Void>> showHelp() {
         return new Function1<String, Function1<String, Void>>() {
-            public Function1<String, Void> call(String s) throws Exception {
+            public Function1<String, Void> call(String line) throws Exception {
                 String help = new StringBuilder().append("Commands include: \n")
                         .append("    src - display last compiled source\n")
                         .append("    exit - exits the app\n")
@@ -68,7 +70,7 @@ public class Repler {
 
     private static Function1<String, Function1<String, Void>> showLastSource(final REPL repl) {
         return new Function1<String, Function1<String, Void>>() {
-            public Function1<String, Void> call(String s) throws Exception {
+            public Function1<String, Void> call(String line) throws Exception {
                 Option<Pair<Expression,Result>> lastEvaluation = repl.context().getEvaluations().headOption();
                 if (lastEvaluation.equals(none())) {
                     System.out.println("No source");
@@ -85,7 +87,14 @@ public class Repler {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 repl.evaluate(line);
+                return null;
+            }
+        };
+    }
 
+    private static Function1<String, Function1<String, Void>> noAction() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
                 return null;
             }
         };
