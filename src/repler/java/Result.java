@@ -2,7 +2,7 @@ package repler.java;
 
 import com.googlecode.totallylazy.Function1;
 
-import static repler.java.Result.methods.extractType;
+import static java.lang.reflect.Modifier.isPrivate;
 
 public class Result {
     private final String key;
@@ -69,18 +69,10 @@ public class Result {
 
     }
 
-    public static enum methods {
-        ;
+    public static String extractType(Class<?> clazz) {
+        if (isPrivate(clazz.getModifiers()))
+            return extractType(clazz.getSuperclass());
 
-        public static String extractType(Class<?> result) {
-            if (result.isArray())
-                return result.getCanonicalName();
-
-            if (result.getComponentType() != null)
-                return extractType(result.getComponentType()) + "[]";
-
-            return result.getCanonicalName();
-        }
-
+        return clazz.getCanonicalName();
     }
 }

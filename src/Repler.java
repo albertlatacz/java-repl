@@ -1,7 +1,4 @@
-import com.googlecode.totallylazy.Callables;
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.*;
 import repler.java.Expression;
 import repler.java.REPL;
 import repler.java.Result;
@@ -19,6 +16,8 @@ import static java.lang.System.exit;
 import static repler.java.Expression.classSource;
 
 public class Repler {
+    public static final String PROMPT = ">> ";
+    public static final REPL repl = new REPL();
 
     public static void main(String[] args) throws Exception {
         System.out.println("    ____                    __              ");
@@ -31,18 +30,18 @@ public class Repler {
         System.out.println();
         System.out.println("Type expression to start or :help for more options.");
 
-        REPL repl = new REPL();
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
                 .addLast(equalTo(":exit"), exitApplication())
                 .addLast(equalTo(":help"), showHelp())
-                .addLast(equalTo(":src"), showLastSource(repl))
-                .addLast(startsWith(":test"), test(repl))
-                .addLast(not(blank()), evaluate(repl))
+                .addLast(equalTo(":src"), showLastSource())
+                .addLast(startsWith(":test"), test())
+                .addLast(equalTo(":!"), evaluateLatest())
+                .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
         do {
-            System.out.print(">> ");
+            System.out.print(PROMPT);
             rules.apply(console.readLine());
             System.out.println();
         } while (true);
@@ -64,6 +63,7 @@ public class Repler {
                         .append("    :help - display this help\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :test <loop | exp | array> - evaluates some exaples\n")
+                        .append("    :! - evaluate the latest expression\n")
                         .append("    :exit - exits the app\n")
                         .toString();
                 System.out.println(help);
@@ -72,7 +72,7 @@ public class Repler {
         };
     }
 
-    private static Function1<String, Function1<String, Void>> showLastSource(final REPL repl) {
+    private static Function1<String, Function1<String, Void>> showLastSource() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 repl.context()
@@ -86,35 +86,58 @@ public class Repler {
         };
     }
 
+    private static Function1<Object, Void> printError() {
+        return printlnToErr();
+    }
 
-    private static Function1<String, Function1<String, Void>> evaluate(final REPL repl) {
-        return new Function1<String, Function1<String, Void>>() {
-            public Function1<String, Void> call(String line) throws Exception {
-                repl.evaluate(line).map(printError(), printResult());
+    private static Function1<Option<Result>, Void> printResult() {
+        return new Function1<Option<Result>, Void>() {
+            public Void call(Option<Result> result) throws Exception {
+                result.map(toString.then(printlnToOut()));
                 return null;
-            }
-
-            private Function1<Object, Void> printError() {
-                return printlnToErr();
-            }
-
-            private Function1<Option<Result>, Void> printResult() {
-                return new Function1<Option<Result>, Void>() {
-                    public Void call(Option<Result> result) throws Exception {
-                        result.map(toString.then(printlnToOut()));
-                        return null;
-                    }
-                };
             }
         };
     }
 
-    private static Function1<String, Function1<String, Void>> test(final REPL repl) {
+
+    private static Function1<String, Function1<String, Void>> evaluate() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String expression) throws Exception {
+                evaluateExpression(expression);
+                return null;
+            }
+
+
+        };
+    }
+
+    private static Function1<String, Function1<String, Void>> evaluateLatest() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String expression) throws Exception {
+                Option<Pair<Expression,Result>> lastEvaluation = repl.context().getLastEvaluation();
+                if (!lastEvaluation.isEmpty()) {
+                    String source = lastEvaluation.get().first().getSource();
+                    System.out.println(PROMPT + source);
+                    evaluateExpression(source);
+                }
+
+                return null;
+            }
+
+
+        };
+    }
+
+    public static void evaluateExpression(String expr) {
+        repl.evaluate(expr).map(printError(), printResult());
+    }
+
+    private static Function1<String, Function1<String, Void>> test() {
         return new Function1<String, Function1<String, Void>>() {
 
             public void evaluateExample(String example) {
                 System.out.println("Evaluating example: " + example);
-                evaluate(repl).apply(example);
+                evaluate().apply(example);
             }
 
             public Function1<String, Void> call(String line) throws Exception {
