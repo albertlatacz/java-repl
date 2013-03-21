@@ -12,6 +12,7 @@ import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -20,7 +21,6 @@ import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.URLs.toURL;
@@ -45,17 +45,17 @@ public class REPL {
             return;
         }
 
-        Option<Pair<Integer, String>> error = compileAndRun(expr, true);
-        if(!error.equals(none())) {
-            error = compileAndRun(expr, false);
+        Option<? extends Throwable> error = evaluate(expr, true);
+        if(!error.equals(none()) && error.get() instanceof ExpressionCompilationException) {
+            error = evaluate(expr, false);
         }
 
         if(!error.equals(none())) {
-            System.err.println(error.get().second());
+            unwrapException(error.get()).printStackTrace(System.err);
         }
     }
 
-    private Option<Pair<Integer, String>> compileAndRun(String expr, boolean asAssignment) {
+    private Option<? extends Throwable> evaluate(String expr, boolean asAssignment) {
         String className = randomIdentifier(getClass().getSimpleName());
         String sources = renderClass(model()
                 .add("isAssignment", asAssignment)
@@ -63,15 +63,12 @@ public class REPL {
                 .add("context", contextModel())
                 .add("expression", expr));
         File outputJavaFile = file(outputDirectory, className + ".java");
+        File outputClassFile = file(outputDirectory, className + ".class");
 
         try {
             Files.write(sources.getBytes(), outputJavaFile);
 
-            OutputStream errors = new ByteArrayOutputStream();
-            int errorCode = javaCompiler.run(null, null, errors, outputJavaFile.getCanonicalPath());
-
-            if (errorCode != 0)
-                return some(pair(errorCode, errors.toString()));
+            compile(outputJavaFile.getCanonicalPath());
 
             Class<?> expressionClass = classLoader.loadClass(className);
             Object expressionInstance = expressionClass.newInstance();
@@ -85,12 +82,24 @@ public class REPL {
                 System.out.println(nextVar + " = " + result);
                 context = context.addEvaluation(expression(expr, className, sources), result(nextVar, result));
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             context = context.addEvaluation(expression(expr, className, sources), result(context.nextVal()));
-            return some(pair(-1000, e.getMessage()));
+            return some(e);
+        } finally {
+            outputJavaFile.delete();
+            outputClassFile.delete();
         }
 
         return none();
+    }
+
+    private void compile(String path) throws ExpressionCompilationException {
+        OutputStream errorStream = new ByteArrayOutputStream();
+
+        int errorCode = javaCompiler.run(null, null, errorStream, path);
+
+        if (errorCode != 0)
+            throw new ExpressionCompilationException(errorCode, errorStream.toString());
     }
 
     private Object contextModel() {
@@ -105,10 +114,10 @@ public class REPL {
                         }));
     }
 
-
     private static String randomIdentifier(String prefix) {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
+
 
     private static String renderClass(Model model) {
         try {
@@ -118,5 +127,26 @@ public class REPL {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Throwable unwrapException(Throwable e) {
+        if (e instanceof InvocationTargetException)
+            return unwrapException(((InvocationTargetException) e).getTargetException());
+
+        return e;
+    }
+
+    public static class ExpressionCompilationException extends Exception {
+        private final int code;
+
+        private ExpressionCompilationException(int code, String message) {
+            super(message);
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
     }
 }

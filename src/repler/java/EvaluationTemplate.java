@@ -11,6 +11,4 @@ public abstract class EvaluationTemplate {
     public final <T> T $val(final String key) {
         return (T) context.resultByKey(key).get().getValue();
     }
-
-    public abstract Object $eval();
 }

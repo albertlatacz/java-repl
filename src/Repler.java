@@ -14,7 +14,9 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.System.exit;
 
 public class Repler {
@@ -28,15 +30,16 @@ public class Repler {
         System.out.println("               / /                          ");
         System.out.println("              /_/    Read-Eval-Print-Loop for Java");
         System.out.println();
-        System.out.println("Type expression to start or 'help' for more options.");
+        System.out.println("Type expression to start or :help for more options.");
 
         REPL repl = new REPL();
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
-                .addLast(equalTo("exit"), exitApplication())
-                .addLast(equalTo("help"), showHelp())
-                .addLast(equalTo("src"), showLastSource(repl))
+                .addLast(equalTo(":exit"), exitApplication())
+                .addLast(equalTo(":help"), showHelp())
+                .addLast(equalTo(":src"), showLastSource(repl))
+                .addLast(startsWith(":test"), test(repl))
                 .addLast(not(blank()), evaluate(repl))
                 .addLast(always(), noAction());
         do {
@@ -59,8 +62,10 @@ public class Repler {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 String help = new StringBuilder().append("Commands include: \n")
-                        .append("    src - display last compiled source\n")
-                        .append("    exit - exits the app\n")
+                        .append("    :help - display this help\n")
+                        .append("    :src - display last compiled source\n")
+                        .append("    :test <loop | exp | array> - evaluates some exaples\n")
+                        .append("    :exit - exits the app\n")
                         .toString();
                 System.out.println(help);
                 return null;
@@ -87,6 +92,25 @@ public class Repler {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 repl.evaluate(line);
+                return null;
+            }
+        };
+    }
+
+    private static Function1<String, Function1<String, Void>> test(final REPL repl) {
+        return new Function1<String, Function1<String, Void>>() {
+
+            public void evaluateExample(String example) {
+                System.out.println("Evaluating example: " + example);
+                repl.evaluate(example);
+            }
+
+            public Function1<String, Void> call(String line) throws Exception {
+                switch (sequence(line.split(" ")).second()) {
+                    case "loop": evaluateExample("for (int i = 0 ; i < 10 ; i++) {System.out.println(\"i = \" + i);}");break;
+                    case "exp": evaluateExample("throw new RuntimeException()");break;
+                    case "array": evaluateExample("new Integer[][]{{1,2,3}, {4,5,6}}");break;
+                }
                 return null;
             }
         };
