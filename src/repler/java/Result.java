@@ -17,10 +17,6 @@ public class Result {
         return new Result(key, value);
     }
 
-    public static Result result(String key) {
-        return result(key, null);
-    }
-
     public static Result empty(String name) {
         return new Result(name, null);
     }

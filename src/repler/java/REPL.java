@@ -74,21 +74,21 @@ public class REPL {
 
             Object resultObject = expressionClass.getMethod("$eval").invoke(expressionInstance);
 
+            String nextVar = context.nextVal();
             if (resultObject != null) {
-                String nextVar = context.nextVal();
                 Result result = result(nextVar, resultObject);
                 context = context.addEvaluation(expression(expr, className, sources), result);
                 return right(some(result));
+            } else {
+                context = context.addEvaluation(expression(expr, className, sources), Result.empty(nextVar));
+                return right(emptyResult());
             }
         } catch (Throwable e) {
-            context = context.addEvaluation(expression(expr, className, sources), result(context.nextVal()));
             return left(unwrapException(e));
         } finally {
             outputJavaFile.delete();
             outputClassFile.delete();
         }
-
-        return right(emptyResult());
     }
 
     private void compile(String path) throws ExpressionCompilationException {

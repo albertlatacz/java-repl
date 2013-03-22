@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <macrodef name="embed.libs">
+        <attribute name="jar"/>
         <sequential>
             <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
                      classpathref="all.dependancies"/>
             <property name="release.no.libs.jar" value="${artifacts}/${release.name}-nolibs.jar"/>
-            <jarjar jarfile="${release.no.libs.jar}">
+            <jarjar jarfile="${release.no.libs.jar}" manifest="@{jar}.mf">
                 <zipfileset src="${release.jar.path}"/>
+                <zipgroupfileset dir="${build.dependencies.dir}"
+                                 includes="totallylazy-*.jar, funclate-*.jar, antlr-*.jar, stringtemplate-*.jar"/>
+                <rule pattern="com.googlecode.totallylazy.*" result="repler.internal.totallylazy.$@1"/>
+                <rule pattern="com.googlecode.totallylazy.**.*" result="repler.internal.totallylazy.@1.$@2"/>
+                <rule pattern="com.googlecode.funclate.*" result="repler.internal.funclate.$@1"/>
+                <rule pattern="com.googlecode.funclate.**.*" result="repler.internal.funclate.@1.$@2"/>
+                <rule pattern="antlr.*" result="repler.internal.antlr.$@1"/>
+                <rule pattern="antlr.**.*" result="repler.internal.antlr.@1.$@2"/>
+                <rule pattern="org.antlr.stringtemplate.*" result="repler.internal.stringtemplate.$@1"/>
+                <rule pattern="org.antlr.stringtemplate.**.*" result="repler.internal.stringtemplate.@1.$@2"/>
             </jarjar>
             <delete file="${release.jar.path}"/>
             <move file="${release.no.libs.jar}" tofile="${release.jar.path}"/>
         </sequential>
     </macrodef>
 
-	<macrodef name="compile.and.jar">
+    <macrodef name="compile.and.jar">
         <attribute name="src"/>
         <attribute name="jar"/>
         <attribute name="classpathref"/>
@@ -23,7 +34,7 @@
         <sequential>
             <mkdir dir="@{classes}"/>
             <javac srcdir="@{src}" destdir="@{classes}" classpathref="@{classpathref}"
-                   target="1.6" source="1.6" debug="true"
+                   target="1.7" source="1.7" debug="true"
                    includeantruntime="false" encoding="UTF-8">
             </javac>
             <copy todir="@{classes}">
@@ -33,21 +44,21 @@
             </copy>
 
             <property name="manifest" value="@{jar}.mf"/>
+
             <manifest file="${manifest}">
                 <attribute name="Built-By" value="${user.name}"/>
-                <section name="${ant.project.name}">
-                    <attribute name="Specification-Title" value="${ant.project.name}"/>
-                    <attribute name="Specification-Version" value="@{version}"/>
-                    <attribute name="Specification-Vendor" value="${ant.project.name}"/>
-                    <attribute name="Implementation-Title" value="${ant.project.name}"/>
-                    <attribute name="Implementation-Version" value="@{version}"/>
-                    <attribute name="Implementation-Vendor" value="${ant.project.name}"/>
-                </section>
+                <attribute name="Main" value="Repler"/>
+                <attribute name="Main-Class" value="Repler"/>
+                <attribute name="Specification-Title" value="${ant.project.name}"/>
+                <attribute name="Specification-Version" value="@{version}"/>
+                <attribute name="Specification-Vendor" value="${ant.project.name}"/>
+                <attribute name="Implementation-Title" value="${ant.project.name}"/>
+                <attribute name="Implementation-Version" value="@{version}"/>
+                <attribute name="Implementation-Vendor" value="${ant.project.name}"/>
             </manifest>
 
             <jar destfile="@{jar}" basedir="@{classes}" manifest="${manifest}"/>
 
-            <delete file="$manifest"/>
             <delete dir="@{classes}"/>
         </sequential>
     </macrodef>
@@ -64,7 +75,9 @@
             <unzip dest="${unzipped.jar}" src="@{jar}"/>
             <junit printsummary="no" fork="on" failureproperty="failed" forkmode="once">
                 <sysproperty key="yatspec.output.dir" value="@{reports}"/>
-                <!--<jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"/>-->
+                <sysproperty key="yatspec.index.enable" value="true"/>
+                <!--<jvmarg value="-Xdebug"/>-->
+                <!--<jvmarg value="-Xrunjdwp:transport=dt_socket,server=n,address=nurofen:5005,suspend=y"/>-->
                 <classpath refid="@{classpathref}"/>
                 <formatter type="xml"/>
                 <batchtest todir="@{reports}">
