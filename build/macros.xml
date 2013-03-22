@@ -9,9 +9,11 @@
             <jarjar jarfile="${release.no.libs.jar}" manifest="@{jar}.mf">
                 <zipfileset src="${release.jar.path}"/>
                 <zipgroupfileset dir="${build.dependencies.dir}"
-                                 includes="totallylazy-*.jar"/>
+                                 includes="totallylazy-*.jar, jline-*.jar"/>
                 <rule pattern="com.googlecode.totallylazy.*" result="repler.internal.totallylazy.$@1"/>
                 <rule pattern="com.googlecode.totallylazy.**.*" result="repler.internal.totallylazy.@1.$@2"/>
+                <rule pattern="jline.**.*" result="repler.internal.jline.@1.$@2"/>
+                <rule pattern="jline.*" result="repler.internal.jline.$@1"/>
             </jarjar>
             <delete file="${release.jar.path}"/>
             <move file="${release.no.libs.jar}" tofile="${release.jar.path}"/>

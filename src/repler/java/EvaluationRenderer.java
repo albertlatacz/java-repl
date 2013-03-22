@@ -24,8 +24,10 @@ public class EvaluationRenderer {
         writer.println(format("  public %s $eval() {", isAssignment ? "Object" : "void"));
 
         for (Pair<Expression, Result> evaluation : context.evaluations()) {
-            writer.println(format("    %s %s = $val(\"%s\"); // %s",
-                    extractType(evaluation.second().getValue().getClass()), evaluation.second().getKey(), evaluation.second().getKey(), evaluation.second()));
+            if (evaluation.second().getValue() != null) {
+                writer.println(format("    %s %s = $val(\"%s\"); // %s",
+                        extractType(evaluation.second().getValue().getClass()), evaluation.second().getKey(), evaluation.second().getKey(), evaluation.second()));
+            }
         }
 
         writer.println();

@@ -1,10 +1,9 @@
 import com.googlecode.totallylazy.*;
+import jline.console.ConsoleReader;
 import repler.java.Expression;
 import repler.java.REPL;
 import repler.java.Result;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Callables.toString;
@@ -16,10 +15,15 @@ import static java.lang.System.exit;
 import static repler.java.Expression.classSource;
 
 public class Repler {
+    public static ConsoleReader console;
     public static final String PROMPT = "java> ";
     public static final REPL repl = new REPL();
 
     public static void main(String[] args) throws Exception {
+        console = new ConsoleReader(System.in, System.out);
+        console.setHistoryEnabled(true);
+        console.setPrompt(PROMPT);
+
         System.out.println("    ____                    __              ");
         System.out.println("   / __ \\  ___     ____    / /  ___    _____");
         System.out.println("  / /_/ / / _ \\   / __ \\  / /  / _ \\  / ___/");
@@ -30,7 +34,6 @@ public class Repler {
         System.out.println();
         System.out.println("Type expression to start or :help for more options.");
 
-        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
                 .addLast(equalTo(":exit"), exitApplication())
@@ -41,7 +44,6 @@ public class Repler {
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
         do {
-            System.out.print(PROMPT);
             rules.apply(console.readLine());
             System.out.println();
         } while (true);
