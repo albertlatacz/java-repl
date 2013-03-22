@@ -27,7 +27,7 @@ public final class EvaluationContext {
     }
 
     public Option<Pair<Expression, Result>> lastEvaluation() {
-        Option<Pair<Expression, Result>> pairs = evaluations.headOption();
+        Option<Pair<Expression, Result>> pairs = evaluations.lastOption();
         return pairs;
     }
 
@@ -44,7 +44,7 @@ public final class EvaluationContext {
     }
 
     public EvaluationContext addEvaluation(Expression expression, Result result) {
-        return new EvaluationContext(evaluations.cons(pair(expression, result)), imports);
+        return new EvaluationContext(evaluations.add(pair(expression, result)), imports);
     }
 
     public EvaluationContext addImport(Expression imp) {

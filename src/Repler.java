@@ -1,10 +1,13 @@
 import com.googlecode.totallylazy.*;
 import jline.console.ConsoleReader;
+import jline.console.completer.*;
 import repler.java.Expression;
 import repler.java.REPL;
 import repler.java.Result;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -23,6 +26,10 @@ public class Repler {
         console = new ConsoleReader(System.in, System.out);
         console.setHistoryEnabled(true);
         console.setPrompt(PROMPT);
+        console.addCompleter(new AggregateCompleter(
+                new ArgumentCompleter(new StringsCompleter(":test"), new StringsCompleter("loop", "array", "exp")),
+                new StringsCompleter(":exit", ":help", ":src", ":!")
+        ));
 
         System.out.println("    ____                    __              ");
         System.out.println("   / __ \\  ___     ____    / /  ___    _____");
@@ -32,7 +39,7 @@ public class Repler {
         System.out.println("               / /                          ");
         System.out.println("              /_/    Read-Eval-Print-Loop for Java");
         System.out.println();
-        System.out.println("Type expression to start or :help for more options.");
+        System.out.println("Type expression to start or :help for more options or <tab> to autocomplete.");
 
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
@@ -44,7 +51,7 @@ public class Repler {
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
         do {
-            rules.apply(console.readLine());
+            rules.apply(console.readLine().trim());
             System.out.println();
         } while (true);
     }
