@@ -1,6 +1,12 @@
 package repler.java;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Some;
+
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.some;
+import static repler.java.Utils.extractSimpleType;
 
 public class Result {
     private final String key;
@@ -15,8 +21,12 @@ public class Result {
         return new Result(key, value);
     }
 
-    public static Result empty(String name) {
-        return new Result(name, null);
+    public static Option<Result> someResult(String key, Object value) {
+        return some(new Result(key, value));
+    }
+
+    public static Option<Result> noResult() {
+        return none();
     }
 
     public String getKey() {
@@ -29,7 +39,7 @@ public class Result {
 
     @Override
     public String toString() {
-        return key + " = " + value;
+        return (value != null ? extractSimpleType(value.getClass()) + " " : "") + key + " = " + value;
     }
 
     @Override
@@ -46,11 +56,20 @@ public class Result {
     }
 
 
-    public static Function1<Result, String> key() {
+    public static Function1<Result, String> resultKey() {
         return new Function1<Result, String>() {
             public String call(Result result) throws Exception {
                 return result.key;
             }
         };
     }
+
+    public static Function1<Result, Object> resultValue() {
+        return new Function1<Result, Object>() {
+            public Object call(Result result) throws Exception {
+                return result.value;
+            }
+        };
+    }
+
 }

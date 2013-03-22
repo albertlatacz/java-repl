@@ -1,54 +1,62 @@
 package repler.java;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 
-import java.util.List;
-
-import static com.googlecode.totallylazy.Pair.pair;
-import static com.googlecode.totallylazy.Predicates.equalTo;
-import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Option.functions.get;
+import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static repler.java.Evaluation.evaluationExpression;
+import static repler.java.Evaluation.evaluationResult;
+import static repler.java.Expression.Type.IMPORT;
+import static repler.java.Expression.expressionType;
+import static repler.java.Result.noResult;
+import static repler.java.Result.resultKey;
 
 public final class EvaluationContext {
-    private final Sequence<Pair<Expression, Result>> evaluations;
-    private final Sequence<Expression> imports;
+    private final Sequence<Evaluation> evaluations;
 
-    private EvaluationContext(Sequence<Pair<Expression, Result>> evaluations, Sequence<Expression> imports) {
+    private EvaluationContext(Sequence<Evaluation> evaluations) {
         this.evaluations = sequence(evaluations);
-        this.imports = sequence(imports);
     }
 
-    public static EvaluationContext emptyContext() {
-        return new EvaluationContext(Sequences.<Pair<Expression, Result>>empty(), Sequences.<Expression>empty());
+    public static EvaluationContext emptyEvaluationContext() {
+        return new EvaluationContext(Sequences.<Evaluation>empty());
     }
 
-    public Sequence<Pair<Expression, Result>> evaluations() {
+    public Sequence<Evaluation> evaluations() {
         return evaluations;
     }
 
-    public Option<Pair<Expression, Result>> lastEvaluation() {
-        Option<Pair<Expression, Result>> pairs = evaluations.lastOption();
-        return pairs;
+    public Option<Evaluation> lastEvaluation() {
+        return evaluations().lastOption();
     }
 
-    public Sequence<Expression> imports() {
-        return imports;
+    public Sequence<Evaluation> imports() {
+        return evaluations()
+                .filter(where(evaluationExpression().then(expressionType()), is(IMPORT)));
     }
 
-    public String nextVal() {
-        return "res" + evaluations.size();
+    public Sequence<Result> results() {
+        return evaluations()
+                .map(evaluationResult())
+                .filter(is(not(noResult())))
+                .map(get(Result.class));
     }
 
-    public Option<Result> resultByKey(final String key) {
-        return evaluations.find(where(Callables.<Result>second().then(Result.key()), equalTo(key))).map(Callables.<Result>second());
+    public Option<Evaluation> evaluationForResult(final String key) {
+        return evaluations()
+                .filter(where(evaluationResult(), is(not(noResult()))).and(
+                        where(evaluationResult().then(get(Result.class)).then(resultKey()), equalTo(key))))
+                .headOption();
     }
 
-    public EvaluationContext addEvaluation(Expression expression, Result result) {
-        return new EvaluationContext(evaluations.add(pair(expression, result)), imports);
+    public String nextResultKey() {
+        return "res" + results().size();
     }
 
-    public EvaluationContext addImport(Expression imp) {
-        return new EvaluationContext(evaluations, imports.cons(imp));
+    public EvaluationContext addEvaluation(Evaluation evaluation) {
+        return new EvaluationContext(evaluations().add(evaluation));
     }
-
 }

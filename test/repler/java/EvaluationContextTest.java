@@ -1,20 +1,22 @@
 package repler.java;
 
-import com.googlecode.totallylazy.Option;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static repler.java.EvaluationContext.emptyContext;
+import static repler.java.EvaluationContext.emptyEvaluationContext;
+import static repler.java.Evaluation.evaluation;
 import static repler.java.Expression.expression;
-import static repler.java.Result.result;
+import static repler.java.Result.someResult;
 
 public class EvaluationContextTest {
 
     @Test
     public void shouldReturnResultByKey() {
-        EvaluationContext context = emptyContext().addEvaluation(expression("", "", ""), result("key1", "value1"));
-        assertEquals(context.resultByKey("key1").get(), result("key1", "value1"));
-        assertTrue(context.resultByKey("invalidKey").isEmpty());
+        Evaluation evaluation = evaluation("", "", expression("", Expression.Type.EVALUATION), someResult("key1", "value1"));
+        EvaluationContext context = emptyEvaluationContext().addEvaluation(evaluation);
+
+        assertEquals(context.evaluationForResult("key1").get(), evaluation);
+        assertTrue(context.evaluationForResult("invalidKey").isEmpty());
     }
 }

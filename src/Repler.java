@@ -1,13 +1,14 @@
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Rules;
 import jline.console.ConsoleReader;
-import jline.console.completer.*;
-import repler.java.Expression;
+import jline.console.completer.AggregateCompleter;
+import jline.console.completer.ArgumentCompleter;
+import jline.console.completer.StringsCompleter;
+import repler.java.Evaluation;
 import repler.java.REPL;
-import repler.java.Result;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -15,7 +16,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.System.exit;
-import static repler.java.Expression.classSource;
+import static repler.java.Evaluation.classSource;
 
 public class Repler {
     public static ConsoleReader console;
@@ -28,7 +29,7 @@ public class Repler {
         console.setPrompt(PROMPT);
         console.addCompleter(new AggregateCompleter(
                 new ArgumentCompleter(new StringsCompleter(":test"), new StringsCompleter("loop", "array", "exp")),
-                new StringsCompleter(":exit", ":help", ":src", ":!")
+                new StringsCompleter(":exit", ":help", ":src", ":clear", ":!")
         ));
 
         System.out.println("    ____                    __              ");
@@ -46,6 +47,7 @@ public class Repler {
                 .addLast(equalTo(":exit"), exitApplication())
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
+                .addLast(equalTo(":clear"), clearContext())
                 .addLast(startsWith(":test"), test())
                 .addLast(equalTo(":!"), evaluateLatest())
                 .addLast(not(blank()), evaluate())
@@ -71,6 +73,7 @@ public class Repler {
                 String help = new StringBuilder().append("Commands include: \n")
                         .append("    :help - display this help\n")
                         .append("    :src - display last compiled source\n")
+                        .append("    :clear - clears all variables\n")
                         .append("    :test <loop | exp | array> - evaluates some exaples\n")
                         .append("    :! - evaluate the latest expression\n")
                         .append("    :exit - exits the app\n")
@@ -86,8 +89,21 @@ public class Repler {
             public Function1<String, Void> call(String line) throws Exception {
                 repl.context()
                         .lastEvaluation()
-                        .map(Callables.<Expression>first().then(classSource()).then(printlnToOut()));
+                        .map(classSource().then(printlnToOut()));
 
+                return null;
+            }
+
+
+        };
+    }
+
+    private static Function1<String, Function1<String, Void>> clearContext() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+                repl.clear();
+                console.println("All variables has been cleared");
+                console.println();
                 return null;
             }
 
@@ -99,10 +115,10 @@ public class Repler {
         return printlnToErr();
     }
 
-    private static Function1<Option<Result>, Void> printResult() {
-        return new Function1<Option<Result>, Void>() {
-            public Void call(Option<Result> result) throws Exception {
-                result.map(toString.then(printlnToOut()));
+    private static Function1<Evaluation, Void> printResult() {
+        return new Function1<Evaluation, Void>() {
+            public Void call(Evaluation result) throws Exception {
+                result.getResult().map(toString.then(printlnToOut()));
                 return null;
             }
         };
@@ -123,9 +139,9 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> evaluateLatest() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String expression) throws Exception {
-                Option<Pair<Expression,Result>> lastEvaluation = repl.context().lastEvaluation();
+                Option<Evaluation> lastEvaluation = repl.context().lastEvaluation();
                 if (!lastEvaluation.isEmpty()) {
-                    String source = lastEvaluation.get().first().getSource();
+                    String source = lastEvaluation.get().getExpression().getSource();
                     System.out.println(PROMPT + source);
                     evaluateExpression(source);
                 }
