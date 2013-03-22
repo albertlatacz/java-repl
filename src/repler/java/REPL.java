@@ -1,8 +1,8 @@
 package repler.java;
 
-import com.googlecode.funclate.Model;
-import com.googlecode.funclate.stringtemplate.StringTemplateFunclate;
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Files;
+import com.googlecode.totallylazy.Option;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -13,16 +13,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Randoms.takeFromValues;
-import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.URLs.toURL;
+import static repler.java.EvaluationRenderer.randomIdentifier;
 import static repler.java.Expression.expression;
 import static repler.java.Result.result;
 
@@ -54,11 +52,7 @@ public class REPL {
 
     private Either<? extends Throwable, Option<Result>> evaluate(String expr, boolean asAssignment) {
         String className = randomIdentifier(getClass().getSimpleName());
-        String sources = renderClass(model()
-                .add("isAssignment", asAssignment)
-                .add("className", className)
-                .add("context", contextModel())
-                .add("expression", expr));
+        String sources = EvaluationRenderer.render(context, className, expr, asAssignment);
         File outputJavaFile = file(outputDirectory, className + ".java");
         File outputClassFile = file(outputDirectory, className + ".class");
 
@@ -98,32 +92,6 @@ public class REPL {
 
         if (errorCode != 0)
             throw new ExpressionCompilationException(errorCode, errorStream.toString());
-    }
-
-    private Object contextModel() {
-        return model()
-                .add("evaluations",
-                        context.getEvaluations().map(new Function1<Pair<Expression, Result>, Object>() {
-                            public Object call(Pair<Expression, Result> expressionResultPair) throws Exception {
-                                return model()
-                                        .add("expression", expressionResultPair.first())
-                                        .add("result", expressionResultPair.second());
-                            }
-                        }));
-    }
-
-    private static String randomIdentifier(String prefix) {
-        return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
-    }
-
-    private static String renderClass(Model model) {
-        try {
-            return new StringTemplateFunclate(REPL.class)
-                    .get("EvaluationTemplate")
-                    .render(model);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static Throwable unwrapException(Throwable e) {

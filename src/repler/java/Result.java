@@ -2,8 +2,6 @@ package repler.java;
 
 import com.googlecode.totallylazy.Function1;
 
-import static java.lang.reflect.Modifier.isPrivate;
-
 public class Result {
     private final String key;
     private final Object value;
@@ -29,10 +27,6 @@ public class Result {
         return value;
     }
 
-    public String getType() {
-        return extractType(value != null ? value.getClass() : Object.class);
-    }
-
     @Override
     public String toString() {
         return key + " = " + value;
@@ -52,23 +46,11 @@ public class Result {
     }
 
 
-    public static enum functions {
-        ;
-
-        public static Function1<Result, String> key() {
-            return new Function1<Result, String>() {
-                public String call(Result result) throws Exception {
-                    return result.key;
-                }
-            };
-        }
-
-    }
-
-    public static String extractType(Class<?> clazz) {
-        if (isPrivate(clazz.getModifiers()))
-            return extractType(clazz.getSuperclass());
-
-        return clazz.getCanonicalName();
+    public static Function1<Result, String> key() {
+        return new Function1<Result, String>() {
+            public String call(Result result) throws Exception {
+                return result.key;
+            }
+        };
     }
 }

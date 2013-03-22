@@ -4,12 +4,5 @@ mvn:junit:junit-dep:jar:4.8.2
 
 http://jarjar.googlecode.com/files/jarjar-1.1.jar
 
-mvn:antlr:antlr:jar:2.7.7
-mvn:org.antlr:stringtemplate:jar:3.2.1
-
-mvn:cglib:cglib-nodep:jar:2.2
-mvn:org.objenesis:objenesis:jar:1.2
-
 s3://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar:1052
-s3://repo.bodar.com/com.googlecode.funclate:funclate:jar:102
 

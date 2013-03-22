@@ -76,7 +76,7 @@ public class Repler {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 repl.context()
-                        .getLastEvaluation()
+                        .lastEvaluation()
                         .map(Callables.<Expression>first().then(classSource()).then(printlnToOut()));
 
                 return null;
@@ -114,7 +114,7 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> evaluateLatest() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String expression) throws Exception {
-                Option<Pair<Expression,Result>> lastEvaluation = repl.context().getLastEvaluation();
+                Option<Pair<Expression,Result>> lastEvaluation = repl.context().lastEvaluation();
                 if (!lastEvaluation.isEmpty()) {
                     String source = lastEvaluation.get().first().getSource();
                     System.out.println(PROMPT + source);

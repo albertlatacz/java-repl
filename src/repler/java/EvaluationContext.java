@@ -8,7 +8,6 @@ import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static repler.java.Result.functions.key;
 
 public final class EvaluationContext {
     private final Sequence<Pair<Expression, Result>> evaluations;
@@ -23,20 +22,16 @@ public final class EvaluationContext {
         return new EvaluationContext(Sequences.<Pair<Expression, Result>>empty(), Sequences.<Expression>empty());
     }
 
-    public List<Result> getResults() {
-        return evaluations.map(Callables.<Result>second()).toList();
-    }
-
-    public Sequence<Pair<Expression, Result>> getEvaluations() {
+    public Sequence<Pair<Expression, Result>> evaluations() {
         return evaluations;
     }
 
-    public Option<Pair<Expression, Result>> getLastEvaluation() {
+    public Option<Pair<Expression, Result>> lastEvaluation() {
         Option<Pair<Expression, Result>> pairs = evaluations.headOption();
         return pairs;
     }
 
-    public Sequence<Expression> getImports() {
+    public Sequence<Expression> imports() {
         return imports;
     }
 
@@ -45,7 +40,7 @@ public final class EvaluationContext {
     }
 
     public Option<Result> resultByKey(final String key) {
-        return evaluations.find(where(Callables.<Result>second().then(key()), equalTo(key))).map(Callables.<Result>second());
+        return evaluations.find(where(Callables.<Result>second().then(Result.key()), equalTo(key))).map(Callables.<Result>second());
     }
 
     public EvaluationContext addEvaluation(Expression expression, Result result) {
