@@ -16,7 +16,7 @@ import static java.lang.System.exit;
 import static repler.java.Expression.classSource;
 
 public class Repler {
-    public static final String PROMPT = ">> ";
+    public static final String PROMPT = "java> ";
     public static final REPL repl = new REPL();
 
     public static void main(String[] args) throws Exception {
