@@ -2,7 +2,6 @@ package repler.java;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Some;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;

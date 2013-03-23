@@ -87,10 +87,7 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> showLastSource() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                repl.context()
-                        .lastEvaluation()
-                        .map(classSource().then(printlnToOut()));
-
+                repl.lastEvaluation().map(classSource().then(printlnToOut()));
                 return null;
             }
 
@@ -111,20 +108,6 @@ public class Repler {
         };
     }
 
-    private static Function1<Object, Void> printError() {
-        return printlnToErr();
-    }
-
-    private static Function1<Evaluation, Void> printResult() {
-        return new Function1<Evaluation, Void>() {
-            public Void call(Evaluation result) throws Exception {
-                result.getResult().map(toString.then(printlnToOut()));
-                return null;
-            }
-        };
-    }
-
-
     private static Function1<String, Function1<String, Void>> evaluate() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String expression) throws Exception {
@@ -136,10 +119,11 @@ public class Repler {
         };
     }
 
+
     private static Function1<String, Function1<String, Void>> evaluateLatest() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String expression) throws Exception {
-                Option<Evaluation> lastEvaluation = repl.context().lastEvaluation();
+                Option<Evaluation> lastEvaluation = repl.lastEvaluation();
                 if (!lastEvaluation.isEmpty()) {
                     String source = lastEvaluation.get().getExpression().getSource();
                     System.out.println(PROMPT + source);
@@ -154,7 +138,7 @@ public class Repler {
     }
 
     public static void evaluateExpression(String expr) {
-        repl.evaluate(expr).map(printError(), printResult());
+        repl.evaluate(expr).map(printlnToErr(), printResult());
     }
 
     private static Function1<String, Function1<String, Void>> test() {
@@ -185,6 +169,15 @@ public class Repler {
     private static Function1<String, Function1<String, Void>> noAction() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
+                return null;
+            }
+        };
+    }
+
+    private static Function1<Evaluation, Void> printResult() {
+        return new Function1<Evaluation, Void>() {
+            public Void call(Evaluation result) throws Exception {
+                result.getResult().map(toString.then(printlnToOut()));
                 return null;
             }
         };

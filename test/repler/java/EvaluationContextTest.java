@@ -13,7 +13,7 @@ public class EvaluationContextTest {
 
     @Test
     public void shouldReturnResultByKey() {
-        Evaluation evaluation = evaluation("", "", expression("", Expression.Type.EVALUATION), someResult("key1", "value1"));
+        Evaluation evaluation = evaluation("", "", expression("", Expression.Type.VALUE), someResult("key1", "value1"));
         EvaluationContext context = emptyEvaluationContext().addEvaluation(evaluation);
 
         assertEquals(context.evaluationForResult("key1").get(), evaluation);

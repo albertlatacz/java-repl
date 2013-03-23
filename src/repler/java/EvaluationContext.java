@@ -14,7 +14,7 @@ import static repler.java.Expression.expressionType;
 import static repler.java.Result.noResult;
 import static repler.java.Result.resultKey;
 
-public final class EvaluationContext {
+class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
 
     private EvaluationContext(Sequence<Evaluation> evaluations) {

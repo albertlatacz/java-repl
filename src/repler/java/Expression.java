@@ -4,7 +4,7 @@ import com.googlecode.totallylazy.Function1;
 
 public class Expression {
     public static enum Type {
-        IMPORT, EVALUATION
+        IMPORT, VALUE, STATEMENT
     }
 
     private final String source;
@@ -25,6 +25,18 @@ public class Expression {
 
     public Type getType() {
         return type;
+    }
+
+    public boolean isImport() {
+        return getType().equals(Type.IMPORT);
+    }
+
+    public boolean isStatement() {
+        return getType().equals(Type.STATEMENT);
+    }
+
+    public boolean isValue() {
+        return getType().equals(Type.VALUE);
     }
 
     @Override

@@ -9,7 +9,6 @@ import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -17,17 +16,16 @@ import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
-import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static repler.java.Evaluation.evaluation;
 import static repler.java.EvaluationContext.emptyEvaluationContext;
-import static repler.java.Expression.Type.EVALUATION;
-import static repler.java.Expression.Type.IMPORT;
+import static repler.java.Expression.Type.*;
 import static repler.java.Expression.expression;
 import static repler.java.Result.noResult;
 import static repler.java.Result.result;
 import static repler.java.Utils.randomIdentifier;
+import static repler.java.Utils.unwrapException;
 
 public class REPL {
 
@@ -36,14 +34,6 @@ public class REPL {
     private final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
     private final ClassLoader classLoader = new URLClassLoader(new URL[]{toURL().apply(outputDirectory)});
     private EvaluationContext context = emptyEvaluationContext();
-
-    public EvaluationContext context() {
-        return context;
-    }
-
-    public void clear() {
-        context = emptyEvaluationContext();
-    }
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
         Option<Evaluation> evaluationOption = context.evaluationForResult(expr);
@@ -54,20 +44,20 @@ public class REPL {
         Boolean isImport = expr.startsWith("import ");
 
         if (isImport) {
-            return evaluate(expr, false, true);
+            return evaluate(expression(expr, IMPORT));
         } else {
-            Either<? extends Throwable, Evaluation> result = evaluate(expr, true, false);
+            Either<? extends Throwable, Evaluation> result = evaluate(expression(expr, VALUE));
             if (result.isLeft() && result.left() instanceof ExpressionCompilationException) {
-                result = evaluate(expr, false, false);
+                result = evaluate(expression(expr, STATEMENT));
             }
 
             return result;
         }
     }
 
-    private Either<? extends Throwable, Evaluation> evaluate(String expr, boolean asAssignment, boolean asImport) {
+    private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
         String className = randomIdentifier(getClass().getSimpleName());
-        String sources = EvaluationRenderer.render(context, className, expr, asAssignment, asImport);
+        String sources = EvaluationRenderer.render(context, className, expression);
         File outputJavaFile = file(outputDirectory, className + ".java");
         File outputClassFile = file(outputDirectory, className + ".class");
 
@@ -85,21 +75,15 @@ public class REPL {
 
             String nextVar = context.nextResultKey();
 
-            if (asImport) {
-                Evaluation evaluation = evaluation(className, sources, expression(expr, IMPORT), noResult());
+            if (resultObject != null) {
+                Result result = result(nextVar, resultObject);
+                Evaluation evaluation = evaluation(className, sources, expression, some(result));
                 context = context.addEvaluation(evaluation);
                 return right(evaluation);
             } else {
-                if (resultObject != null) {
-                    Result result = result(nextVar, resultObject);
-                    Evaluation evaluation = evaluation(className, sources, expression(expr, EVALUATION), some(result));
-                    context = context.addEvaluation(evaluation);
-                    return right(evaluation);
-                } else {
-                    Evaluation evaluation = evaluation(className, sources, expression(expr, EVALUATION), noResult());
-                    context = context.addEvaluation(evaluation);
-                    return right(evaluation);
-                }
+                Evaluation evaluation = evaluation(className, sources, expression, noResult());
+                context = context.addEvaluation(evaluation);
+                return right(evaluation);
             }
         } catch (Throwable e) {
             return left(unwrapException(e));
@@ -118,11 +102,11 @@ public class REPL {
             throw new ExpressionCompilationException(errorCode, errorStream.toString());
     }
 
-    public static Throwable unwrapException(Throwable e) {
-        if (e instanceof InvocationTargetException)
-            return unwrapException(((InvocationTargetException) e).getTargetException());
-
-        return e;
+    public Option<Evaluation> lastEvaluation() {
+        return context.lastEvaluation();
     }
 
+    public void clear() {
+        context = emptyEvaluationContext();
+    }
 }
