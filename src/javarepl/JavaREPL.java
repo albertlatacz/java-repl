@@ -27,7 +27,7 @@ import static javarepl.Result.result;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.unwrapException;
 
-public class REPL {
+public class JavaREPL {
 
     private final File outputDirectory = temporaryDirectory(getClass().getSimpleName());
 

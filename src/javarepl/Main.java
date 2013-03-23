@@ -7,8 +7,6 @@ import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
-import javarepl.Evaluation;
-import javarepl.REPL;
 
 import java.io.PrintStream;
 
@@ -16,7 +14,6 @@ import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
-import static com.googlecode.totallylazy.Strings.format;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
@@ -26,7 +23,7 @@ import static javarepl.Evaluation.classSource;
 public class Main {
     public static ConsoleReader console;
     public static final String PROMPT = "java> ";
-    public static final REPL repl = new REPL();
+    public static final JavaREPL repl = new JavaREPL();
 
     public static void main(String[] args) throws Exception {
         console = new ConsoleReader(System.in, System.out);
