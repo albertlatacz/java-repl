@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="repler" default="build">
+<project name="javarepl" default="build">
 
     <property name="build.number" value="dev.build"/>
     <property name="build" value="${basedir}/build"/>

@@ -1,9 +1,9 @@
-package repler.java;
+package javarepl;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
-import static repler.java.Result.resultKey;
-import static repler.java.Result.resultValue;
+import static javarepl.Result.resultKey;
+import static javarepl.Result.resultValue;
 
 public abstract class EvaluationTemplate {
     private EvaluationContext context;
@@ -15,8 +15,8 @@ public abstract class EvaluationTemplate {
     @SuppressWarnings("unchecked")
     public final <T> T valueOf(final String key) {
         return (T) context.results()
-                .filter(where(resultKey(), equalTo(key)))
-                .map(resultValue())
+                .filter(where(Result.resultKey(), equalTo(key)))
+                .map(Result.resultValue())
                 .headOption()
                 .getOrThrow(new IllegalArgumentException("Result '" + key + "' not found"));
     }

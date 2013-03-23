@@ -1,4 +1,4 @@
-package repler.java;
+package javarepl;
 
 class ExpressionCompilationException extends Exception {
     private final int code;

@@ -1,4 +1,4 @@
-package repler.java;
+package javarepl;
 
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Files;
@@ -18,14 +18,14 @@ import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.URLs.toURL;
-import static repler.java.Evaluation.evaluation;
-import static repler.java.EvaluationContext.emptyEvaluationContext;
-import static repler.java.Expression.Type.*;
-import static repler.java.Expression.expression;
-import static repler.java.Result.noResult;
-import static repler.java.Result.result;
-import static repler.java.Utils.randomIdentifier;
-import static repler.java.Utils.unwrapException;
+import static javarepl.Evaluation.evaluation;
+import static javarepl.EvaluationContext.emptyEvaluationContext;
+import static javarepl.Expression.Type.*;
+import static javarepl.Expression.expression;
+import static javarepl.Result.noResult;
+import static javarepl.Result.result;
+import static javarepl.Utils.randomIdentifier;
+import static javarepl.Utils.unwrapException;
 
 public class REPL {
 
@@ -56,7 +56,7 @@ public class REPL {
     }
 
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
-        String className = randomIdentifier(getClass().getSimpleName());
+        String className = Utils.randomIdentifier(getClass().getSimpleName());
         String sources = EvaluationRenderer.render(context, className, expression);
         File outputJavaFile = file(outputDirectory, className + ".java");
         File outputClassFile = file(outputDirectory, className + ".class");
@@ -76,17 +76,17 @@ public class REPL {
             String nextVar = context.nextResultKey();
 
             if (resultObject != null) {
-                Result result = result(nextVar, resultObject);
+                Result result = Result.result(nextVar, resultObject);
                 Evaluation evaluation = evaluation(className, sources, expression, some(result));
                 context = context.addEvaluation(evaluation);
                 return right(evaluation);
             } else {
-                Evaluation evaluation = evaluation(className, sources, expression, noResult());
+                Evaluation evaluation = evaluation(className, sources, expression, Result.noResult());
                 context = context.addEvaluation(evaluation);
                 return right(evaluation);
             }
         } catch (Throwable e) {
-            return left(unwrapException(e));
+            return left(Utils.unwrapException(e));
         } finally {
             outputJavaFile.delete();
             outputClassFile.delete();

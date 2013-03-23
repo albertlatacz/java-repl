@@ -1,4 +1,4 @@
-package repler.java;
+package javarepl;
 
 import java.lang.reflect.InvocationTargetException;
 

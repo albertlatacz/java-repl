@@ -1,3 +1,5 @@
+package javarepl;
+
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Rules;
@@ -5,8 +7,8 @@ import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
-import repler.java.Evaluation;
-import repler.java.REPL;
+import javarepl.Evaluation;
+import javarepl.REPL;
 
 import java.io.PrintStream;
 
@@ -14,11 +16,14 @@ import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.format;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static java.lang.String.format;
 import static java.lang.System.exit;
-import static repler.java.Evaluation.classSource;
+import static java.lang.System.getProperty;
+import static javarepl.Evaluation.classSource;
 
-public class Repler {
+public class Main {
     public static ConsoleReader console;
     public static final String PROMPT = "java> ";
     public static final REPL repl = new REPL();
@@ -32,15 +37,10 @@ public class Repler {
                 new StringsCompleter(":exit", ":help", ":src", ":clear", ":!")
         ));
 
-        System.out.println("    ____                    __              ");
-        System.out.println("   / __ \\  ___     ____    / /  ___    _____");
-        System.out.println("  / /_/ / / _ \\   / __ \\  / /  / _ \\  / ___/");
-        System.out.println(" / _, _/ /  __/  / /_/ / / /  /  __/ / /    ");
-        System.out.println("/_/ |_|  \\___/  / ,___/ /_/   \\___/ /_/     ");
-        System.out.println("               / /                          ");
-        System.out.println("              /_/    Read-Eval-Print-Loop for Java");
-        System.out.println();
-        System.out.println("Type expression to start or :help for more options or <tab> to autocomplete.");
+        System.out.println(format("Welcome to JavaREPL (%s, Java %s)", getProperty("java.vm.name"), getProperty("java.version")));
+        System.out.println("Type in expression to evaluate.");
+        System.out.println("Type :help for more options or <tab> to auto-complete.");
+        System.out.println("");
 
 
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()

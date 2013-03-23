@@ -1,13 +1,16 @@
-package repler.java;
+package javarepl;
 
+import javarepl.Evaluation;
+import javarepl.EvaluationContext;
+import javarepl.Expression;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static repler.java.EvaluationContext.emptyEvaluationContext;
-import static repler.java.Evaluation.evaluation;
-import static repler.java.Expression.expression;
-import static repler.java.Result.someResult;
+import static javarepl.EvaluationContext.emptyEvaluationContext;
+import static javarepl.Evaluation.evaluation;
+import static javarepl.Expression.expression;
+import static javarepl.Result.someResult;
 
 public class EvaluationContextTest {
 

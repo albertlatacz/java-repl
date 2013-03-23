@@ -1,18 +1,19 @@
-package repler.java;
+package javarepl;
 
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 
 import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static repler.java.Evaluation.evaluationExpression;
-import static repler.java.Evaluation.evaluationResult;
-import static repler.java.Expression.Type.IMPORT;
-import static repler.java.Expression.expressionType;
-import static repler.java.Result.noResult;
-import static repler.java.Result.resultKey;
+import static javarepl.Evaluation.evaluationExpression;
+import static javarepl.Evaluation.evaluationResult;
+import static javarepl.Expression.Type.IMPORT;
+import static javarepl.Expression.expressionType;
+import static javarepl.Result.noResult;
+import static javarepl.Result.resultKey;
 
 class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
@@ -35,20 +36,20 @@ class EvaluationContext {
 
     public Sequence<Evaluation> imports() {
         return evaluations()
-                .filter(where(evaluationExpression().then(expressionType()), is(IMPORT)));
+                .filter(where(evaluationExpression().then(Expression.expressionType()), Predicates.is(Expression.Type.IMPORT)));
     }
 
     public Sequence<Result> results() {
         return evaluations()
                 .map(evaluationResult())
-                .filter(is(not(noResult())))
+                .filter(is(Predicates.not(Result.noResult())))
                 .map(get(Result.class));
     }
 
     public Option<Evaluation> evaluationForResult(final String key) {
         return evaluations()
-                .filter(where(evaluationResult(), is(not(noResult()))).and(
-                        where(evaluationResult().then(get(Result.class)).then(resultKey()), equalTo(key))))
+                .filter(where(evaluationResult(), is(Predicates.not(Result.noResult()))).and(
+                        where(evaluationResult().then(get(Result.class)).then(Result.resultKey()), equalTo(key))))
                 .headOption();
     }
 

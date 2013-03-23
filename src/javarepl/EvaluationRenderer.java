@@ -1,10 +1,10 @@
-package repler.java;
+package javarepl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static java.lang.String.format;
-import static repler.java.Utils.extractType;
+import static javarepl.Utils.extractType;
 
 class EvaluationRenderer {
 
@@ -26,12 +26,12 @@ class EvaluationRenderer {
         }
 
         writer.println();
-        writer.println(format("public class %s extends repler.java.EvaluationTemplate {", className));
+        writer.println(format("public class %s extends javarepl.EvaluationTemplate {", className));
         writer.println(format("  public %s evaluate() throws Exception {", expression.isValue() ? "Object" : "void"));
 
         for (Result result : context.results()) {
-            writer.println(format("    %s %s = valueOf(\"%s\");",
-                    extractType(result.getValue().getClass()), result.getKey(), result.getKey()));
+            writer.println(String.format("    %s %s = valueOf(\"%s\");",
+                    Utils.extractType(result.getValue().getClass()), result.getKey(), result.getKey()));
         }
 
         if (!expression.isImport()) {

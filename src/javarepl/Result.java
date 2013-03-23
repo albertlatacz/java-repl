@@ -1,11 +1,11 @@
-package repler.java;
+package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static repler.java.Utils.extractSimpleType;
+import static javarepl.Utils.extractSimpleType;
 
 public class Result {
     private final String key;
@@ -38,7 +38,7 @@ public class Result {
 
     @Override
     public String toString() {
-        return (value != null ? extractSimpleType(value.getClass()) + " " : "") + key + " = " + value;
+        return (value != null ? Utils.extractSimpleType(value.getClass()) + " " : "") + key + " = " + value;
     }
 
     @Override

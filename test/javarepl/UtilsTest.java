@@ -1,4 +1,4 @@
-package repler.java;
+package javarepl;
 
 import org.junit.Test;
 
@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static repler.java.Utils.extractSimpleType;
-import static repler.java.Utils.extractType;
+import static javarepl.Utils.extractSimpleType;
+import static javarepl.Utils.extractType;
 
 public class UtilsTest {
 

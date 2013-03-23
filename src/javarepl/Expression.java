@@ -1,4 +1,4 @@
-package repler.java;
+package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 
