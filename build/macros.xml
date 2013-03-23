@@ -43,7 +43,7 @@
 
             <manifest file="${manifest}">
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Main-Class" value="javarepl.main"/>
+                <attribute name="Main-Class" value="javarepl.Main"/>
                 <attribute name="Specification-Title" value="${ant.project.name}"/>
                 <attribute name="Specification-Version" value="@{version}"/>
                 <attribute name="Specification-Vendor" value="${ant.project.name}"/>
