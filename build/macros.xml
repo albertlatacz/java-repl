@@ -30,7 +30,7 @@
         <sequential>
             <mkdir dir="@{classes}"/>
             <javac srcdir="@{src}" destdir="@{classes}" classpathref="@{classpathref}"
-                   target="1.7" source="1.7" debug="true"
+                   target="1.6" source="1.6" debug="true"
                    includeantruntime="false" encoding="UTF-8">
             </javac>
             <copy todir="@{classes}">

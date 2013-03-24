@@ -147,17 +147,17 @@ public class Main {
             }
 
             public Function1<String, Void> call(String line) throws Exception {
-                switch (sequence(line.split(" ")).second()) {
-                    case "loop":
-                        evaluateExample("for (int i = 0 ; i < 10 ; i++) {System.out.println(\"i = \" + i);}");
-                        break;
-                    case "exp":
-                        evaluateExample("throw new RuntimeException()");
-                        break;
-                    case "array":
-                        evaluateExample("new Integer[][]{{1,2,3}, {4,5,6}}");
-                        break;
-                }
+//                switch (sequence(line.split(" ")).second()) {
+//                    case "loop":
+//                        evaluateExample("for (int i = 0 ; i < 10 ; i++) {System.out.println(\"i = \" + i);}");
+//                        break;
+//                    case "exp":
+//                        evaluateExample("throw new RuntimeException()");
+//                        break;
+//                    case "array":
+//                        evaluateExample("new Integer[][]{{1,2,3}, {4,5,6}}");
+//                        break;
+//                }
                 return null;
             }
         };
