@@ -48,9 +48,10 @@ import java.util.*;
 public class JavaREPLConsoleRunner {
 
     public static final String REPL_TITLE = "Java REPL";
-    public static final String EXECUTE_ACTION_IMMEDIATELY_ID = "Clojure.Console.Execute.Immediately";
-    public static final String EXECUTE_ACTION_ID = "Clojure.Console.Execute";
-    public static final String JAVAREPL_MAIN = "javarepl.Main";
+    public static final String REPL_MAIN_CLASS = "javarepl.Main";
+
+    public static final String EXECUTE_ACTION_IMMEDIATELY_ID = "JavaREPL.Console.Execute.Immediately";
+    public static final String EXECUTE_ACTION_ID = "JavaREPL.Console.Execute";
 
 
     private final Module module;
@@ -58,11 +59,12 @@ public class JavaREPLConsoleRunner {
     private final String consoleTitle;
     private final CommandLineArgumentsProvider argumentsProvider;
     private final String workingDir;
+
     private final ConsoleHistoryModel consoleHistoryModel;
+    private LanguageConsoleViewImpl languageConsoleView;
+    private LanguageConsoleImpl languageConsole;
 
-    private LanguageConsoleViewImpl consoleView;
     private ProcessHandler processHandler;
-
     private JavaREPLConsoleExecuteActionHandler consoleExecuteActionHandler;
     private AnAction runAction;
 
@@ -114,12 +116,13 @@ public class JavaREPLConsoleRunner {
         final Process process = createProcess(argumentsProvider);
 
         // !!! do not change order!!!
-        consoleView = new LanguageConsoleViewImpl(new LanguageConsoleImpl(project, consoleTitle, JavaLanguage.INSTANCE));
+        languageConsole = new LanguageConsoleImpl(project, consoleTitle, JavaLanguage.INSTANCE);
+        languageConsoleView = new LanguageConsoleViewImpl(languageConsole);
         processHandler = new ColoredProcessHandler(process, argumentsProvider.getCommandLineString(), CharsetToolkit.UTF8_CHARSET) {
             @Override
             protected void textAvailable(String text, Key attributes) {
-                getLanguageConsole().setPrompt("java> ");
-                LanguageConsoleImpl.printToConsole(getLanguageConsole(), StringUtil.convertLineSeparators(text), ConsoleViewContentType.NORMAL_OUTPUT, null);
+                languageConsole.setPrompt("java> ");
+                LanguageConsoleImpl.printToConsole(languageConsole, StringUtil.convertLineSeparators(text), ConsoleViewContentType.NORMAL_OUTPUT, null);
             }
 
         } ;
@@ -134,18 +137,18 @@ public class JavaREPLConsoleRunner {
             @Override
             public void processTerminated(ProcessEvent event) {
                 runAction.getTemplatePresentation().setEnabled(false);
-                consoleView.getConsole().setPrompt("");
-                consoleView.getConsole().getConsoleEditor().setRendererMode(true);
+                languageConsoleView.getConsole().setPrompt("");
+                languageConsoleView.getConsole().getConsoleEditor().setRendererMode(true);
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        consoleView.getConsole().getConsoleEditor().getComponent().updateUI();
+                        languageConsoleView.getConsole().getConsoleEditor().getComponent().updateUI();
                     }
                 });
             }
         });
 
         // Attach a console view to the process
-        consoleView.attachToProcess(processHandler);
+        languageConsoleView.attachToProcess(processHandler);
 
         // Runner creating
         final Executor defaultExecutor = ExecutorRegistry.getInstance().getExecutorById(DefaultRunExecutor.EXECUTOR_ID);
@@ -154,14 +157,14 @@ public class JavaREPLConsoleRunner {
 
         final JPanel panel = new JPanel(new BorderLayout());
         panel.add(actionToolbar.getComponent(), BorderLayout.WEST);
-        panel.add(consoleView.getComponent(), BorderLayout.CENTER);
+        panel.add(languageConsoleView.getComponent(), BorderLayout.CENTER);
 
         final RunContentDescriptor myDescriptor =
-                new RunContentDescriptor(consoleView, processHandler, panel, consoleTitle);
+                new RunContentDescriptor(languageConsoleView, processHandler, panel, consoleTitle);
 
         // tool bar actions
         final AnAction[] actions = fillToolBarActions(toolbarActions, defaultExecutor, myDescriptor);
-        registerActionShortcuts(actions, getLanguageConsole().getConsoleEditor().getComponent());
+        registerActionShortcuts(actions, languageConsole.getConsoleEditor().getComponent());
         registerActionShortcuts(actions, panel);
         panel.updateUI();
 
@@ -175,14 +178,14 @@ public class JavaREPLConsoleRunner {
         final ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(defaultExecutor.getId());
         window.activate(new Runnable() {
             public void run() {
-                IdeFocusManager.getInstance(project).requestFocus(getLanguageConsole().getCurrentEditor().getContentComponent(), true);
+                IdeFocusManager.getInstance(project).requestFocus(languageConsole.getCurrentEditor().getContentComponent(), true);
             }
         });
 
         // Run
         processHandler.startNotify();
 
-        final LanguageConsoleImpl console = consoleView.getConsole();
+        final LanguageConsoleImpl console = languageConsoleView.getConsole();
         for (String statement : statements) {
             final String st = statement + "\n";
 
@@ -196,12 +199,12 @@ public class JavaREPLConsoleRunner {
     }
 
     private void createAndRegisterEnterAction(JPanel panel) {
-        final AnAction enterAction = new JavaREPLExecuteActionBase(getLanguageConsole(), processHandler, JavaREPLConsoleRunner.EXECUTE_ACTION_ID) {
+        final AnAction enterAction = new JavaREPLExecuteActionBase(languageConsole, processHandler, JavaREPLConsoleRunner.EXECUTE_ACTION_ID) {
             public void actionPerformed(AnActionEvent anActionEvent) {
                 consoleExecuteActionHandler.runExecuteAction(languageConsole, false);
             }
         };
-        enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), getLanguageConsole().getConsoleEditor().getComponent());
+        enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), languageConsole.getConsoleEditor().getComponent());
         enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), panel);
     }
 
@@ -229,7 +232,7 @@ public class JavaREPLConsoleRunner {
         actionList.add(closeAction);
 
         // run and consoleHistoryModel actions
-        ArrayList<AnAction> executionActions = createConsoleExecActions(getLanguageConsole(),
+        ArrayList<AnAction> executionActions = createConsoleExecActions(languageConsole,
                 processHandler, consoleHistoryModel);
         runAction = executionActions.get(0);
         actionList.addAll(executionActions);
@@ -237,8 +240,8 @@ public class JavaREPLConsoleRunner {
         actionList.add(new ToggleUseSoftWrapsToolbarAction(SoftWrapAppliancePlaces.CONSOLE) {
             @Override
             public void setSelected(AnActionEvent e, boolean state) {
-                EditorEx consoleEditor = getLanguageConsole().getConsoleEditor();
-                EditorEx historyViewer = getLanguageConsole().getHistoryViewer();
+                EditorEx consoleEditor = languageConsole.getConsoleEditor();
+                EditorEx historyViewer = languageConsole.getHistoryViewer();
 
                 consoleEditor.getSettings().setUseSoftWraps(state);
                 historyViewer.getSettings().setUseSoftWraps(state);
@@ -266,7 +269,7 @@ public class JavaREPLConsoleRunner {
             }
         };
 
-        final ConsoleHistoryController historyController = new ConsoleHistoryController("clojure", null, languageConsole, historyModel);
+        final ConsoleHistoryController historyController = new ConsoleHistoryController("JavaREPL", null, languageConsole, historyModel);
         historyController.install();
 
         final AnAction upAction = historyController.getHistoryPrev();
@@ -312,7 +315,7 @@ public class JavaREPLConsoleRunner {
             params.getClassPath().add(file.getPath());
         }
 
-        params.setMainClass(JAVAREPL_MAIN);
+        params.setMainClass(REPL_MAIN_CLASS);
         params.setWorkingDirectory(new File(workingDir));
 
         final GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()), true);
@@ -325,8 +328,6 @@ public class JavaREPLConsoleRunner {
         final ArrayList<String> cmd = new ArrayList<String>();
         cmd.add(executablePath);
         cmd.addAll(line.getParametersList().getList());
-
-
 
         return cmd;
     }
@@ -349,15 +350,12 @@ public class JavaREPLConsoleRunner {
             params.getClassPath().add(file.getPath());
         }
 
-        params.setMainClass(JAVAREPL_MAIN);
+        params.setMainClass(REPL_MAIN_CLASS);
         params.setWorkingDirectory(new File(workingDir));
 
         final GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()), true);
 
-        final Sdk sdk = params.getJdk();
-        assert sdk != null;
-        final SdkType type = (SdkType) sdk.getSdkType();
-        final String executablePath = ((JavaSdkType) type).getVMExecutablePath(sdk);
+        assert params.getJdk() != null;
 
         Map<String, String> envParams = new HashMap<String, String>();
         envParams.putAll(System.getenv());
@@ -379,11 +377,4 @@ public class JavaREPLConsoleRunner {
         return process;
 
     }
-
-
-    public LanguageConsoleImpl getLanguageConsole() {
-        return consoleView.getConsole();
-    }
-
-
 }
