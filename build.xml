@@ -8,6 +8,9 @@
     <property name="src" value="${basedir}/src"/>
     <property name="test" value="${basedir}/test"/>
     <property name="release.version" value="${build.number}"/>
+    <property name="plugin.src" value="${basedir}/intellij-plugin/src"/>
+    <property name="release.plugin.jar" value="${ant.project.name}-intellij-${release.version}.jar"/>
+    <property name="release.plugin.zip" value="${ant.project.name}-intellij-${release.version}.zip"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
     <property name="release.pom" value="${release.name}.pom"/>
@@ -15,12 +18,16 @@
     <property name="release.src" value="${release.name}-sources.jar"/>
     <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
     <property name="release.manifest.path" value="${artifacts}/${release.manifest}"/>
+    <property name="release.plugin.jar.path" value="${artifacts}/${release.plugin.jar}"/>
+    <property name="release.plugin.zip.path" value="${artifacts}/${release.plugin.zip}"/>
     <property name="tests.jar" value="${release.name}-tests.jar"/>
     <property name="tests.src" value="${release.name}-test-sources.jar"/>
     <property name="tests.jar.path" value="${artifacts}/${tests.jar}"/>
+
     <property name="build.dependencies.dir" value="lib/build"/>
     <property name="runtime.dependencies.dir" value="lib/runtime"/>
     <property name="optional.dependencies.dir" value="lib/optional"/>
+    <property name="manual.dependencies.dir" value="lib/manual"/>
 
     <import file="${build}/macros.xml"/>
     <import file="${build}/shavenmaven.xml"/>
@@ -29,6 +36,7 @@
         <fileset dir="${build.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${runtime.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${optional.dependencies.dir}" includes="**/*.jar"/>
+        <fileset dir="${manual.dependencies.dir}" includes="**/*.jar"/>
     </path>
 
     <path id="all.jars">
@@ -53,9 +61,24 @@
         <delete dir="${artifacts}"/>
     </target>
 
+    <target name="plugin">
+        <copy file="${plugin.src}/META-INF/plugin.xml" tofile="${artifacts}/META-INF/plugin.xml"/>
+        <compile.and.jar src="${plugin.src}" jar="${release.plugin.jar.path}" classpathref="all.jars"
+                         version="${release.version}"/>
+
+        <zip destfile="${release.plugin.zip.path}">
+            <zipfileset file="${release.jar.path}" prefix="java-repl/lib"/>
+            <zipfileset file="${release.plugin.jar.path}" prefix="java-repl/lib"/>
+        </zip>
+    </target>
+
     <target name="compile">
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies" version="${release.version}"/>
+
+        <antcall target="plugin"/>
+
         <embed.libs jar="${release.jar.path}"/>
+
         <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
     </target>
 
@@ -71,6 +94,8 @@
         <zip destfile="${artifacts}/${tests.src}" basedir="test"/>
     </target>
 
+
+
     <target name="build" description="build all">
         <parallel>
             <antcall target="update"/>
@@ -80,6 +105,7 @@
         <parallel>
             <antcall target="test"/>
             <antcall target="package"/>
+            <antcall target="plugin"/>
         </parallel>
     </target>
 

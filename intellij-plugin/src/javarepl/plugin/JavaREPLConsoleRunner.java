@@ -37,6 +37,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.util.PathUtil;
+import javarepl.Main;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +48,6 @@ import java.io.File;
 import java.util.*;
 
 public class JavaREPLConsoleRunner {
-
     public static final String REPL_TITLE = "Java REPL";
     public static final String REPL_MAIN_CLASS = "javarepl.Main";
 
@@ -122,10 +123,10 @@ public class JavaREPLConsoleRunner {
             @Override
             protected void textAvailable(String text, Key attributes) {
                 languageConsole.setPrompt("java> ");
-                LanguageConsoleImpl.printToConsole(languageConsole, StringUtil.convertLineSeparators(text), ConsoleViewContentType.NORMAL_OUTPUT, null);
+                LanguageConsoleImpl.printToConsole(languageConsole, StringUtil.convertLineSeparators(text).replace("java> ", ""), ConsoleViewContentType.NORMAL_OUTPUT, null);
             }
 
-        } ;
+        };
 
         consoleExecuteActionHandler = new JavaREPLConsoleExecuteActionHandler(processHandler, consoleHistoryModel, project, false);
 
@@ -296,6 +297,8 @@ public class JavaREPLConsoleRunner {
         final JavaParameters params = new JavaParameters();
         params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
 
+        params.getClassPath().add(PathUtil.getJarPathForClass(Main.class));
+
         Set<VirtualFile> cpVFiles = new HashSet<VirtualFile>();
         ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
         OrderEntry[] entries = moduleRootManager.getOrderEntries();
@@ -335,6 +338,8 @@ public class JavaREPLConsoleRunner {
     private GeneralCommandLine createCommandLine(Module module, String workingDir) throws CantRunException {
         final JavaParameters params = new JavaParameters();
         params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
+
+        params.getClassPath().add(PathUtil.getJarPathForClass(Main.class));
 
         Set<VirtualFile> cpVFiles = new HashSet<VirtualFile>();
         ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);

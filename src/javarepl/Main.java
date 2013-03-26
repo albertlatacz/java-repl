@@ -23,7 +23,7 @@ import static javarepl.Evaluation.classSource;
 public class Main {
     public static ConsoleReader console;
     public static final String PROMPT = "java> ";
-    public static final JavaREPL repl = new JavaREPL();
+    public static final Evaluator repl = new Evaluator();
 
     public static void main(String[] args) throws Exception {
         console = new ConsoleReader(System.in, System.out);
