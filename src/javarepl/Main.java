@@ -122,7 +122,7 @@ public class Main {
             public Function1<String, Void> call(String expression) throws Exception {
                 Option<Evaluation> lastEvaluation = repl.lastEvaluation();
                 if (!lastEvaluation.isEmpty()) {
-                    String source = lastEvaluation.get().getExpression().getSource();
+                    String source = lastEvaluation.get().expression.source;
                     System.out.println(PROMPT + source);
                     evaluateExpression(source);
                 }
@@ -174,7 +174,7 @@ public class Main {
     private static Function1<Evaluation, Void> printResult() {
         return new Function1<Evaluation, Void>() {
             public Void call(Evaluation result) throws Exception {
-                result.getResult().map(toString.then(printlnToOut()));
+                result.result.map(toString.then(printlnToOut()));
                 return null;
             }
         };

@@ -12,15 +12,19 @@ class Utils {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
 
-    public static String extractType(Class<?> clazz) {
+    public static Class<?> extractType(Class<?> clazz) {
+        if (clazz.isAnonymousClass()) {
+            if (clazz.getSuperclass().equals(Object.class)) {
+                return extractType(clazz.getInterfaces()[0]);
+            } else {
+                return extractType(clazz.getSuperclass());
+            }
+        }
+
         if (isPrivate(clazz.getModifiers()))
             return extractType(clazz.getSuperclass());
 
-        return clazz.getCanonicalName();
-    }
-
-    public static String extractSimpleType(Class<?> clazz) {
-        return sequence(extractType(clazz).split("\\.")).last();
+        return clazz;
     }
 
     public static Throwable unwrapException(Throwable e) {

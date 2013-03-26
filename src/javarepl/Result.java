@@ -5,11 +5,10 @@ import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static javarepl.Utils.extractSimpleType;
 
 public class Result {
-    private final String key;
-    private final Object value;
+    public final String key;
+    public final Object value;
 
     private Result(String key, Object value) {
         this.key = key;
@@ -28,17 +27,9 @@ public class Result {
         return none();
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
     @Override
     public String toString() {
-        return (value != null ? Utils.extractSimpleType(value.getClass()) + " " : "") + key + " = " + value;
+        return (value != null ? Utils.extractType(value.getClass()).getSimpleName() + " " : "") + key + " = " + value;
     }
 
     @Override
@@ -55,7 +46,7 @@ public class Result {
     }
 
 
-    public static Function1<Result, String> resultKey() {
+    public static Function1<Result, String> key() {
         return new Function1<Result, String>() {
             public String call(Result result) throws Exception {
                 return result.key;
@@ -63,7 +54,7 @@ public class Result {
         };
     }
 
-    public static Function1<Result, Object> resultValue() {
+    public static Function1<Result, Object> value() {
         return new Function1<Result, Object>() {
             public Object call(Result result) throws Exception {
                 return result.value;

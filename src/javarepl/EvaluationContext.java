@@ -8,12 +8,8 @@ import com.googlecode.totallylazy.Sequences;
 import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.Evaluation.evaluationExpression;
-import static javarepl.Evaluation.evaluationResult;
-import static javarepl.Expression.Type.IMPORT;
-import static javarepl.Expression.expressionType;
-import static javarepl.Result.noResult;
-import static javarepl.Result.resultKey;
+import static javarepl.Evaluation.expression;
+import static javarepl.Evaluation.result;
 
 class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
@@ -36,20 +32,20 @@ class EvaluationContext {
 
     public Sequence<Evaluation> imports() {
         return evaluations()
-                .filter(where(evaluationExpression().then(Expression.expressionType()), Predicates.is(Expression.Type.IMPORT)));
+                .filter(where(expression().then(Expression.type()), Predicates.is(Expression.Type.IMPORT)));
     }
 
     public Sequence<Result> results() {
         return evaluations()
-                .map(evaluationResult())
+                .map(result())
                 .filter(is(Predicates.not(Result.noResult())))
                 .map(get(Result.class));
     }
 
     public Option<Evaluation> evaluationForResult(final String key) {
         return evaluations()
-                .filter(where(evaluationResult(), is(Predicates.not(Result.noResult()))).and(
-                        where(evaluationResult().then(get(Result.class)).then(Result.resultKey()), equalTo(key))))
+                .filter(where(result(), is(Predicates.not(Result.noResult()))).and(
+                        where(result().then(get(Result.class)).then(Result.key()), equalTo(key))))
                 .headOption();
     }
 

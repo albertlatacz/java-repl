@@ -4,10 +4,10 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
 public class Evaluation {
-    private final String className;
-    private final String classSource;
-    private final Expression expression;
-    private final Option<Result> result;
+    public final String className;
+    public final String classSource;
+    public final Expression expression;
+    public final Option<Result> result;
 
 
     private Evaluation(String className, String classSource, Expression expression, Option<Result> result) {
@@ -21,21 +21,6 @@ public class Evaluation {
         return new Evaluation(className, classSource, expression, result);
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public String getClassSource() {
-        return classSource;
-    }
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    public Option<Result> getResult() {
-        return result;
-    }
 
     @Override
     public String toString() {
@@ -59,19 +44,15 @@ public class Evaluation {
                 (result != null && result.equals(((Evaluation) other).result));
     }
 
-    public static enum ExpressionType {
-        IMPORT, EVALUATION
-    }
-
     public static Function1<Evaluation, String> classSource() {
         return new Function1<Evaluation, String>() {
             public String call(Evaluation evaluation) throws Exception {
-                return evaluation.getClassSource();
+                return evaluation.classSource;
             }
         };
     }
 
-    public static Function1<Evaluation, Option<Result>> evaluationResult() {
+    public static Function1<Evaluation, Option<Result>> result() {
         return new Function1<Evaluation, Option<Result>>() {
             public Option<Result> call(Evaluation value) throws Exception {
                 return value.result;
@@ -79,7 +60,7 @@ public class Evaluation {
         };
     }
 
-    public static Function1<Evaluation, Expression> evaluationExpression() {
+    public static Function1<Evaluation, Expression> expression() {
         return new Function1<Evaluation, Expression>() {
             public Expression call(Evaluation value) throws Exception {
                 return value.expression;

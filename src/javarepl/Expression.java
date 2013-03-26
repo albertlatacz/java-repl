@@ -7,8 +7,8 @@ public class Expression {
         IMPORT, VALUE, STATEMENT
     }
 
-    private final String source;
-    private final Type type;
+    public final String source;
+    public final Type type;
 
     private Expression(String source, Type type) {
         this.source = source;
@@ -19,24 +19,17 @@ public class Expression {
         return new Expression(source, type);
     }
 
-    public String getSource() {
-        return source;
-    }
-
-    public Type getType() {
-        return type;
-    }
 
     public boolean isImport() {
-        return getType().equals(Type.IMPORT);
+        return Type.IMPORT.equals(type);
     }
 
     public boolean isStatement() {
-        return getType().equals(Type.STATEMENT);
+        return Type.STATEMENT.equals(type);
     }
 
     public boolean isValue() {
-        return getType().equals(Type.VALUE);
+        return Type.VALUE.equals(type);
     }
 
     @Override
@@ -57,10 +50,10 @@ public class Expression {
                 (type != null && type.equals(((Expression) other).type));
     }
 
-    public static Function1<Expression, Type> expressionType() {
+    public static Function1<Expression, Type> type() {
         return new Function1<Expression, Type>() {
             public Type call(Expression value) throws Exception {
-                return value.getType();
+                return value.type;
             }
         };
     }

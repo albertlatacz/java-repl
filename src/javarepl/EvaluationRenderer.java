@@ -17,12 +17,12 @@ class EvaluationRenderer {
         writer.println(format("import static java.lang.Math.*;"));
         writer.println();
 
-        for (Evaluation expr : context.imports()) {
-            writer.println(format("%s;", expr.getExpression().getSource()));
+        for (Evaluation evaluation : context.imports()) {
+            writer.println(format("%s;", evaluation.expression.source));
         }
 
         if (expression.isImport()) {
-            writer.println(format("%s;", expression.getSource()));
+            writer.println(format("%s;", expression.source));
         }
 
         writer.println();
@@ -31,12 +31,12 @@ class EvaluationRenderer {
 
         for (Result result : context.results()) {
             writer.println(String.format("    %s %s = valueOf(\"%s\");",
-                    Utils.extractType(result.getValue().getClass()), result.getKey(), result.getKey()));
+                    extractType(result.value.getClass()).getCanonicalName(), result.key, result.key));
         }
 
         if (!expression.isImport()) {
             writer.println();
-            writer.println(format("%s    %s;", expression.isValue() ? "    return\n" : "", expression.getSource()));
+            writer.println(format("%s    %s;", expression.isValue() ? "    return\n" : "", expression.source));
             writer.println();
         }
 

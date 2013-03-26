@@ -55,6 +55,7 @@ public class JavaREPL {
         }
     }
 
+
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
         String className = Utils.randomIdentifier(getClass().getSimpleName());
         String sources = EvaluationRenderer.render(context, className, expression);
