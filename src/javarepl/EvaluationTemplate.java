@@ -3,6 +3,7 @@ package javarepl;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
 
+@SuppressWarnings("unused")
 public abstract class EvaluationTemplate {
     private EvaluationContext context;
 

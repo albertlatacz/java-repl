@@ -40,9 +40,7 @@ public class Evaluator {
             return right(evaluationOption.get());
         }
 
-        Boolean isImport = expr.startsWith("import ");
-
-        if (isImport) {
+        if (expr.startsWith("import ")) {
             return evaluate(expression(expr, IMPORT));
         } else {
             Either<? extends Throwable, Evaluation> result = evaluate(expression(expr, VALUE));
@@ -68,15 +66,11 @@ public class Evaluator {
 
             Class<?> expressionClass = classLoader.loadClass(className);
             Object expressionInstance = expressionClass.newInstance();
-
             expressionClass.getMethod("init", EvaluationContext.class).invoke(expressionInstance, context);
-
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
-            String nextVar = context.nextResultKey();
-
             if (resultObject != null) {
-                Result result = Result.result(nextVar, resultObject);
+                Result result = Result.result(context.nextResultKey(), resultObject);
                 Evaluation evaluation = evaluation(className, sources, expression, some(result));
                 context = context.addEvaluation(evaluation);
                 return right(evaluation);

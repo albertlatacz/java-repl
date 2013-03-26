@@ -5,7 +5,6 @@ import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.lang.FileASTNode;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.CaretModel;
@@ -25,7 +24,7 @@ public class JavaREPLConsoleExecuteActionHandler {
     private final ProcessHandler myProcessHandler;
     private ConsoleHistoryModel consoleHistoryModel;
     private final Project project;
-    private final IndentHelper myIndentHelper;
+    private final IndentHelper indentHelper;
     private boolean myPreserveMarkup;
 
 
@@ -37,7 +36,7 @@ public class JavaREPLConsoleExecuteActionHandler {
         this.consoleHistoryModel = consoleHistoryModel;
         this.project = project;
         myPreserveMarkup = preserveMarkup;
-        myIndentHelper = IndentHelper.getInstance();
+        indentHelper = IndentHelper.getInstance();
     }
 
     public void processLine(String line) {
@@ -71,7 +70,7 @@ public class JavaREPLConsoleExecuteActionHandler {
             final String after = text.substring(offset);
             final FileASTNode node = console.getFile().getNode();
             final Project project = editor.getProject();
-            final int indent = myIndentHelper.getIndent(project, JavaFileType.INSTANCE, node);
+            final int indent = indentHelper.getIndent(project, JavaFileType.INSTANCE, node);
             final String spaces = IndentHelperImpl.fillIndent(project, JavaFileType.INSTANCE, indent);
             final String newText = before + "\n" + spaces + after;
 
