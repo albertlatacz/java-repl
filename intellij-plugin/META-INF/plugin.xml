@@ -32,6 +32,18 @@
           <keyboard-shortcut first-keystroke="control shift D" keymap="$default"/>
       </action>
 
+      <action id="JavaREPL.Console.Execute"
+              class="com.intellij.openapi.actionSystem.EmptyAction"
+              text="Execute Current Java Statement">
+          <keyboard-shortcut keymap="$default" first-keystroke="ENTER"/>
+      </action>
+
+      <action id="JavaREPL.Console.Execute.Immediately"
+              class="com.intellij.openapi.actionSystem.EmptyAction"
+              text="Execute Current Java Statement">
+          <keyboard-shortcut keymap="$default" first-keystroke="shift ENTER"/>
+      </action>
+
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
