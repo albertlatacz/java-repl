@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="javarepl" default="build">
+    <property environment="env"/>
 
-    <property name="build.number" value="dev.build"/>
+    <condition property="build.number" value="${env.JAVAREPL_BUILD_NUMBER}" else="dev.build">
+        <isset property="env.JAVAREPL_BUILD_NUMBER" />
+    </condition>
+
     <property name="build" value="${basedir}/build"/>
     <property name="artifacts" value="${build}/artifacts"/>
     <property name="reports" value="${artifacts}/reports"/>
