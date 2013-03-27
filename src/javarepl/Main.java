@@ -7,15 +7,19 @@ import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 
+import static com.googlecode.totallylazy.Callables.fifth;
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Strings.blank;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
+import static java.net.URLDecoder.*;
 import static javarepl.Evaluation.classSource;
 
 public class Main {
@@ -28,13 +32,13 @@ public class Main {
         new Main().run();
     }
 
-    public Main() throws IOException {
+    public Main() throws Exception {
         console = new ConsoleReader(System.in, System.out);
         console.setHistoryEnabled(true);
         console.setPrompt(PROMPT);
         console.addCompleter(new AggregateCompleter(new StringsCompleter(":exit", ":help", ":src", ":clear", ":!")));
 
-        console.println(format("Welcome to JavaREPL (%s, Java %s)", getProperty("java.vm.name"), getProperty("java.version")));
+        console.println(format("Welcome to JavaREPL version %s (%s, Java %s)", extractVersion(), getProperty("java.vm.name"), getProperty("java.version")));
         console.println("Type in expression to evaluate.");
         console.println("Type :help for more options.");
         console.println("");
@@ -118,7 +122,6 @@ public class Main {
         };
     }
 
-
     private Function1<String, Function1<String, Void>> evaluateLatest() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String expression) throws Exception {
@@ -133,6 +136,7 @@ public class Main {
             }
         };
     }
+
 
     public void evaluateExpression(String expr) {
         evaluator.evaluate(expr).map(printlnToErr(), printResult());
@@ -173,5 +177,21 @@ public class Main {
                 return null;
             }
         };
+    }
+
+    private String extractVersion() throws Exception {
+        File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
+
+        if (!path.isDirectory()) {
+            try {
+                JarInputStream jarStream = new JarInputStream(new FileInputStream(path));
+                Manifest manifest = jarStream.getManifest();
+                return manifest.getMainAttributes().getValue("Implementation-Version");
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
+        return "[unknown]";
     }
 }

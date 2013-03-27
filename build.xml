@@ -78,12 +78,10 @@
 
     <target name="compile">
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies" version="${release.version}"/>
+        <embed.libs jar="${release.jar.path}"/>
+        <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
 
         <antcall target="plugin"/>
-
-        <embed.libs jar="${release.jar.path}"/>
-
-        <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
     </target>
 
     <target name="test">
