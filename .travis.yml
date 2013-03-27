@@ -3,8 +3,9 @@ env:
     global:
         - secure: "bIFU+VgbcIJ5DmsXkoxTaLGI40uIyWdTFnco7FaJLoJLwLJSake4jemFv5SI\nJaSFVINBXA+Xn/qqHmFfWVr2fKsAevwRfkkIuTM1QMlN2TOMkCwOrz6mYA3f\nxjh+oKXUzNutZTHSyoCyZ72uHSJ33TlPWHU+OToS4AYxf8LrTYI="
         - secure: "O0xTkW+WBNWT0a44u7XRpm0vp0q04ZFv/ovmPX6nm3fRokuiHMoRaL1l7r1K\nLF9ow3n+Ncsl64XRJNv2rjKVrxb19GtZQjxnHqi6bW2FSnoTEJsfvIjgMOwh\nrOHL9MUP61idRqN15ki0qYsmZ8t3xN9rw04fJLGZn73Oy0uRSGI="
+        - JAVAREPL_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
 
-before_install:
+install:
  - sudo apt-get install -qq s3cmd
 
 script:
