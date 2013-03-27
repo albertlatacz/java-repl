@@ -1,32 +1,32 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
 
-import java.io.*;
-import java.util.jar.Attributes;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
-import static com.googlecode.totallylazy.Callables.fifth;
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Strings.blank;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
-import static java.net.URLDecoder.*;
+import static java.net.URLDecoder.decode;
 import static javarepl.Evaluation.classSource;
 
 public class Main {
     public static final String PROMPT = "java> ";
 
-    public ConsoleReader console;
-    public Evaluator evaluator = new Evaluator();
+    private ConsoleReader console;
+    private Evaluator evaluator = new Evaluator();
+    private final ExpressionReader expressionReader;
 
     public static void main(String[] args) throws Exception {
         new Main().run();
@@ -34,8 +34,8 @@ public class Main {
 
     public Main() throws Exception {
         console = new ConsoleReader(System.in, System.out);
+
         console.setHistoryEnabled(true);
-        console.setPrompt(PROMPT);
         console.addCompleter(new AggregateCompleter(new StringsCompleter(":exit", ":help", ":src", ":clear", ":!")));
 
         console.println(format("Welcome to JavaREPL version %s (%s, Java %s)", extractVersion(), getProperty("java.vm.name"), getProperty("java.version")));
@@ -43,7 +43,7 @@ public class Main {
         console.println("Type :help for more options.");
         console.println("");
 
-
+        expressionReader = new ExpressionReader(readFromConsole(), setPrompt());
     }
 
     public void run() throws IOException {
@@ -57,7 +57,8 @@ public class Main {
                 .addLast(always(), noAction());
 
         do {
-            rules.apply(console.readLine().trim());
+            Expression expression = expressionReader.readExpression();
+            rules.apply(expression.source);
             console.println();
         } while (true);
     }
@@ -137,7 +138,6 @@ public class Main {
         };
     }
 
-
     public void evaluateExpression(String expr) {
         evaluator.evaluate(expr).map(printlnToErr(), printResult());
     }
@@ -145,6 +145,29 @@ public class Main {
     private Function1<String, Function1<String, Void>> noAction() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
+                return null;
+            }
+        };
+    }
+
+
+    private Function<String> readFromConsole() {
+        return new Function<String>() {
+            public String call() throws Exception {
+                return console.readLine();
+            }
+        };
+    }
+
+    private Function1<Sequence<String>, Void> setPrompt() {
+        return new Function1<Sequence<String>, Void>() {
+            @Override
+            public Void call(Sequence<String> strings) throws Exception {
+                if (strings.size() > 0)
+                    console.setPrompt("    | ");
+                else
+                    console.setPrompt(PROMPT);
+
                 return null;
             }
         };
