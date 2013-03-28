@@ -5,14 +5,11 @@ import com.googlecode.totallylazy.*;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Predicates.nullValue;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.join;
-import static javarepl.Expression.Type.STATEMENT;
-import static javarepl.Expression.expression;
 
 public class ExpressionReader {
     final static Sequence<Character> openBrackets = sequence('[', '{', '(');
@@ -25,14 +22,14 @@ public class ExpressionReader {
         this.lineReader = lineReader;
     }
 
-    public Expression readExpression() {
+    public String readExpression() {
         Sequence<String> lines = Sequences.empty();
 
         do {
             lines = lines.add(lineReader.apply(lines));
         } while (!expressionIsTerminated(lines));
 
-        return expression(lines.filter(not(nullValue())).toString("\n"), STATEMENT);
+        return lines.filter(not(nullValue())).toString("\n").trim();
     }
 
     private boolean expressionIsTerminated(Sequence<String> strings) {

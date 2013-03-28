@@ -32,7 +32,7 @@ class EvaluationContext {
 
     public Sequence<Evaluation> imports() {
         return evaluations()
-                .filter(where(expression().then(Expression.type()), Predicates.is(Expression.Type.IMPORT)));
+                .filter(instanceOf(Expression.Import.class));
     }
 
     public Sequence<Result> results() {

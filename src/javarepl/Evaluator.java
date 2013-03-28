@@ -20,18 +20,15 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
-import static javarepl.Expression.Type.*;
-import static javarepl.Expression.expression;
-import static javarepl.Result.noResult;
-import static javarepl.Result.result;
-import static javarepl.Utils.randomIdentifier;
-import static javarepl.Utils.unwrapException;
+import static javarepl.Expression.*;
+import static javarepl.Utils.isValidAssignment;
 
 public class Evaluator {
     private final File outputDirectory = temporaryDirectory(getClass().getSimpleName());
 
     private final JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
     private final ClassLoader classLoader = new URLClassLoader(new URL[]{toURL().apply(outputDirectory)});
+
     private EvaluationContext context = emptyEvaluationContext();
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
@@ -41,11 +38,13 @@ public class Evaluator {
         }
 
         if (expr.startsWith("import ")) {
-            return evaluate(expression(expr, IMPORT));
+            return evaluate(new Import(expr));
+        } else if (isValidAssignment(expr)) {
+            return evaluate(new Assignment(expr));
         } else {
-            Either<? extends Throwable, Evaluation> result = evaluate(expression(expr, VALUE));
+            Either<? extends Throwable, Evaluation> result = evaluate(new Value(expr));
             if (result.isLeft() && result.left() instanceof ExpressionCompilationException) {
-                result = evaluate(expression(expr, STATEMENT));
+                result = evaluate(new Statement(expr));
             }
 
             return result;
@@ -70,7 +69,8 @@ public class Evaluator {
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
             if (resultObject != null) {
-                Result result = Result.result(context.nextResultKey(), resultObject);
+                String key = (expression instanceof Assignment) ? ((Assignment)expression).key : context.nextResultKey();
+                Result result = Result.result(key, resultObject);
                 Evaluation evaluation = evaluation(className, sources, expression, some(result));
                 context = context.addEvaluation(evaluation);
                 return right(evaluation);

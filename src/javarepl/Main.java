@@ -18,13 +18,9 @@ import static java.lang.System.exit;
 import static java.lang.System.getProperty;
 import static java.net.URLDecoder.decode;
 import static javarepl.Evaluation.classSource;
+import static javarepl.Utils.applicationVersion;
 
 public class Main {
-
-
-    private Evaluator evaluator = new Evaluator();
-    private final ExpressionReader expressionReader;
-
     public static void main(String[] args) throws Exception {
         Sequence<String> arguments = sequence(args);
         boolean simpleConsole = arguments.contains("-sc");
@@ -32,13 +28,18 @@ public class Main {
         new Main(simpleConsole).run();
     }
 
+    private final Evaluator evaluator;
+    private final ExpressionReader expressionReader;
+
     public Main(boolean simpleConsole) throws Exception {
-        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", extractVersion(), getProperty("java.vm.name"), getProperty("java.version")));
+        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
+
+        evaluator = new Evaluator();
+        expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole());
+
         System.out.println("Type in expression to evaluate.");
         System.out.println("Type :help for more options.");
         System.out.println("");
-
-        expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole());
     }
 
     public void run() throws IOException {
@@ -52,8 +53,7 @@ public class Main {
                 .addLast(always(), noAction());
 
         do {
-            Expression expression = expressionReader.readExpression();
-            rules.apply(expression.source);
+            rules.apply(expressionReader.readExpression());
             System.out.println();
         } while (true);
     }
@@ -149,6 +149,7 @@ public class Main {
     private Function1<Sequence<String>, String> readFromExtendedConsole() throws IOException {
         return new Function1<Sequence<String>, String>() {
             private final ConsoleReader console;
+
             {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
@@ -202,19 +203,5 @@ public class Main {
         };
     }
 
-    private String extractVersion() throws Exception {
-        File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
 
-        if (!path.isDirectory()) {
-            try {
-                JarInputStream jarStream = new JarInputStream(new FileInputStream(path));
-                Manifest manifest = jarStream.getManifest();
-                return manifest.getMainAttributes().getValue("Implementation-Version");
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-
-        return "[unknown]";
-    }
 }

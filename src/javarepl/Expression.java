@@ -3,58 +3,65 @@ package javarepl;
 import com.googlecode.totallylazy.Function1;
 
 public class Expression {
-    public static enum Type {
-        IMPORT, VALUE, STATEMENT
-    }
-
     public final String source;
-    public final Type type;
 
-    private Expression(String source, Type type) {
+    private Expression(String source) {
         this.source = source;
-        this.type = type;
-    }
-
-    public static Expression expression(String source, Type type) {
-        return new Expression(source, type);
-    }
-
-
-    public boolean isImport() {
-        return Type.IMPORT.equals(type);
-    }
-
-    public boolean isStatement() {
-        return Type.STATEMENT.equals(type);
-    }
-
-    public boolean isValue() {
-        return Type.VALUE.equals(type);
     }
 
     @Override
     public String toString() {
-        return type + "(" + source +")";
+        return getClass().getSimpleName() + "(" + source + ")";
     }
 
     @Override
     public int hashCode() {
-        return (source != null ? source.hashCode() : 0) +
-                (type != null ? type.hashCode() : 0);
+        return (source != null ? source.hashCode() : 0);
     }
 
     @Override
     public boolean equals(Object other) {
         return other instanceof Expression &&
-                (source != null && source.equals(((Expression) other).source)) &&
-                (type != null && type.equals(((Expression) other).type));
+                other.getClass().equals(getClass()) &&
+                (source != null && source.equals(((Expression) other).source));
     }
 
-    public static Function1<Expression, Type> type() {
-        return new Function1<Expression, Type>() {
-            public Type call(Expression value) throws Exception {
-                return value.type;
+    public static Function1<Expression, String> source() {
+        return new Function1<Expression, String>() {
+            public String call(Expression value) throws Exception {
+                return value.source;
             }
         };
     }
+
+    public static class Import extends Expression {
+        public Import(String source) {
+            super(source);
+        }
+    }
+
+    public static class Value extends Expression {
+        public Value(String source) {
+            super(source);
+        }
+    }
+
+    public static class Statement extends Expression {
+        public Statement(String source) {
+            super(source);
+        }
+    }
+
+    public static class Assignment extends Expression {
+        public final String key;
+        public final String value;
+
+        public Assignment(String source) {
+            super(source);
+
+            this.key = source.substring(0, source.indexOf("=")).trim();
+            this.value = source.substring(source.indexOf("=") + 1).trim();
+        }
+    }
+
 }

@@ -61,7 +61,7 @@ public class RunJavaREPLConsoleAction extends AnAction implements DumbAware {
             if (modules.length == 1) {
                 module = modules[0];
             } else {
-                if (module == null && modules.length > 0) {
+                if (modules.length > 0) {
                     module = modules[0];
                 }
             }

@@ -292,7 +292,7 @@ public class JavaREPLConsoleRunner {
         params.setMainClass(REPL_MAIN_CLASS);
         params.setWorkingDirectory(new File(workingDir));
 
-        final GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()), true);
+        final GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, project, true);
 
         assert params.getJdk() != null;
 
