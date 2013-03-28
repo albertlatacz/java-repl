@@ -5,9 +5,9 @@ import com.googlecode.totallylazy.Function1;
 import java.util.regex.MatchResult;
 
 import static com.googlecode.totallylazy.regex.Regex.regex;
-import static javarepl.ExpressionValidators.ASSIGNMENT_WITH_TYPE_PATTERN;
+import static javarepl.ExpressionValidators.assignmentWithTypePattern;
 
-public class Expression {
+public abstract class Expression {
     public final String source;
 
     private Expression(String source) {
@@ -77,7 +77,7 @@ public class Expression {
         public AssignmentWithType(String source) {
             super(source);
 
-            MatchResult matches = regex(ASSIGNMENT_WITH_TYPE_PATTERN).match(source);
+            MatchResult matches = assignmentWithTypePattern.match(source);
             type = matches.group(1).trim();
             key = matches.group(2).trim();
             value = matches.group(3).trim();

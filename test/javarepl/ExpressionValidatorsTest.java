@@ -2,6 +2,7 @@ package javarepl;
 
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.regex.Regex.regex;
 import static javarepl.ExpressionValidators.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
