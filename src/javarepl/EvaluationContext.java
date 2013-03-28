@@ -1,15 +1,13 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 
 import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Evaluation.expression;
 import static javarepl.Evaluation.result;
+import static javarepl.Result.key;
 
 class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
@@ -39,13 +37,17 @@ class EvaluationContext {
         return evaluations()
                 .map(result())
                 .filter(is(Predicates.not(Result.noResult())))
-                .map(get(Result.class));
+                .map(get(Result.class))
+                .reverse()
+                .unique(key())
+                .reverse();
     }
 
     public Option<Evaluation> evaluationForResult(final String key) {
         return evaluations()
+                .reverse()
                 .filter(where(result(), is(Predicates.not(Result.noResult()))).and(
-                        where(result().then(get(Result.class)).then(Result.key()), equalTo(key))))
+                        where(result().then(get(Result.class)).then(key()), equalTo(key))))
                 .headOption();
     }
 
