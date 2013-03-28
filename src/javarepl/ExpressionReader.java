@@ -15,6 +15,10 @@ import static javarepl.Expression.Type.STATEMENT;
 import static javarepl.Expression.expression;
 
 public class ExpressionReader {
+    final static Sequence<Character> openBrackets = sequence('[', '{', '(');
+    final static Sequence<Character> closedBrackets = sequence(']', '}', ')');
+    final static Map<Character, Character> matchingBrackets = Maps.map(closedBrackets.zip(openBrackets));
+
     private final Function1<Sequence<String>, String> lineReader;
 
     public ExpressionReader(Function1<Sequence<String>, String> lineReader) {
@@ -31,31 +35,27 @@ public class ExpressionReader {
         return expression(lines.filter(not(nullValue())).toString("\n"), STATEMENT);
     }
 
-    private boolean expressionIsTerminated(Sequence<String> lines) {
-        final Sequence<Character> openBrackets = sequence('[', '{', '(');
-        final Sequence<Character> closedBrackets = sequence(']', '}', ')');
-        final Map<Character, Character> matchingBrackets = Maps.map(closedBrackets.zip(openBrackets));
-        final String line = lines.reduce(join);
-        final Sequence<Character> characters = characters(line);
+    private boolean expressionIsTerminated(Sequence<String> strings) {
+        final Sequence<Character> characters = characters(strings.reduce(join));
 
-        if (lines.zip(lines.drop(1)).contains(pair("", "")))
+        if (hasNullLine(strings))
             return true;
 
-        if (lines.contains(null))
+        if (hasTwoEmptyLines(strings))
             return true;
 
         LinkedList<Character> brackets = new LinkedList<Character>();
         for (Character character : characters) {
-            if (openBrackets.contains(character)) {
+            if (isOpeningBracket(character)) {
                 brackets.push(character);
             }
 
-            if (closedBrackets.contains(character)) {
+            if (isClosingBracket(character)) {
                 if (brackets.isEmpty()) {
                     return false;
                 }
 
-                if (matchingBrackets.get(character).equals(brackets.peek())) {
+                if (isMatchingBracket(brackets.peek(), character)) {
                     brackets.pop();
                 } else {
                     return false;
@@ -66,22 +66,33 @@ public class ExpressionReader {
         return brackets.isEmpty();
     }
 
-    public static  Function1<Sequence<String>, String> lines(final String... strings) {
+    private boolean isMatchingBracket(Character character1, Character character2) {
+        return matchingBrackets.get(character2).equals(character1);
+    }
+
+    private boolean isClosingBracket(Character character) {
+        return closedBrackets.contains(character);
+    }
+
+    private boolean isOpeningBracket(Character character) {
+        return openBrackets.contains(character);
+    }
+
+    private boolean hasNullLine(Sequence<String> strings) {
+        return strings.contains(null);
+    }
+
+    private boolean hasTwoEmptyLines(Sequence<String> lines) {
+        return lines.windowed(2).contains(sequence("", ""));
+    }
+
+    public static Function1<Sequence<String>, String> lines(final String... strings) {
         return new Function1<Sequence<String>, String>() {
             Sequence<String> toRead = sequence(strings);
             public String call(Sequence<String> lines) throws Exception {
                 Option<String> head = toRead.headOption();
                 toRead = toRead.tail();
                 return head.getOrNull();
-            }
-        };
-    }
-
-    public static Function1<Sequence<String>, Void> emptyPrompt() {
-        return new Function1<Sequence<String>, Void>() {
-            @Override
-            public Void call(Sequence<String> strings) throws Exception {
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }
