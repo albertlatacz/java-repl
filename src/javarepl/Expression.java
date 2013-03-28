@@ -2,6 +2,11 @@ package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 
+import java.util.regex.MatchResult;
+
+import static com.googlecode.totallylazy.regex.Regex.regex;
+import static javarepl.ExpressionValidators.ASSIGNMENT_WITH_TYPE_PATTERN;
+
 public class Expression {
     public final String source;
 
@@ -64,4 +69,18 @@ public class Expression {
         }
     }
 
+    public static class AssignmentWithType extends Expression {
+        public final String type;
+        public final String key;
+        public final String value;
+
+        public AssignmentWithType(String source) {
+            super(source);
+
+            MatchResult matches = regex(ASSIGNMENT_WITH_TYPE_PATTERN).match(source);
+            type = matches.group(1).trim();
+            key = matches.group(2).trim();
+            value = matches.group(3).trim();
+        }
+    }
 }

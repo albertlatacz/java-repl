@@ -11,5 +11,4 @@ class ExpressionCompilationException extends Exception {
     public int getCode() {
         return code;
     }
-
 }

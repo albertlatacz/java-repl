@@ -10,13 +10,13 @@ import java.io.PrintStream;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static javarepl.Evaluation.*;
-import static javarepl.EvaluationRenderer.ExpressionRenderer.renderExpression;
-import static javarepl.EvaluationRenderer.MethodNameRenderer.renderMethodName;
+import static javarepl.EvaluationClassRenderer.ExpressionRenderer.renderExpression;
+import static javarepl.EvaluationClassRenderer.MethodNameRenderer.renderMethodName;
 import static javarepl.Expression.*;
 import static javarepl.Utils.extractType;
 
-class EvaluationRenderer {
-    public static String render(EvaluationContext context, String className, Expression expression) {
+class EvaluationClassRenderer {
+    public static String renderEvaluationClass(EvaluationContext context, String className, Expression expression) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
@@ -104,6 +104,11 @@ class EvaluationRenderer {
         }
 
         @multimethod
+        private static String renderMethodName(AssignmentWithType expression) {
+            return methodNameWithType(expression.type);
+        }
+
+        @multimethod
         private static String renderMethodName(Value expression) {
             return methodNameWithType("Object");
         }
@@ -132,6 +137,11 @@ class EvaluationRenderer {
 
         @multimethod
         private static String renderExpression(Assignment expression) {
+            return expressionWithValue(expression.value);
+        }
+
+        @multimethod
+        private static String renderExpression(AssignmentWithType expression) {
             return expressionWithValue(expression.value);
         }
 
