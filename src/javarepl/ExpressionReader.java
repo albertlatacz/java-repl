@@ -2,10 +2,8 @@ package javarepl;
 
 import com.googlecode.totallylazy.*;
 
-import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -13,25 +11,21 @@ import static com.googlecode.totallylazy.Predicates.nullValue;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.join;
-import static com.googlecode.totallylazy.Strings.lines;
 import static javarepl.Expression.Type.STATEMENT;
 import static javarepl.Expression.expression;
 
 public class ExpressionReader {
-    private final Function<String> lineReader;
-    private final Function1<Sequence<String>, Void> setPrompt;
+    private final Function1<Sequence<String>, String> lineReader;
 
-    public ExpressionReader(Function<String> lineReader, Function1<Sequence<String>, Void> setPrompt) {
+    public ExpressionReader(Function1<Sequence<String>, String> lineReader) {
         this.lineReader = lineReader;
-        this.setPrompt = setPrompt;
     }
 
     public Expression readExpression() {
         Sequence<String> lines = Sequences.empty();
 
         do {
-            setPrompt.apply(lines);
-            lines = lines.add(lineReader.apply());
+            lines = lines.add(lineReader.apply(lines));
         } while (!expressionIsTerminated(lines));
 
         return expression(lines.filter(not(nullValue())).toString("\n"), STATEMENT);
@@ -72,12 +66,12 @@ public class ExpressionReader {
         return brackets.isEmpty();
     }
 
-    public static  Function<String> lines(final String... strings) {
-        return new Function<String>() {
-            Sequence<String> lines = sequence(strings);
-            public String call() throws Exception {
-                Option<String> head = lines.headOption();
-                lines = lines.tail();
+    public static  Function1<Sequence<String>, String> lines(final String... strings) {
+        return new Function1<Sequence<String>, String>() {
+            Sequence<String> toRead = sequence(strings);
+            public String call(Sequence<String> lines) throws Exception {
+                Option<String> head = toRead.headOption();
+                toRead = toRead.tail();
                 return head.getOrNull();
             }
         };

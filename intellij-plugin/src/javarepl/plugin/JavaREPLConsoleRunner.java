@@ -17,22 +17,17 @@ import com.intellij.ide.DataManager;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.editor.actions.ToggleUseSoftWrapsToolbarAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.softwrap.SoftWrapAppliancePlaces;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.projectRoots.JavaSdkType;
-import com.intellij.openapi.projectRoots.Sdk;
-import com.intellij.openapi.projectRoots.SdkType;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ModuleSourceOrderEntry;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ToolWindow;
@@ -45,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class JavaREPLConsoleRunner {
@@ -58,7 +54,6 @@ public class JavaREPLConsoleRunner {
     private final Module module;
     private final Project project;
     private final String consoleTitle;
-    private final CommandLineArgumentsProvider argumentsProvider;
     private final String workingDir;
 
     private final ConsoleHistoryModel consoleHistoryModel;
@@ -72,12 +67,10 @@ public class JavaREPLConsoleRunner {
 
     public JavaREPLConsoleRunner(@NotNull Module module,
                                  @NotNull String consoleTitle,
-                                 @NotNull CommandLineArgumentsProvider argumentsProvider,
                                  @Nullable String workingDir) {
         this.module = module;
         this.project = module.getProject();
         this.consoleTitle = consoleTitle;
-        this.argumentsProvider = argumentsProvider;
         this.workingDir = workingDir;
         this.consoleHistoryModel = new ConsoleHistoryModel();
     }
@@ -85,41 +78,25 @@ public class JavaREPLConsoleRunner {
     public static void run(@NotNull final Module module,
                            final String workingDir,
                            final String... statements) throws CantRunException {
-        final ArrayList<String> args = createRuntimeArgs(module, workingDir);
-
-        final CommandLineArgumentsProvider provider = new CommandLineArgumentsProvider() {
-            public String[] getArguments() {
-                return args.toArray(new String[args.size()]);
-            }
-
-            public boolean passParentEnvs() {
-                return false;
-            }
-
-            public Map<String, String> getAdditionalEnvs() {
-                // todo add extra env. variables
-                return new HashMap<String, String>();
-            }
-        };
-
         final Project project = module.getProject();
-        final JavaREPLConsoleRunner runner = new JavaREPLConsoleRunner(module, REPL_TITLE, provider, workingDir);
+        final JavaREPLConsoleRunner runner = new JavaREPLConsoleRunner(module, REPL_TITLE, workingDir);
 
         try {
             runner.initAndRun(statements);
         } catch (ExecutionException e) {
             ExecutionHelper.showErrors(project, Arrays.<Exception>asList(e), REPL_TITLE, null);
+        } catch (IOException e) {
+            ExecutionHelper.showErrors(project, Arrays.<Exception>asList(e), REPL_TITLE, null);
         }
     }
 
-    public void initAndRun(final String... statements) throws ExecutionException {
-        // Create Server process
-        final Process process = createProcess(argumentsProvider);
+    public void initAndRun(final String... statements) throws ExecutionException, IOException {
 
-        // !!! do not change order!!!
         languageConsole = new LanguageConsoleImpl(project, consoleTitle, JavaLanguage.INSTANCE);
         languageConsoleView = new LanguageConsoleViewImpl(languageConsole);
-        processHandler = new ColoredProcessHandler(process, argumentsProvider.getCommandLineString(), CharsetToolkit.UTF8_CHARSET) {
+
+        GeneralCommandLine commandLine = createCommandLine(module, workingDir);
+        processHandler = new ColoredProcessHandler(commandLine.createProcess(), commandLine.getCommandLineString()) {
             @Override
             protected void textAvailable(String text, Key attributes) {
                 languageConsole.setPrompt("java> ");
@@ -292,49 +269,6 @@ public class JavaREPLConsoleRunner {
         return ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM);
     }
 
-
-    private static ArrayList<String> createRuntimeArgs(Module module, String workingDir) throws CantRunException {
-        final JavaParameters params = new JavaParameters();
-        params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
-
-        params.getClassPath().add(PathUtil.getJarPathForClass(Main.class));
-
-        Set<VirtualFile> cpVFiles = new HashSet<VirtualFile>();
-        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-        OrderEntry[] entries = moduleRootManager.getOrderEntries();
-        for (OrderEntry orderEntry : entries) {
-            // Add module sources to classpath
-            if (orderEntry instanceof ModuleSourceOrderEntry) {
-                cpVFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.SOURCES)));
-            }
-        }
-        // Also add output folders
-        final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
-        if (outputDirectory != null) {
-            cpVFiles.add(outputDirectory);
-        }
-
-        for (VirtualFile file : cpVFiles) {
-            params.getClassPath().add(file.getPath());
-        }
-
-        params.setMainClass(REPL_MAIN_CLASS);
-        params.setWorkingDirectory(new File(workingDir));
-
-        final GeneralCommandLine line = CommandLineBuilder.createFromJavaParameters(params, PlatformDataKeys.PROJECT.getData(DataManager.getInstance().getDataContext()), true);
-
-        final Sdk sdk = params.getJdk();
-        assert sdk != null;
-        final SdkType type = (SdkType) sdk.getSdkType();
-        final String executablePath = ((JavaSdkType) type).getVMExecutablePath(sdk);
-
-        final ArrayList<String> cmd = new ArrayList<String>();
-        cmd.add(executablePath);
-        cmd.addAll(line.getParametersList().getList());
-
-        return cmd;
-    }
-
     private GeneralCommandLine createCommandLine(Module module, String workingDir) throws CantRunException {
         final JavaParameters params = new JavaParameters();
         params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS);
@@ -366,20 +300,8 @@ public class JavaREPLConsoleRunner {
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
 
+        line.addParameter("-sc");
+
         return line;
-    }
-
-    protected Process createProcess(CommandLineArgumentsProvider argumentsProvider) throws ExecutionException {
-        final GeneralCommandLine commandLine = createCommandLine(module, workingDir);
-
-        Process process = null;
-        try {
-            process = commandLine.createProcess();
-        } catch (Exception e) {
-            ExecutionHelper.showErrors(project, Arrays.<Exception>asList(e), REPL_TITLE, null);
-        }
-
-        return process;
-
     }
 }
