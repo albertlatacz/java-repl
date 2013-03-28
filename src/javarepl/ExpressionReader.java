@@ -3,6 +3,7 @@ package javarepl;
 import com.googlecode.totallylazy.*;
 
 import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -49,7 +50,7 @@ public class ExpressionReader {
         if (lines.contains(null))
             return true;
 
-        ArrayDeque<Character> brackets = new ArrayDeque<Character>();
+        LinkedList<Character> brackets = new LinkedList<Character>();
         for (Character character : characters) {
             if (openBrackets.contains(character)) {
                 brackets.push(character);
