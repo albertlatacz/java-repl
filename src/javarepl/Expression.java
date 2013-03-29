@@ -1,11 +1,11 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.regex.Regex;
 
 import java.util.regex.MatchResult;
 
-import static javarepl.ExpressionValidators.assignmentWithTypePattern;
-import static javarepl.ExpressionValidators.classOrInterfacePattern;
+import static javarepl.ExpressionValidators.*;
 
 public abstract class Expression {
     public final String source;
@@ -89,7 +89,8 @@ public abstract class Expression {
 
         public ClassOrInterface(String source) {
             super(source);
-            type =  classOrInterfacePattern.match(source).group(1);
+
+            type = (isValidClass(source) ? classPattern : interfacePattern).match(source).group(1);
         }
     }
 }

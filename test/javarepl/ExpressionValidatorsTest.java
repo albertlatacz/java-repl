@@ -43,17 +43,29 @@ public class ExpressionValidatorsTest {
     }
 
     @Test
-    public void shouldMatchClassOrInterface() {
-        assertTrue(isValidClassOrInterface("public static final interface SomeInterface {"));
-        assertTrue(isValidClassOrInterface("public static final class SomeClass{  "));
-        assertTrue(isValidClassOrInterface("static public final class SomeClass{"));
-        assertTrue(isValidClassOrInterface("final static public class SomeClass{"));
-        assertTrue(isValidClassOrInterface("final static class SomeClass{"));
-        assertTrue(isValidClassOrInterface("final class SomeClass{"));
-        assertTrue(isValidClassOrInterface("class SomeClass { "));
-        assertTrue(isValidClassOrInterface("class SomeClass{ "));
-        assertTrue(isValidClassOrInterface("class SomeClass{\n}"));
-        assertFalse(isValidClassOrInterface("class SomeClass "));
-        assertFalse(isValidClassOrInterface("class "));
+    public void shouldMatchClass() {
+//        assertTrue(isValidClass("public static final class SomeClass extends BaseClass implements Interface1,Interface2{  "));
+        assertTrue(isValidClass("static public final class SomeClass{"));
+        assertTrue(isValidClass("final static public class SomeClass{"));
+        assertTrue(isValidClass("final static class SomeClass{"));
+        assertTrue(isValidClass("final class SomeClass{"));
+        assertTrue(isValidClass("class SomeClass { "));
+        assertTrue(isValidClass("class SomeClass{ "));
+        assertTrue(isValidClass("class SomeClass{\n}"));
+        assertFalse(isValidClass("class SomeClass "));
+        assertFalse(isValidClass("class "));
+    }
+
+    @Test
+    public void shouldMatchInterface() {
+        assertTrue(isValidInterface("static public final interface SomeInterface{"));
+        assertTrue(isValidInterface("final static public interface SomeInterface{"));
+        assertTrue(isValidInterface("final static interface SomeInterface{"));
+        assertTrue(isValidInterface("final interface SomeInterface{"));
+        assertTrue(isValidInterface("interface SomeInterface { "));
+        assertTrue(isValidInterface("interface SomeInterface{ "));
+        assertTrue(isValidInterface("interface SomeInterface{\n}"));
+        assertFalse(isValidInterface("interface SomeInterface "));
+        assertFalse(isValidInterface("interface "));
     }
 }

@@ -21,18 +21,23 @@ public class ExpressionValidators {
     public static final Regex assignmentWithTypePattern = regex(typePattern + " +" + assignmentPattern);
     public static final Regex importPattern = regex("import .*");
 
-    public static final Regex classVisibilityPattern = regex("(?:private +|public +|protected +|)");
-    public static final Regex classExtensibilityPattern = regex("(?:final +|abstract +|)");
-    public static final Regex classStaticPattern = regex("(?:static +|)");
-    public static final Regex classVESPattern = permutations(sequence(classExtensibilityPattern, classStaticPattern, classVisibilityPattern));
-    public static final Regex classOrInterfacePattern = regex(classVESPattern + "(?:class +|interface +) *" + identifierPattern + " *\\{(?:.*)", DOTALL);
+    public static final Regex typeVisibilityModifiersPattern = regex("(?:private +|public +|protected +|)");
+    public static final Regex typeExtensibilityModifiersPattern = regex("(?:final +|abstract +|)");
+    public static final Regex typeStaticModifierPattern = regex("(?:static +|)");
+    public static final Regex typePrefixPattern = permutations(sequence(typeExtensibilityModifiersPattern, typeStaticModifierPattern, typeVisibilityModifiersPattern));
+    public static final Regex classPattern = regex(typePrefixPattern + "class +" + identifierPattern + " *\\{(?:.*)", DOTALL);
+    public static final Regex interfacePattern = regex(typePrefixPattern + "interface +" + identifierPattern + " *\\{(?:.*)", DOTALL);
 
     public static boolean isValidImport(String string) {
         return importPattern.matches(string.trim());
     }
 
-    public static boolean isValidClassOrInterface(String string) {
-        return classOrInterfacePattern.matches(string.trim());
+    public static boolean isValidClass(String string) {
+        return classPattern.matches(string.trim());
+    }
+
+    public static boolean isValidInterface(String string) {
+        return interfacePattern.matches(string.trim());
     }
 
     public static boolean isValidIdentifier(String string) {

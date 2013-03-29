@@ -50,7 +50,7 @@ public class Evaluator {
         if (isValidImport(expr))
             return new Import(expr);
 
-        if (isValidClassOrInterface(expr))
+        if (isValidClass(expr) || isValidInterface(expr))
             return new ClassOrInterface(expr);
 
         if (isValidAssignmentWithType(expr)) {
