@@ -7,8 +7,8 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 
 public class Result {
-    public final String key;
-    public final Object value;
+    private final String key;
+    private final Object value;
 
     private Result(String key, Object value) {
         this.key = key;
@@ -21,6 +21,14 @@ public class Result {
 
     public static Option<Result> someResult(String key, Object value) {
         return some(new Result(key, value));
+    }
+
+    public String key() {
+        return key;
+    }
+
+    public Object value() {
+        return value;
     }
 
     public static Option<Result> noResult() {
@@ -45,21 +53,21 @@ public class Result {
                 (value != null && value.equals(((Result) other).value));
     }
 
+    public static enum functions {;
+        public static Function1<Result, String> key() {
+            return new Function1<Result, String>() {
+                public String call(Result result) throws Exception {
+                    return result.key;
+                }
+            };
+        }
 
-    public static Function1<Result, String> key() {
-        return new Function1<Result, String>() {
-            public String call(Result result) throws Exception {
-                return result.key;
-            }
-        };
+        public static Function1<Result, Object> value() {
+            return new Function1<Result, Object>() {
+                public Object call(Result result) throws Exception {
+                    return result.value;
+                }
+            };
+        }
     }
-
-    public static Function1<Result, Object> value() {
-        return new Function1<Result, Object>() {
-            public Object call(Result result) throws Exception {
-                return result.value;
-            }
-        };
-    }
-
 }

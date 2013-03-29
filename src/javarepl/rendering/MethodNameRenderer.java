@@ -2,7 +2,7 @@ package javarepl.rendering;
 
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
-import javarepl.Expression;
+import javarepl.expressions.*;
 
 import static java.lang.String.format;
 
@@ -14,32 +14,27 @@ public class MethodNameRenderer {
     }
 
     @multimethod
-    private static String renderMethodName(Expression.ClassOrInterface expression) {
+    private static String renderMethodName(Statement expression) {
         return methodNameWithType("void");
     }
 
     @multimethod
-    private static String renderMethodName(Expression.Statement expression) {
+    private static String renderMethodName(Import expression) {
         return methodNameWithType("void");
     }
 
     @multimethod
-    private static String renderMethodName(Expression.Import expression) {
-        return methodNameWithType("void");
-    }
-
-    @multimethod
-    private static String renderMethodName(Expression.Assignment expression) {
+    private static String renderMethodName(Assignment expression) {
         return methodNameWithType("Object");
     }
 
     @multimethod
-    private static String renderMethodName(Expression.AssignmentWithType expression) {
-        return methodNameWithType(expression.type);
+    private static String renderMethodName(AssignmentWithType expression) {
+        return methodNameWithType(expression.type());
     }
 
     @multimethod
-    private static String renderMethodName(Expression.Value expression) {
+    private static String renderMethodName(Value expression) {
         return methodNameWithType("Object");
     }
 

@@ -1,6 +1,7 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Either;
+import javarepl.expressions.Expression;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -13,7 +14,7 @@ public class EvaluationTestHelper {
     public static Matcher<Either<? extends Throwable,Evaluation>> hasNoResult() {
         return new FeatureMatcher<Either<? extends Throwable,Evaluation>, Object>(Matchers.<Object>is(Result.noResult()), "result value", "result value") {
             protected Object featureValueOf(Either<? extends Throwable,Evaluation> evaluation) {
-                return evaluation.right().result;
+                return evaluation.right().result();
             }
         };
     }
@@ -29,7 +30,7 @@ public class EvaluationTestHelper {
     public static <T> Matcher<Either<? extends Throwable,Evaluation>> hasResult(T value) {
         return new FeatureMatcher<Either<? extends Throwable,Evaluation>, T>(is(value), "result value", "result value") {
             protected T featureValueOf(Either<? extends Throwable,Evaluation> evaluation) {
-                return (T) evaluation.right().result.get().value;
+                return (T) evaluation.right().result().get().value();
             }
         };
     }
@@ -38,7 +39,7 @@ public class EvaluationTestHelper {
     public static Matcher<Either<? extends Throwable,Evaluation>> hasExpressionOfType(Class<?> clazz) {
         return new FeatureMatcher<Either<? extends Throwable,Evaluation>, Expression>(instanceOf(clazz), "result value", "result value") {
             protected Expression featureValueOf(Either<? extends Throwable,Evaluation> evaluation) {
-                return evaluation.right().expression;
+                return evaluation.right().expression();
             }
         };
     }

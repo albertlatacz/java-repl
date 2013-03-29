@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
+import javarepl.expressions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,10 +20,9 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
-import static javarepl.Expression.*;
-import static javarepl.ExpressionValidators.*;
+import static javarepl.expressions.ExpressionPatterns.*;
 import static javarepl.Utils.randomIdentifier;
-import static javarepl.rendering.EvaluationClassRenderer.renderExpression;
+import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
@@ -72,18 +72,22 @@ public class Evaluator {
 
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(ClassOrInterface expression) {
-        if (classLoader.isClassLoaded(expression.type)) {
+        if (classLoader.isClassLoaded(expression.type())) {
             return left(new UnsupportedOperationException("Redefining classes not supported"));
         }
 
         try {
-            File outputJavaFile = file(outputDirectory, expression.type + ".java");
+            File outputJavaFile = file(outputDirectory, expression.type() + ".java");
 
-            Files.write(renderExpression(context, expression.type, expression).getBytes(), outputJavaFile);
+            String sources = renderExpressionClass(context, expression.type(), expression);
+            Files.write(sources.getBytes(), outputJavaFile);
             compile(outputJavaFile);
-            classLoader.loadClass(expression.type);
+            classLoader.loadClass(expression.type());
 
-            return right(evaluation(expression.type, expression.source, expression, Result.noResult()));
+            Evaluation evaluation = evaluation(expression.type(), sources, expression, Result.noResult());
+            context = context.addEvaluation(evaluation);
+
+            return right(evaluation);
         } catch (Exception e) {
             return left(Utils.unwrapException(e));
         }
@@ -95,7 +99,7 @@ public class Evaluator {
         File outputClassFile = file(outputDirectory, className + ".class");
 
         try {
-            String sources = renderExpression(context, className, expression);
+            String sources = renderExpressionClass(context, className, expression);
             Files.write(sources.getBytes(), outputJavaFile);
 
             compile(outputJavaFile);
@@ -124,16 +128,9 @@ public class Evaluator {
     }
 
     private String nextResultKeyFor(Expression expression) {
-        if (expression instanceof Assignment)
-            return ((Assignment) expression).key;
-
-        if (expression instanceof AssignmentWithType)
-            return ((AssignmentWithType) expression).key;
-
-        if (expression instanceof ClassOrInterface)
-            return ((ClassOrInterface) expression).type;
-
-        return context.nextResultKey();
+        return (expression instanceof WithKey)
+                ? ((WithKey)expression).key()
+                : context.nextResultKey();
     }
 
     private void compile(File file) throws Exception {

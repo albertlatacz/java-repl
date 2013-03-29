@@ -20,7 +20,7 @@ import static com.googlecode.totallylazy.Strings.blank;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
-import static javarepl.Evaluation.classSource;
+import static javarepl.Evaluation.functions.classSource;
 import static javarepl.Utils.applicationVersion;
 
 public class Main {
@@ -126,7 +126,7 @@ public class Main {
             public Function1<String, Void> call(String expression) throws Exception {
                 Option<Evaluation> lastEvaluation = evaluator.lastEvaluation();
                 if (!lastEvaluation.isEmpty()) {
-                    String source = lastEvaluation.get().expression.source;
+                    String source = lastEvaluation.get().expression().source();
                     System.out.println(source);
                     evaluateExpression(source);
                 }
@@ -180,7 +180,7 @@ public class Main {
     private Function1<Evaluation, Void> printResult() {
         return new Function1<Evaluation, Void>() {
             public Void call(Evaluation result) throws Exception {
-                result.result.map(toString.then(printlnToOut()));
+                result.result().map(toString.then(printlnToOut()));
                 return null;
             }
         };

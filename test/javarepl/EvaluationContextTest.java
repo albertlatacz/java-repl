@@ -4,7 +4,8 @@ import org.junit.Test;
 
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
-import static javarepl.Expression.Value;
+
+import javarepl.expressions.Value;
 import static javarepl.Result.someResult;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

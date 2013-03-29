@@ -1,12 +1,12 @@
-package javarepl;
+package javarepl.expressions;
 
 import org.junit.Test;
 
-import static javarepl.ExpressionValidators.*;
+import static javarepl.expressions.ExpressionPatterns.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ExpressionValidatorsTest {
+public class ExpressionPatternsTest {
 
     @Test
     public void shouldMatchValidIdentifier() {

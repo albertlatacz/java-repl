@@ -1,4 +1,4 @@
-package javarepl;
+package javarepl.expressions;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Pair;
@@ -13,10 +13,10 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 import static java.util.regex.Pattern.DOTALL;
 
-public class ExpressionValidators {
+public class ExpressionPatterns {
 
     public static final Regex identifierPattern = regex("([a-zA-Z\\$_][a-zA-Z0-9\\$_]*)");
-    public static final Regex assignmentPattern = regex(identifierPattern + " *=[^=](.*)$");
+    public static final Regex assignmentPattern = regex(identifierPattern + " *=(.*)$");
     public static final Regex typePattern = regex("([a-zA-Z\\$_][a-zA-Z0-9\\.\\$_\\[\\]<> ]*)");
     public static final Regex assignmentWithTypePattern = regex(typePattern + " +" + assignmentPattern);
     public static final Regex importPattern = regex("import .*");

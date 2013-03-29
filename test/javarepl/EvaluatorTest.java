@@ -1,12 +1,12 @@
 package javarepl;
 
+import javarepl.expressions.*;
 import org.junit.Test;
 
 import static javarepl.EvaluationTestHelper.*;
-import static javarepl.Expression.*;
 import static org.junit.Assert.assertThat;
 
-public class EvaluatorTest{
+public class EvaluatorTest {
     @Test
     public void shouldCreateExpressionOfCorrectType() {
         assertThat(evaluating("1 + 2"), hasExpressionOfType(Value.class));
@@ -20,7 +20,7 @@ public class EvaluatorTest{
 
     @Test
     public void shouldCopyImportsOnNewClasses() {
-       assertThat(evaluating("new NewClass{URL url;}"), hasCompilationError());
+        assertThat(evaluating("new NewClass{URL url;}"), hasCompilationError());
         assertThat(evaluating("import java.net.*", "class NewClass{URL url;}"), hasExpressionOfType(ClassOrInterface.class));
     }
 

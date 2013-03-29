@@ -2,12 +2,13 @@ package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
+import javarepl.expressions.Expression;
 
 public class Evaluation {
-    public final String className;
-    public final String classSource;
-    public final Expression expression;
-    public final Option<Result> result;
+    private final String className;
+    private final String classSource;
+    private final Expression expression;
+    private final Option<Result> result;
 
 
     private Evaluation(String className, String classSource, Expression expression, Option<Result> result) {
@@ -15,6 +16,22 @@ public class Evaluation {
         this.classSource = classSource;
         this.expression = expression;
         this.result = result;
+    }
+
+    public String className() {
+        return className;
+    }
+
+    public String classSource() {
+        return classSource;
+    }
+
+    public Expression expression() {
+        return expression;
+    }
+
+    public Option<Result> result() {
+        return result;
     }
 
     public static Evaluation evaluation(String className, String classSource, Expression expression, Option<Result> result) {
@@ -44,27 +61,29 @@ public class Evaluation {
                 (result != null && result.equals(((Evaluation) other).result));
     }
 
-    public static Function1<Evaluation, String> classSource() {
-        return new Function1<Evaluation, String>() {
-            public String call(Evaluation evaluation) throws Exception {
-                return evaluation.classSource;
-            }
-        };
-    }
+    public static enum functions {;
+        public static Function1<Evaluation, String> classSource() {
+            return new Function1<Evaluation, String>() {
+                public String call(Evaluation evaluation) throws Exception {
+                    return evaluation.classSource;
+                }
+            };
+        }
 
-    public static Function1<Evaluation, Option<Result>> result() {
-        return new Function1<Evaluation, Option<Result>>() {
-            public Option<Result> call(Evaluation value) throws Exception {
-                return value.result;
-            }
-        };
-    }
+        public static Function1<Evaluation, Option<Result>> result() {
+            return new Function1<Evaluation, Option<Result>>() {
+                public Option<Result> call(Evaluation value) throws Exception {
+                    return value.result;
+                }
+            };
+        }
 
-    public static Function1<Evaluation, Expression> expression() {
-        return new Function1<Evaluation, Expression>() {
-            public Expression call(Evaluation value) throws Exception {
-                return value.expression;
-            }
-        };
+        public static Function1<Evaluation, Expression> expression() {
+            return new Function1<Evaluation, Expression>() {
+                public Expression call(Evaluation value) throws Exception {
+                    return value.expression;
+                }
+            };
+        }
     }
 }
