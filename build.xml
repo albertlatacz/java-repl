@@ -78,7 +78,7 @@
 
     <target name="compile">
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies" version="${release.version}"/>
-        <embed.libs jar="${release.jar.path}"/>
+
         <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
 
         <antcall target="plugin"/>
@@ -96,6 +96,10 @@
         <zip destfile="${artifacts}/${tests.src}" basedir="test"/>
     </target>
 
+    <target name="embed">
+        <embed.libs jar="${release.jar.path}"/>
+    </target>
+
 
 
     <target name="build" description="build all">
@@ -109,6 +113,7 @@
             <antcall target="package"/>
             <antcall target="plugin"/>
         </parallel>
+        <antcall target="embed"/>
     </target>
 
 </project>

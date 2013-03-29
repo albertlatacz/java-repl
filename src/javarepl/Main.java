@@ -1,13 +1,17 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.Sequence;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
 
-import java.io.*;
-import java.util.jar.JarInputStream;
-import java.util.jar.Manifest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -16,7 +20,6 @@ import static com.googlecode.totallylazy.Strings.blank;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
-import static java.net.URLDecoder.decode;
 import static javarepl.Evaluation.classSource;
 import static javarepl.Utils.applicationVersion;
 

@@ -2,7 +2,6 @@ package javarepl;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLStreamHandlerFactory;
 
 public class EvaluationClassLoader extends URLClassLoader{
     public EvaluationClassLoader(URL[] urls) {

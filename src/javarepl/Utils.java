@@ -11,7 +11,7 @@ import static com.googlecode.totallylazy.Sequences.characters;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.net.URLDecoder.decode;
 
-class Utils {
+public class Utils {
     public static String randomIdentifier(String prefix) {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }

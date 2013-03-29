@@ -18,11 +18,11 @@ import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static javarepl.Evaluation.evaluation;
-import static javarepl.EvaluationClassRenderer.renderEvaluationClass;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.Expression.*;
 import static javarepl.ExpressionValidators.*;
 import static javarepl.Utils.randomIdentifier;
+import static javarepl.rendering.EvaluationClassRenderer.renderExpression;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
@@ -78,7 +78,8 @@ public class Evaluator {
 
         try {
             File outputJavaFile = file(outputDirectory, expression.type + ".java");
-            Files.write(expression.source.getBytes(), outputJavaFile);
+
+            Files.write(renderExpression(context, expression.type, expression).getBytes(), outputJavaFile);
             compile(outputJavaFile);
             classLoader.loadClass(expression.type);
 
@@ -94,7 +95,7 @@ public class Evaluator {
         File outputClassFile = file(outputDirectory, className + ".class");
 
         try {
-            String sources = renderEvaluationClass(context, className, expression);
+            String sources = renderExpression(context, className, expression);
             Files.write(sources.getBytes(), outputJavaFile);
 
             compile(outputJavaFile);

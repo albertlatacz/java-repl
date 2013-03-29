@@ -25,8 +25,9 @@ public class ExpressionValidators {
     public static final Regex typeExtensibilityModifiersPattern = regex("(?:final +|abstract +|)");
     public static final Regex typeStaticModifierPattern = regex("(?:static +|)");
     public static final Regex typePrefixPattern = permutations(sequence(typeExtensibilityModifiersPattern, typeStaticModifierPattern, typeVisibilityModifiersPattern));
-    public static final Regex classPattern = regex(typePrefixPattern + "class +" + identifierPattern + " *\\{(?:.*)", DOTALL);
-    public static final Regex interfacePattern = regex(typePrefixPattern + "interface +" + identifierPattern + " *\\{(?:.*)", DOTALL);
+
+    public static final Regex classPattern = regex(typePrefixPattern + "class +" + identifierPattern + ".*\\{.*", DOTALL);
+    public static final Regex interfacePattern = regex(typePrefixPattern + "interface +" + identifierPattern + ".*\\{.*", DOTALL);
 
     public static boolean isValidImport(String string) {
         return importPattern.matches(string.trim());

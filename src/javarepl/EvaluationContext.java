@@ -10,7 +10,7 @@ import static javarepl.Evaluation.result;
 import static javarepl.Result.key;
 import static javarepl.Result.noResult;
 
-class EvaluationContext {
+public class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
 
     private EvaluationContext(Sequence<Evaluation> evaluations) {

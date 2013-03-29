@@ -18,6 +18,11 @@ public class EvaluatorTest{
         assertThat(evaluating("interface SomeInterface{}"), hasExpressionOfType(ClassOrInterface.class));
     }
 
+    @Test
+    public void shouldCopyImportsOnNewClasses() {
+       assertThat(evaluating("new NewClass{URL url;}"), hasCompilationError());
+        assertThat(evaluating("import java.net.*", "class NewClass{URL url;}"), hasExpressionOfType(ClassOrInterface.class));
+    }
 
     @Test
     public void shouldEvaluateExpressions() {

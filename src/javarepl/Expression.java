@@ -1,7 +1,6 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.regex.Regex;
 
 import java.util.regex.MatchResult;
 
