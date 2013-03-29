@@ -11,6 +11,7 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
+import static java.util.regex.Pattern.DOTALL;
 
 public class ExpressionValidators {
 
@@ -24,7 +25,7 @@ public class ExpressionValidators {
     public static final Regex classExtensibilityPattern = regex("(?:final +|abstract +|)");
     public static final Regex classStaticPattern = regex("(?:static +|)");
     public static final Regex classVESPattern = permutations(sequence(classExtensibilityPattern, classStaticPattern, classVisibilityPattern));
-    public static final Regex classOrInterfacePattern = regex(classVESPattern + "(?:class +|interface +) *" + identifierPattern + " *\\{(?:.*)$");
+    public static final Regex classOrInterfacePattern = regex(classVESPattern + "(?:class +|interface +) *" + identifierPattern + " *\\{(?:.*)", DOTALL);
 
     public static boolean isValidImport(String string) {
         return importPattern.matches(string.trim());

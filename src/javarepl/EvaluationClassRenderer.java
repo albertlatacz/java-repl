@@ -30,10 +30,6 @@ class EvaluationClassRenderer {
         writer.println();
 
         writer.println(renderClassName(className));
-        writer.println(renderUserClasses(context));
-        writer.println();
-
-        writer.println(renderClassOrInterfaceExpression(expression));
         writer.println();
 
         writer.println(renderMethodName(expression));
@@ -47,16 +43,6 @@ class EvaluationClassRenderer {
         writer.println(renderEndOfFile());
 
         return outputStream.toString();
-    }
-
-    private static String renderClassOrInterfaceExpression(Expression expression) {
-        return format("%s;", expression instanceof ClassOrInterface ? expression.source : "");
-    }
-
-    private static String renderUserClasses(EvaluationContext context) {
-        return context.classes()
-                .map(expression().then(source()))
-                .toString("", ";\n", ";");
     }
 
     private static String renderPreviousEvaluations(EvaluationContext context) {

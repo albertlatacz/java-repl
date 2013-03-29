@@ -3,12 +3,13 @@ package javarepl;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.annotations.multimethod;
+import com.googlecode.totallylazy.multi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
@@ -26,7 +27,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
     private final File outputDirectory = temporaryDirectory("JavaREPL");
-    private final ClassLoader classLoader = new URLClassLoader(new URL[]{toURL().apply(outputDirectory)});
+    private final EvaluationClassLoader classLoader = new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
 
     private EvaluationContext context = emptyEvaluationContext();
 
@@ -63,8 +64,31 @@ public class Evaluator {
         return new Value(expr);
     }
 
-
+    @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
+        return new multi(){}.<Either<? extends Throwable, Evaluation>>
+                methodOption(expression).getOrElse(evaluateExpression(expression));
+    }
+
+    @multimethod
+    private Either<? extends Throwable, Evaluation> evaluate(ClassOrInterface expression) {
+        if (classLoader.isClassLoaded(expression.type)) {
+            return left(new UnsupportedOperationException("Redefining classes not supported"));
+        }
+
+        try {
+            File outputJavaFile = file(outputDirectory, expression.type + ".java");
+            Files.write(expression.source.getBytes(), outputJavaFile);
+            compile(outputJavaFile);
+            classLoader.loadClass(expression.type);
+
+            return right(evaluation(expression.type, expression.source, expression, Result.noResult()));
+        } catch (Exception e) {
+            return left(Utils.unwrapException(e));
+        }
+    }
+
+    private Either<? extends Throwable, Evaluation> evaluateExpression(Expression expression) {
         String className = randomIdentifier("Evaluation");
         File outputJavaFile = file(outputDirectory, className + ".java");
         File outputClassFile = file(outputDirectory, className + ".class");
@@ -100,13 +124,13 @@ public class Evaluator {
 
     private String nextResultKeyFor(Expression expression) {
         if (expression instanceof Assignment)
-            return ((Assignment)expression).key;
+            return ((Assignment) expression).key;
 
         if (expression instanceof AssignmentWithType)
-            return ((AssignmentWithType)expression).key;
+            return ((AssignmentWithType) expression).key;
 
         if (expression instanceof ClassOrInterface)
-            return ((ClassOrInterface)expression).type;
+            return ((ClassOrInterface) expression).type;
 
         return context.nextResultKey();
     }
@@ -114,7 +138,7 @@ public class Evaluator {
     private void compile(File file) throws Exception {
         OutputStream errorStream = new ByteArrayOutputStream();
 
-        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, file.getCanonicalPath());
+        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, "-cp", System.getProperty("java.class.path") + System.getProperty("path.separator") + outputDirectory.getCanonicalPath(), file.getCanonicalPath());
 
         if (errorCode != 0)
             throw new ExpressionCompilationException(errorCode, errorStream.toString());

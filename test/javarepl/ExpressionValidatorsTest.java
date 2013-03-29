@@ -52,6 +52,7 @@ public class ExpressionValidatorsTest {
         assertTrue(isValidClassOrInterface("final class SomeClass{"));
         assertTrue(isValidClassOrInterface("class SomeClass { "));
         assertTrue(isValidClassOrInterface("class SomeClass{ "));
+        assertTrue(isValidClassOrInterface("class SomeClass{\n}"));
         assertFalse(isValidClassOrInterface("class SomeClass "));
         assertFalse(isValidClassOrInterface("class "));
     }
