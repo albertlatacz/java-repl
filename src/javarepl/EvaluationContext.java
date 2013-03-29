@@ -8,6 +8,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Evaluation.expression;
 import static javarepl.Evaluation.result;
 import static javarepl.Result.key;
+import static javarepl.Result.noResult;
 
 class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
@@ -30,23 +31,27 @@ class EvaluationContext {
 
     public Sequence<Evaluation> imports() {
         return evaluations()
-                .filter(instanceOf(Expression.Import.class));
+                .filter(where(expression(), instanceOf(Expression.Import.class)));
+    }
+
+    public Sequence<Evaluation> classes() {
+        return evaluations()
+                .filter(where(expression(), instanceOf(Expression.ClassOrInterface.class)));
     }
 
     public Sequence<Result> results() {
         return evaluations()
                 .map(result())
-                .filter(is(Predicates.not(Result.noResult())))
+                .filter(is(not(noResult())))
                 .map(get(Result.class))
                 .reverse()
-                .unique(key())
-                .reverse();
+                .unique(key());
     }
 
     public Option<Evaluation> evaluationForResult(final String key) {
         return evaluations()
                 .reverse()
-                .filter(where(result(), is(Predicates.not(Result.noResult()))).and(
+                .filter(where(result(), is(not(noResult()))).and(
                         where(result().then(get(Result.class)).then(key()), equalTo(key))))
                 .headOption();
     }

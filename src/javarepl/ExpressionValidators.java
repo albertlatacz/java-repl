@@ -1,7 +1,15 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.regex.Regex;
 
+import static com.googlecode.totallylazy.Callables.size;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 
 public class ExpressionValidators {
@@ -11,6 +19,20 @@ public class ExpressionValidators {
     public static final Regex typePattern = regex("([a-zA-Z\\$_][a-zA-Z0-9\\.\\$_\\[\\]<> ]*)");
     public static final Regex assignmentWithTypePattern = regex(typePattern + " +" + assignmentPattern);
     public static final Regex importPattern = regex("import .*");
+
+    public static final Regex classVisibilityPattern = regex("(?:private +|public +|protected +|)");
+    public static final Regex classExtensibilityPattern = regex("(?:final +|abstract +|)");
+    public static final Regex classStaticPattern = regex("(?:static +|)");
+    public static final Regex classVESPattern = permutations(sequence(classExtensibilityPattern, classStaticPattern, classVisibilityPattern));
+    public static final Regex classOrInterfacePattern = regex(classVESPattern + "(?:class +|interface +) *" + identifierPattern + " *\\{(?:.*)$");
+
+    public static boolean isValidImport(String string) {
+        return importPattern.matches(string.trim());
+    }
+
+    public static boolean isValidClassOrInterface(String string) {
+        return classOrInterfacePattern.matches(string.trim());
+    }
 
     public static boolean isValidIdentifier(String string) {
         return identifierPattern.matches(string.trim());
@@ -24,8 +46,33 @@ public class ExpressionValidators {
         return assignmentWithTypePattern.matches(string.trim());
     }
 
-    public static boolean isValidImport(String string) {
-        return importPattern.matches(string.trim());
+    private static Regex permutations(Sequence<Regex> patterns) {
+        return regex(patterns.cartesianProduct(patterns.cartesianProduct(patterns))
+                .map(flattenOptions())
+                .filter(where(size(), is(patterns.size())))
+                .map(Sequences.toString("(?:", "", ")"))
+                .toString("(?:", "|", ")"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Function1<Pair, Sequence<T>> flattenOptions() {
+        return new Function1<Pair, Sequence<T>>() {
+            public Sequence<T> call(Pair pair) throws Exception {
+                Sequence<T> result = Sequences.empty();
+                if (pair.first() instanceof Pair)
+                    result = result.join(call((Pair) pair.first()));
+                else
+                    result = result.add((T) pair.first());
+
+                if (pair.second() instanceof Pair)
+                    result = result.join(call((Pair) pair.second()));
+                else
+                    result = result.add((T) pair.second());
+
+
+                return result.unique();
+            }
+        };
     }
 
 }

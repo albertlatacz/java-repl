@@ -2,7 +2,6 @@ package javarepl;
 
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.regex.Regex.regex;
 import static javarepl.ExpressionValidators.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,5 +40,19 @@ public class ExpressionValidatorsTest {
         assertTrue(isValidImport("  import     xx.yy.zz"));
         assertFalse(isValidImport("Import     xx.yy.zz"));
         assertFalse(isValidImport("importxx.yy.zz"));
+    }
+
+    @Test
+    public void shouldMatchClassOrInterface() {
+        assertTrue(isValidClassOrInterface("public static final interface SomeInterface {"));
+        assertTrue(isValidClassOrInterface("public static final class SomeClass{  "));
+        assertTrue(isValidClassOrInterface("static public final class SomeClass{"));
+        assertTrue(isValidClassOrInterface("final static public class SomeClass{"));
+        assertTrue(isValidClassOrInterface("final static class SomeClass{"));
+        assertTrue(isValidClassOrInterface("final class SomeClass{"));
+        assertTrue(isValidClassOrInterface("class SomeClass { "));
+        assertTrue(isValidClassOrInterface("class SomeClass{ "));
+        assertFalse(isValidClassOrInterface("class SomeClass "));
+        assertFalse(isValidClassOrInterface("class "));
     }
 }

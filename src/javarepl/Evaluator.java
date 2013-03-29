@@ -20,9 +20,7 @@ import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassRenderer.renderEvaluationClass;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.Expression.*;
-import static javarepl.ExpressionValidators.isValidAssignment;
-import static javarepl.ExpressionValidators.isValidAssignmentWithType;
-import static javarepl.ExpressionValidators.isValidImport;
+import static javarepl.ExpressionValidators.*;
 import static javarepl.Utils.randomIdentifier;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -51,11 +49,16 @@ public class Evaluator {
         if (isValidImport(expr))
             return new Import(expr);
 
-        if (isValidAssignmentWithType(expr))
-            return new AssignmentWithType(expr);
+        if (isValidClassOrInterface(expr))
+            return new ClassOrInterface(expr);
 
-        if (isValidAssignment(expr))
+        if (isValidAssignmentWithType(expr)) {
+            return new AssignmentWithType(expr);
+        }
+
+        if (isValidAssignment(expr)) {
             return new Assignment(expr);
+        }
 
         return new Value(expr);
     }
@@ -101,6 +104,9 @@ public class Evaluator {
 
         if (expression instanceof AssignmentWithType)
             return ((AssignmentWithType)expression).key;
+
+        if (expression instanceof ClassOrInterface)
+            return ((ClassOrInterface)expression).type;
 
         return context.nextResultKey();
     }

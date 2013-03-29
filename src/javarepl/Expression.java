@@ -4,8 +4,8 @@ import com.googlecode.totallylazy.Function1;
 
 import java.util.regex.MatchResult;
 
-import static com.googlecode.totallylazy.regex.Regex.regex;
 import static javarepl.ExpressionValidators.assignmentWithTypePattern;
+import static javarepl.ExpressionValidators.classOrInterfacePattern;
 
 public abstract class Expression {
     public final String source;
@@ -81,6 +81,15 @@ public abstract class Expression {
             type = matches.group(1).trim();
             key = matches.group(2).trim();
             value = matches.group(3).trim();
+        }
+    }
+
+    public static class ClassOrInterface extends Expression {
+        public final String type;
+
+        public ClassOrInterface(String source) {
+            super(source);
+            type =  classOrInterfacePattern.match(source).group(1);
         }
     }
 }
