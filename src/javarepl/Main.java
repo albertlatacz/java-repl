@@ -1,6 +1,8 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
+import javarepl.expressions.ClassOrInterface;
+import javarepl.expressions.Expression;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
@@ -20,6 +22,7 @@ import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
 import static javarepl.Evaluation.functions.classSource;
+import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.applicationVersion;
 
 public class Main {
@@ -51,6 +54,7 @@ public class Main {
                 .addLast(equalTo(":src"), showLastSource())
                 .addLast(equalTo(":clear"), clearContext())
                 .addLast(startsWith(":include "), addClasspath())
+                .addLast(startsWith(":list "), list())
                 .addLast(equalTo(":!"), evaluateLatest())
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
@@ -76,6 +80,7 @@ public class Main {
                 String help = new StringBuilder().append("Available commands: \n")
                         .append("    :help - display this help\n")
                         .append("    :include <classpath_url> - includes given url in the classpath\n")
+                        .append("    :list <results|types> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
                         .append("    :! - evaluate the latest expression\n")
@@ -140,7 +145,6 @@ public class Main {
     private Function1<String, Function1<String, Void>> addClasspath() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-
                 String path = line.replace(":include ", "");
                 try {
                     evaluator.addClasspathUrl(new URL(path));
@@ -149,6 +153,22 @@ public class Main {
                     System.err.println("Could not include " + path + ". " + e.getLocalizedMessage());
                 }
 
+                return null;
+            }
+        };
+    }
+
+    private Function1<String, Function1<String, Void>> list() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+                String items = line.replace(":list ", "");
+                if (items.equals("results")) {
+                    sequence(evaluator.results()).forEach(printlnToOut());
+                }
+
+                if (items.equals("types")) {
+                    sequence(evaluator.classes()).map(expression()).forEach(printlnToOut());
+                }
                 return null;
             }
         };
@@ -174,7 +194,7 @@ public class Main {
             {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
-                console.addCompleter(new AggregateCompleter(new StringsCompleter(":exit", ":help", ":src", ":clear", ":!")));
+                console.addCompleter(new AggregateCompleter(new StringsCompleter(":exit", ":help", ":include", ":list", ":src", ":clear", ":!")));
             }
 
             public String call(Sequence<String> lines) throws Exception {

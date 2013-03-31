@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
@@ -48,6 +49,14 @@ public class Evaluator {
 
     public Option<Evaluation> lastEvaluation() {
         return context.lastEvaluation();
+    }
+
+    public List<Result> results() {
+        return context.results().toList();
+    }
+
+    public List<Evaluation> classes() {
+        return context.classes().toList();
     }
 
     public void clear() {

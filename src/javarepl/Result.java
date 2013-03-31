@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class Result {
     private final String key;
@@ -37,7 +38,7 @@ public class Result {
 
     @Override
     public String toString() {
-        return (value != null ? Utils.extractType(value.getClass()).getSimpleName() + " " : "") + key + " = " + value;
+        return (value != null ? Utils.extractType(value.getClass()).getSimpleName() + " " : "") + key + " = " + Utils.valueToString().apply(value);
     }
 
     @Override
