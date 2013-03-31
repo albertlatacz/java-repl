@@ -1,9 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Rules;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
@@ -12,11 +9,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.URL;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
@@ -51,6 +50,7 @@ public class Main {
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
                 .addLast(equalTo(":clear"), clearContext())
+                .addLast(startsWith(":include "), addClasspath())
                 .addLast(equalTo(":!"), evaluateLatest())
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
@@ -73,8 +73,9 @@ public class Main {
     private Function1<String, Function1<String, Void>> showHelp() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                String help = new StringBuilder().append("Commands include: \n")
+                String help = new StringBuilder().append("Available commands: \n")
                         .append("    :help - display this help\n")
+                        .append("    :include <classpath_url> - includes given url in the classpath\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
                         .append("    :! - evaluate the latest expression\n")
@@ -129,6 +130,23 @@ public class Main {
                     String source = lastEvaluation.get().expression().source();
                     System.out.println(source);
                     evaluateExpression(source);
+                }
+
+                return null;
+            }
+        };
+    }
+
+    private Function1<String, Function1<String, Void>> addClasspath() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+
+                String path = line.replace(":include ", "");
+                try {
+                    evaluator.addClasspathUrl(new URL(path));
+                    System.out.println("Included " + path);
+                } catch (Exception e) {
+                    System.err.println("Could not include " + path + ". " + e.getLocalizedMessage());
                 }
 
                 return null;

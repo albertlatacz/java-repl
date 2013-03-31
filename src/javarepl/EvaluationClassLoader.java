@@ -8,6 +8,11 @@ public class EvaluationClassLoader extends URLClassLoader{
         super(urls);
     }
 
+    @Override
+    public void addURL(URL url) {
+        super.addURL(url);
+    }
+
     public boolean isClassLoaded(String name) {
         return findLoadedClass(name) != null;
     }

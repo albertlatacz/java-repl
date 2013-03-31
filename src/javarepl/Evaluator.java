@@ -1,23 +1,24 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Files;
-import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.annotations.multimethod;
-import com.googlecode.totallylazy.multi;
 import javarepl.expressions.*;
+import javarepl.expressions.Value;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.net.URL;
 
+import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.toURL;
+import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.expressions.ExpressionPatterns.*;
@@ -43,7 +44,18 @@ public class Evaluator {
         }
 
         return result;
+    }
 
+    public Option<Evaluation> lastEvaluation() {
+        return context.lastEvaluation();
+    }
+
+    public void clear() {
+        context = emptyEvaluationContext();
+    }
+
+    public void addClasspathUrl(URL classpathUrl) {
+        classLoader.addURL(classpathUrl);
     }
 
     private Expression createExpression(String expr) {
@@ -135,18 +147,12 @@ public class Evaluator {
 
     private void compile(File file) throws Exception {
         OutputStream errorStream = new ByteArrayOutputStream();
+        String classpath = sequence(System.getProperty("java.class.path"))
+                .join(sequence(classLoader.getURLs()).map(toString)).toString(pathSeparator);
 
-        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, "-cp", System.getProperty("java.class.path") + System.getProperty("path.separator") + outputDirectory.getCanonicalPath(), file.getCanonicalPath());
+        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, "-cp", classpath, file.getCanonicalPath());
 
         if (errorCode != 0)
             throw new ExpressionCompilationException(errorCode, errorStream.toString());
-    }
-
-    public Option<Evaluation> lastEvaluation() {
-        return context.lastEvaluation();
-    }
-
-    public void clear() {
-        context = emptyEvaluationContext();
     }
 }
