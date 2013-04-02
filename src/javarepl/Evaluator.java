@@ -1,9 +1,11 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.Files;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.annotations.multimethod;
+import com.googlecode.totallylazy.multi;
 import javarepl.expressions.*;
-import javarepl.expressions.Value;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -22,8 +24,8 @@ import static com.googlecode.totallylazy.URLs.toURL;
 import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
-import static javarepl.expressions.ExpressionPatterns.*;
 import static javarepl.Utils.randomIdentifier;
+import static javarepl.expressions.ExpressionPatterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -87,7 +89,7 @@ public class Evaluator {
 
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
-        return new multi(){}.<Either<? extends Throwable, Evaluation>>
+        return new multi() {}.<Either<? extends Throwable, Evaluation>>
                 methodOption(expression).getOrElse(evaluateExpression(expression));
     }
 
@@ -150,7 +152,7 @@ public class Evaluator {
 
     private String nextResultKeyFor(Expression expression) {
         return (expression instanceof WithKey)
-                ? ((WithKey)expression).key()
+                ? ((WithKey) expression).key()
                 : context.nextResultKey();
     }
 

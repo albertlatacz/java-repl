@@ -111,9 +111,10 @@
         <parallel>
             <antcall target="test"/>
             <antcall target="package"/>
-            <antcall target="plugin"/>
         </parallel>
+
         <antcall target="embed"/>
+        <antcall target="plugin"/>
     </target>
 
 </project>

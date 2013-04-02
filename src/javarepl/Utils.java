@@ -41,10 +41,10 @@ public class Utils {
                     return "null";
 
                 if (value instanceof String)
-                    return "\""+value+"\"";
+                    return "\"" + value + "\"";
 
                 if (value.getClass().isArray())
-                    return sequence((Object[])value).map(valueToString()).toString("[", ", ", "]");
+                    return sequence((Object[]) value).map(valueToString()).toString("[", ", ", "]");
 
                 return value.toString();
             }
