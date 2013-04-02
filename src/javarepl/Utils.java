@@ -5,12 +5,14 @@ import com.googlecode.totallylazy.Function1;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.URLs.url;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.net.URLDecoder.decode;
 
@@ -56,6 +58,14 @@ public class Utils {
             return unwrapException(((InvocationTargetException) e).getTargetException());
 
         return e;
+    }
+
+    public static URL resolveClasspath(String path) {
+        try {
+            return url(path);
+        } catch (Exception e) {
+            return url("file:" + path);
+        }
     }
 
     public static String applicationVersion() throws Exception {

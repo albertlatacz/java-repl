@@ -10,6 +10,7 @@ import javarepl.expressions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.List;
 
@@ -128,8 +129,9 @@ public class Evaluator {
             compile(outputJavaFile);
 
             Class<?> expressionClass = classLoader.loadClass(className);
-            Object expressionInstance = expressionClass.newInstance();
-            expressionClass.getMethod("init", EvaluationContext.class).invoke(expressionInstance, context);
+            Constructor<?> constructor = expressionClass.getDeclaredConstructor(EvaluationContext.class);
+            Object expressionInstance = constructor.newInstance(context);
+
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
             if (resultObject != null) {

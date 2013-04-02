@@ -7,9 +7,9 @@ import static javarepl.Result.functions.value;
 
 @SuppressWarnings("unused")
 public abstract class EvaluationTemplate {
-    private EvaluationContext context;
+    private final EvaluationContext context;
 
-    public final void init(EvaluationContext context) {
+    public EvaluationTemplate(EvaluationContext context) {
         this.context = context;
     }
 

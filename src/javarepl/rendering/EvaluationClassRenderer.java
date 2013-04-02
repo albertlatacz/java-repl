@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 import javarepl.EvaluationContext;
+import javarepl.EvaluationTemplate;
 import javarepl.expressions.*;
 import javarepl.Result;
 
@@ -55,8 +56,9 @@ public class EvaluationClassRenderer {
         writer.println(renderUserImports(context));
         writer.println(renderImportExpression(expression));
         writer.println(renderClassName(className));
-        writer.println(renderMethodName(expression));
+        writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
+        writer.println(renderMethodName(expression));
         writer.println(renderEndOfMethod());
         writer.println(renderEndOfFile());
 
@@ -83,8 +85,9 @@ public class EvaluationClassRenderer {
         writer.println(renderDefaultImports());
         writer.println(renderUserImports(context));
         writer.println(renderClassName(className));
-        writer.println(renderMethodName(expression));
+        writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
+        writer.println(renderMethodName(expression));
         writer.println(renderExpression(expression));
         writer.println(renderEndOfMethod());
         writer.println(renderEndOfFile());
@@ -95,9 +98,9 @@ public class EvaluationClassRenderer {
     private static String renderPreviousEvaluations(EvaluationContext context) {
         return context.results().map(new Function1<Result, String>() {
             public String call(Result result) throws Exception {
-                return format("    %s %s = valueOf(\"%s\");", extractType(result.value().getClass()).getCanonicalName(), result.key(), result.key());
+                return format("  private final %s %s = valueOf(\"%s\");", extractType(result.value().getClass()).getCanonicalName(), result.key(), result.key());
             }
-        }).toString("\n");
+        }).toString("\n", "\n", "\n");
     }
 
     private static String renderImportExpression(Import expression) {
@@ -119,7 +122,11 @@ public class EvaluationClassRenderer {
     }
 
     private static String renderClassName(String className) {
-        return format("public class %s extends javarepl.EvaluationTemplate {", className);
+        return format("public final class %s extends %s {", className, EvaluationTemplate.class.getCanonicalName());
+    }
+
+    private static String renderClassConstructor(String className) {
+        return format("  public %s(%s context) { super(context); }", className, EvaluationContext.class.getCanonicalName());
     }
 
     private static String renderEndOfMethod() {

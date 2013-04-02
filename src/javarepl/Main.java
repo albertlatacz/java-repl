@@ -1,8 +1,9 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
-import javarepl.expressions.ClassOrInterface;
-import javarepl.expressions.Expression;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.Sequence;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.StringsCompleter;
@@ -11,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.URL;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -24,6 +24,7 @@ import static java.lang.System.getProperty;
 import static javarepl.Evaluation.functions.classSource;
 import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.applicationVersion;
+import static javarepl.Utils.resolveClasspath;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -49,11 +50,11 @@ public class Main {
 
     public void run() throws IOException {
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
-                .addLast(equalTo(":exit"), exitApplication())
+                .addLast(equalTo(":quit"), quitApplication())
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
                 .addLast(equalTo(":clear"), clearContext())
-                .addLast(startsWith(":include "), addClasspath())
+                .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
                 .addLast(equalTo(":!"), evaluateLatest())
                 .addLast(not(blank()), evaluate())
@@ -65,7 +66,7 @@ public class Main {
         } while (true);
     }
 
-    private static Function1<String, Function1<String, Void>> exitApplication() {
+    private static Function1<String, Function1<String, Void>> quitApplication() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 exit(0);
@@ -79,12 +80,12 @@ public class Main {
             public Function1<String, Void> call(String line) throws Exception {
                 String help = new StringBuilder().append("Available commands: \n")
                         .append("    :help - display this help\n")
-                        .append("    :include <classpath_url> - includes given url in the classpath\n")
+                        .append("    :cp <path> - includes given file or directory in the classpath\n")
                         .append("    :list <results|types> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
                         .append("    :! - evaluate the latest expression\n")
-                        .append("    :exit - exits the app\n")
+                        .append("    :quit - exits the app\n")
                         .toString();
                 System.out.println(help);
                 return null;
@@ -145,12 +146,12 @@ public class Main {
     private Function1<String, Function1<String, Void>> addClasspath() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                String path = line.replace(":include ", "");
+                String path = line.replace(":cp ", "");
                 try {
-                    evaluator.addClasspathUrl(new URL(path));
-                    System.out.println("Included " + path);
+                    evaluator.addClasspathUrl(resolveClasspath(path));
+                    System.out.println(format("Added %s to classpath.", path));
                 } catch (Exception e) {
-                    System.err.println("Could not include " + path + ". " + e.getLocalizedMessage());
+                    System.err.println(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
                 }
 
                 return null;

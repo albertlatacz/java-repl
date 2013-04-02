@@ -10,7 +10,6 @@ public class Evaluation {
     private final Expression expression;
     private final Option<Result> result;
 
-
     private Evaluation(String className, String classSource, Expression expression, Option<Result> result) {
         this.className = className;
         this.classSource = classSource;
