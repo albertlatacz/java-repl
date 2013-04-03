@@ -26,7 +26,7 @@ import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.Utils.randomIdentifier;
-import static javarepl.expressions.ExpressionPatterns.*;
+import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -74,8 +74,8 @@ public class Evaluator {
         if (isValidImport(expr))
             return new Import(expr);
 
-        if (isValidClass(expr) || isValidInterface(expr))
-            return new ClassOrInterface(expr);
+        if (isValidType(expr))
+            return new Type(expr);
 
         if (isValidAssignmentWithType(expr)) {
             return new AssignmentWithType(expr);
@@ -95,7 +95,7 @@ public class Evaluator {
     }
 
     @multimethod
-    private Either<? extends Throwable, Evaluation> evaluate(ClassOrInterface expression) {
+    private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
         if (classLoader.isClassLoaded(expression.type())) {
             return left(new UnsupportedOperationException("Redefining classes not supported"));
         }

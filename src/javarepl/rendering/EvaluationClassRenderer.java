@@ -66,7 +66,7 @@ public class EvaluationClassRenderer {
     }
 
     @multimethod
-    private static String renderExpressionClass(EvaluationContext context, String className, ClassOrInterface expression) {
+    private static String renderExpressionClass(EvaluationContext context, String className, Type expression) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 

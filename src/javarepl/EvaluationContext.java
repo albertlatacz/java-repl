@@ -1,7 +1,7 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
-import javarepl.expressions.ClassOrInterface;
+import javarepl.expressions.Type;
 import javarepl.expressions.Import;
 
 import static com.googlecode.totallylazy.Option.functions.get;
@@ -38,7 +38,7 @@ public class EvaluationContext {
 
     public Sequence<Evaluation> classes() {
         return evaluations()
-                .filter(where(expression(), instanceOf(ClassOrInterface.class)));
+                .filter(where(expression(), instanceOf(Type.class)));
     }
 
     public Sequence<Result> results() {

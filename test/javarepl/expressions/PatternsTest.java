@@ -2,11 +2,11 @@ package javarepl.expressions;
 
 import org.junit.Test;
 
-import static javarepl.expressions.ExpressionPatterns.*;
+import static javarepl.expressions.Patterns.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class ExpressionPatternsTest {
+public class PatternsTest {
 
     @Test
     public void shouldMatchValidIdentifier() {
@@ -44,28 +44,28 @@ public class ExpressionPatternsTest {
 
     @Test
     public void shouldMatchClass() {
-//        assertTrue(isValidClass("public static final class SomeClass extends BaseClass implements Interface1,Interface2{  "));
-        assertTrue(isValidClass("static public final class SomeClass{"));
-        assertTrue(isValidClass("final static public class SomeClass{"));
-        assertTrue(isValidClass("final static class SomeClass{"));
-        assertTrue(isValidClass("final class SomeClass{"));
-        assertTrue(isValidClass("class SomeClass { "));
-        assertTrue(isValidClass("class SomeClass{ "));
-        assertTrue(isValidClass("class SomeClass{\n}"));
-        assertFalse(isValidClass("class SomeClass "));
-        assertFalse(isValidClass("class "));
+        assertTrue(isValidType("public static final class SomeClass extends BaseClass implements Interface1,Interface2{  "));
+        assertTrue(isValidType("static public final class SomeClass{"));
+        assertTrue(isValidType("final static public class SomeClass{"));
+        assertTrue(isValidType("final static class SomeClass{"));
+        assertTrue(isValidType("final class SomeClass{"));
+        assertTrue(isValidType("class SomeClass { "));
+        assertTrue(isValidType("class SomeClass{ "));
+        assertTrue(isValidType("class SomeClass{\n}"));
+        assertFalse(isValidType("class SomeClass "));
+        assertFalse(isValidType("class "));
     }
 
     @Test
     public void shouldMatchInterface() {
-        assertTrue(isValidInterface("static public final interface SomeInterface{"));
-        assertTrue(isValidInterface("final static public interface SomeInterface{"));
-        assertTrue(isValidInterface("final static interface SomeInterface{"));
-        assertTrue(isValidInterface("final interface SomeInterface{"));
-        assertTrue(isValidInterface("interface SomeInterface { "));
-        assertTrue(isValidInterface("interface SomeInterface{ "));
-        assertTrue(isValidInterface("interface SomeInterface{\n}"));
-        assertFalse(isValidInterface("interface SomeInterface "));
-        assertFalse(isValidInterface("interface "));
+        assertTrue(isValidType("static public final interface SomeInterface{"));
+        assertTrue(isValidType("final static public interface SomeInterface{"));
+        assertTrue(isValidType("final static interface SomeInterface{"));
+        assertTrue(isValidType("final interface SomeInterface{"));
+        assertTrue(isValidType("interface SomeInterface { "));
+        assertTrue(isValidType("interface SomeInterface{ "));
+        assertTrue(isValidType("interface SomeInterface{\n}"));
+        assertFalse(isValidType("interface SomeInterface "));
+        assertFalse(isValidType("interface "));
     }
 }

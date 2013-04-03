@@ -1,0 +1,10 @@
+* Create enums
+* Add methods and move variables to class scope
+* Add downloading of jar from web
+* Add searching and listing of history
+* Load and compile java files
+* Replay execution of all previous commands
+* List imports
+* Improve expression listing
+* Simple auto-completion
+* add auto-documentation to commands

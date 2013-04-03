@@ -8,7 +8,7 @@ public final class Assignment extends Expression implements WithKey {
 
     public Assignment(String source) {
         super(source);
-        MatchResult match = ExpressionPatterns.assignmentPattern.match(source);
+        MatchResult match = Patterns.assignmentPattern.match(source);
         this.key = match.group(1).trim();
         this.value = match.group(2).trim();
     }

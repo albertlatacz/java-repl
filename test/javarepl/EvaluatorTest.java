@@ -14,14 +14,14 @@ public class EvaluatorTest {
         assertThat(evaluating("someVar = 12"), hasExpressionOfType(Assignment.class));
         assertThat(evaluating("int someVar = 12"), hasExpressionOfType(AssignmentWithType.class));
         assertThat(evaluating("import java.util.*"), hasExpressionOfType(Import.class));
-        assertThat(evaluating("class SomeClass{}"), hasExpressionOfType(ClassOrInterface.class));
-        assertThat(evaluating("interface SomeInterface{}"), hasExpressionOfType(ClassOrInterface.class));
+        assertThat(evaluating("class SomeClass{}"), hasExpressionOfType(Type.class));
+        assertThat(evaluating("interface SomeInterface{}"), hasExpressionOfType(Type.class));
     }
 
     @Test
     public void shouldCopyImportsOnNewClasses() {
         assertThat(evaluating("new NewClass{URL url;}"), hasCompilationError());
-        assertThat(evaluating("import java.net.*", "class NewClass{URL url;}"), hasExpressionOfType(ClassOrInterface.class));
+        assertThat(evaluating("import java.net.*", "class NewClass{URL url;}"), hasExpressionOfType(Type.class));
     }
 
     @Test

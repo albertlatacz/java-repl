@@ -2,7 +2,7 @@ package javarepl.expressions;
 
 import java.util.regex.MatchResult;
 
-import static javarepl.expressions.ExpressionPatterns.assignmentWithTypePattern;
+import static javarepl.expressions.Patterns.assignmentWithTypeNamePattern;
 
 public final  class AssignmentWithType extends Expression implements WithKey{
     private final String type;
@@ -12,7 +12,7 @@ public final  class AssignmentWithType extends Expression implements WithKey{
     public AssignmentWithType(String source) {
         super(source);
 
-        MatchResult matches = assignmentWithTypePattern.match(source);
+        MatchResult matches = assignmentWithTypeNamePattern.match(source);
         type = matches.group(1).trim();
         key = matches.group(2).trim();
         value = matches.group(3).trim();
