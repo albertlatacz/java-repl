@@ -1,32 +1,32 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.regex.Regex;
 
-import static com.googlecode.totallylazy.Callables.size;
 import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Predicates.where;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 import static java.util.regex.Pattern.DOTALL;
+import static javarepl.Utils.powerSetPermutations;
 
 public class Patterns {
-
-    public static final Regex identifierPattern = regex("([a-zA-Z\\$_][a-zA-Z0-9\\$_]*)");
-    public static final Regex assignmentPattern = regex(identifierPattern + " *=(.*)$");
-    public static final Regex typeNamePattern = regex("([a-zA-Z\\$_][a-zA-Z0-9\\.\\$_\\[\\]<> ]*)");
-    public static final Regex assignmentWithTypeNamePattern = regex(typeNamePattern + " +" + assignmentPattern);
+    public static final Regex identifierPattern = captureGroup("[a-zA-Z\\$_][a-zA-Z0-9\\$_]*");
+    public static final Regex assignmentPattern = join(identifierPattern, " *=(.*)$");
+    public static final Regex typeNamePattern = captureGroup("[a-zA-Z\\$_][a-zA-Z0-9\\.\\$_\\[\\]<> ]*");
+    public static final Regex assignmentWithTypeNamePattern = join(typeNamePattern, " +", assignmentPattern);
     public static final Regex importPattern = regex("import .*");
 
-    public static final Regex typeVisibilityModifiersPattern = regex("(?:private +|public +|protected +|)");
-    public static final Regex typeExtensibilityModifiersPattern = regex("(?:final +|abstract +|)");
-    public static final Regex typeStaticModifierPattern = regex("(?:static +|)");
-    public static final Regex typePrefixPattern = permutations(sequence(typeExtensibilityModifiersPattern, typeStaticModifierPattern, typeVisibilityModifiersPattern));
-    public static final Regex typePattern = regex(typePrefixPattern + "(?:class +|interface +|enum +)" + identifierPattern + ".*\\{.*", DOTALL);
+    public static final Regex visibilityModifiersPattern = oneOf("private +", "public +", "protected +");
+    public static final Regex staticModifierPattern = oneOf("static +");
 
+    public static final Regex typeExtensibilityModifiersPattern = oneOf("final +", "abstract +");
+    public static final Regex typePrefixPattern = oneOf(regexPermutations(typeExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
+    public static final Regex typeKindPattern = oneOf("class +", "interface +", "enum +");
+    public static final Regex typePattern = join(typePrefixPattern, typeKindPattern, identifierPattern, ".*\\{.*");
+
+    public static final Regex methodExtensibilityModifiersPattern = oneOf("final +");
+    public static final Regex methodPrefixPattern = oneOf(regexPermutations(methodExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
+    public static final Regex methodPattern = join(methodPrefixPattern, typeNamePattern, " +", identifierPattern, " *\\(.*\\) *\\{.*");
 
 
     public static boolean isValidImport(String string) {
@@ -35,6 +35,10 @@ public class Patterns {
 
     public static boolean isValidType(String string) {
         return typePattern.matches(string.trim());
+    }
+
+    public static boolean isValidMethod(String string) {
+        return methodPattern.matches(string.trim());
     }
 
     public static boolean isValidIdentifier(String string) {
@@ -49,33 +53,21 @@ public class Patterns {
         return assignmentWithTypeNamePattern.matches(string.trim());
     }
 
-    private static Regex permutations(Sequence<Regex> patterns) {
-        return regex(patterns.cartesianProduct(patterns.cartesianProduct(patterns))
-                .map(flattenOptions())
-                .filter(where(size(), is(patterns.size())))
+    private static Regex regexPermutations(Regex... patterns) {
+        return regex(powerSetPermutations(sequence(patterns)).remove(Sequences.<Regex>empty())
                 .map(Sequences.toString("(?:", "", ")"))
                 .toString("(?:", "|", ")"));
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> Function1<Pair, Sequence<T>> flattenOptions() {
-        return new Function1<Pair, Sequence<T>>() {
-            public Sequence<T> call(Pair pair) throws Exception {
-                Sequence<T> result = Sequences.empty();
-                if (pair.first() instanceof Pair)
-                    result = result.join(call((Pair) pair.first()));
-                else
-                    result = result.add((T) pair.first());
-
-                if (pair.second() instanceof Pair)
-                    result = result.join(call((Pair) pair.second()));
-                else
-                    result = result.add((T) pair.second());
-
-
-                return result.unique();
-            }
-        };
+    public static Regex join(Object... items) {
+        return regex(sequence(items).toString(""), DOTALL);
     }
 
+    public static Regex captureGroup(Object... items) {
+        return regex(sequence(items).toString("(", "", ")"), DOTALL);
+    }
+
+    private static Regex oneOf(Object... patterns) {
+        return regex(sequence(patterns).toString("(?:", "|", ")"));
+    }
 }

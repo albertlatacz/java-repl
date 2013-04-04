@@ -1,17 +1,17 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Sequences;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static javarepl.Utils.extractType;
-import static javarepl.Utils.resolveClasspath;
-import static javarepl.Utils.valueToString;
+import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.Utils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 
 public class UtilsTest {
@@ -35,6 +35,20 @@ public class UtilsTest {
         assertThat(resolveClasspath("file:/aaa/bbb").toString(), equalTo("file:/aaa/bbb"));
         assertThat(resolveClasspath("http://aaa/bbb").toString(), equalTo("http://aaa/bbb"));
         assertThat(resolveClasspath("aaa/bbb").toString(), equalTo("file:aaa/bbb"));
+    }
+
+    @Test
+    public void returnsPowerSetPermutations() {
+        assertThat(powerSetPermutations(sequence(1, 2)),
+                containsInAnyOrder(sequence(1), sequence(2), sequence(1, 2), sequence(2, 1), Sequences.<Integer>empty()));
+    }
+
+    @Test
+    public void returnsAllPermutationsOfTheSet() {
+        assertThat(permutations(sequence(1, 2, 3)),
+                containsInAnyOrder(
+                        sequence(1, 2, 3), sequence(1, 3, 2), sequence(2, 1, 3),
+                        sequence(2, 3, 1), sequence(3, 1, 2), sequence(3, 2, 1)));
     }
 
     private Matcher<? super Class<?>> equalToClass(Class clazz) {

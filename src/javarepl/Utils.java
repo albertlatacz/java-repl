@@ -1,6 +1,9 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +12,9 @@ import java.net.URL;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
+import static com.googlecode.totallylazy.Callables.size;
+import static com.googlecode.totallylazy.Predicates.is;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -82,5 +88,27 @@ public class Utils {
         }
 
         return "[unknown]";
+    }
+
+    public static <T> Sequence<Sequence<T>> permutations(Sequence<T> items) {
+        return powerSetPermutations(items).filter(where(size(), is(items.size())));
+    }
+
+    public static <T> Sequence<Sequence<T>> powerSetPermutations(Sequence<T> items) {
+        return cartesianProductPower(items, items.size()).add(Sequences.<T>empty());
+    }
+
+    private static <T> Sequence<Sequence<T>> cartesianProductPower(Sequence<T> items, int times) {
+        if (times == 1) {
+            Sequence<Sequence<T>> sequences = items.cartesianProduct().map(Pair.functions.values()).unsafeCast();
+            return sequences;
+        }
+
+        return cartesianProductPower(items, times - 1).cartesianProduct(items).map(new Function1<Pair<Sequence<T>, T>, Sequence<T>>() {
+            public Sequence<T> call(Pair<Sequence<T>, T> sequenceObjectPair) throws Exception {
+                return sequenceObjectPair.first().add(sequenceObjectPair.second()).unique();
+            }
+        }).unique();
+
     }
 }

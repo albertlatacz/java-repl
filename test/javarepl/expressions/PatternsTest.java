@@ -2,7 +2,11 @@ package javarepl.expressions;
 
 import org.junit.Test;
 
+import java.util.regex.MatchResult;
+
 import static javarepl.expressions.Patterns.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -16,6 +20,9 @@ public class PatternsTest {
         assertTrue(isValidIdentifier("  aass"));
         assertFalse(isValidIdentifier("£Aaa"));
         assertFalse(isValidIdentifier("aa ss"));
+
+        MatchResult result = identifierPattern.match("Aa_$09");
+        assertThat(result.group(1), is("Aa_$09"));
     }
 
     @Test
@@ -25,6 +32,10 @@ public class PatternsTest {
         assertTrue(isValidAssignment("val= 42"));
         assertTrue(isValidAssignment("  val  =   42  42  "));
         assertFalse(isValidAssignment("val wrong=   42  42  "));
+
+        MatchResult result = assignmentPattern.match("val = 42");
+        assertThat(result.group(1), is("val"));
+        assertThat(result.group(2), is(" 42"));
     }
 
     @Test
@@ -32,6 +43,11 @@ public class PatternsTest {
         assertTrue(isValidAssignmentWithType("java.lang.String[]   aaa = 12"));
         assertTrue(isValidAssignmentWithType("Sequence< Object[] > aaa = 12"));
         assertFalse(isValidAssignmentWithType("Sequence< Object[] > aaa  12"));
+
+        MatchResult result = assignmentWithTypeNamePattern.match("Integer val = 42");
+        assertThat(result.group(1), is("Integer"));
+        assertThat(result.group(2), is("val"));
+        assertThat(result.group(3), is(" 42"));
     }
 
     @Test
@@ -54,6 +70,9 @@ public class PatternsTest {
         assertTrue(isValidType("class SomeClass{\n}"));
         assertFalse(isValidType("class SomeClass "));
         assertFalse(isValidType("class "));
+
+        MatchResult result = typePattern.match("public static final class SomeClass extends BaseClass{");
+        assertThat(result.group(1), is("SomeClass"));
     }
 
     @Test
@@ -67,5 +86,23 @@ public class PatternsTest {
         assertTrue(isValidType("interface SomeInterface{\n}"));
         assertFalse(isValidType("interface SomeInterface "));
         assertFalse(isValidType("interface "));
+
+        MatchResult result = typePattern.match("static public final interface SomeInterface {");
+        assertThat(result.group(1), is("SomeInterface"));
+    }
+
+    @Test
+    public void shouldMatchMethod() {
+        assertTrue(isValidMethod("public final java.lang.String SomeMethod () { "));
+        assertTrue(isValidMethod("static public final void SomeMethod () {"));
+        assertTrue(isValidMethod("final static public void SomeMethod(){"));
+        assertTrue(isValidMethod("final static void SomeMethod(){"));
+        assertTrue(isValidMethod("final void SomeMethod(){"));
+        assertTrue(isValidMethod("void SomeMethod(){"));
+        assertFalse(isValidMethod("SomeMethod(){"));
+
+        MatchResult result = methodPattern.match("public final java.lang.String SomeMethod () { ");
+        assertThat(result.group(1), is("java.lang.String"));
+        assertThat(result.group(2), is("SomeMethod"));
     }
 }
