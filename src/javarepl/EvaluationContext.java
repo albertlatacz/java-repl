@@ -1,8 +1,11 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
-import javarepl.expressions.Type;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Import;
+import javarepl.expressions.Method;
+import javarepl.expressions.Type;
 
 import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -32,13 +35,15 @@ public class EvaluationContext {
     }
 
     public Sequence<Evaluation> imports() {
-        return evaluations()
-                .filter(where(expression(), instanceOf(Import.class)));
+        return evaluations().filter(where(expression(), instanceOf(Import.class)));
     }
 
     public Sequence<Evaluation> classes() {
-        return evaluations()
-                .filter(where(expression(), instanceOf(Type.class)));
+        return evaluations().filter(where(expression(), instanceOf(Type.class)));
+    }
+
+    public Sequence<Evaluation> methods() {
+        return evaluations().filter(where(expression(), instanceOf(Method.class)));
     }
 
     public Sequence<Result> results() {

@@ -16,6 +16,7 @@ public class EvaluatorTest {
         assertThat(evaluating("import java.util.*"), hasExpressionOfType(Import.class));
         assertThat(evaluating("class SomeClass{}"), hasExpressionOfType(Type.class));
         assertThat(evaluating("interface SomeInterface{}"), hasExpressionOfType(Type.class));
+        assertThat(evaluating("int max(int a, int b) { return a > b ? a : b; }"), hasExpressionOfType(Method.class));
     }
 
     @Test
@@ -31,6 +32,7 @@ public class EvaluatorTest {
         assertThat(evaluating("new String(\"hello there\")"), hasResult("hello there"));
         assertThat(evaluating("class NewClass {public int field=20;}"), hasNoResult());
         assertThat(evaluating("class NewClass {public int field=20;}", "new NewClass().field"), hasResult(20));
+        assertThat(evaluating("int max(int a, int b) { return a > b ? a : b; }", "max(20, 30)"), hasResult(30));
     }
 
 }

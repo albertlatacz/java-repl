@@ -24,6 +24,11 @@ public class MethodNameRenderer {
     }
 
     @multimethod
+    private static String renderMethodName(Method expression) {
+        return methodNameWithType("void");
+    }
+
+    @multimethod
     private static String renderMethodName(Assignment expression) {
         return methodNameWithType("Object");
     }

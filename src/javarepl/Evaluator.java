@@ -77,13 +77,16 @@ public class Evaluator {
         if (isValidType(expr))
             return new Type(expr);
 
-        if (isValidAssignmentWithType(expr)) {
-            return new AssignmentWithType(expr);
-        }
+        if (isValidMethod(expr))
+            return new Method(expr);
 
-        if (isValidAssignment(expr)) {
+        if (isValidAssignmentWithType(expr))
+            return new AssignmentWithType(expr);
+
+
+        if (isValidAssignment(expr))
             return new Assignment(expr);
-        }
+
 
         return new Value(expr);
     }
