@@ -50,7 +50,7 @@ public class Main {
 
     public void run() throws IOException {
         Rules<String, Function1<String, Void>> rules = Rules.<String, Function1<String, Void>>rules()
-                .addLast(equalTo(":quit"), quitApplication())
+                .addLast(equalTo(":quit").or(equalTo(null)), quitApplication())
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
                 .addLast(equalTo(":clear"), clearContext())
@@ -195,6 +195,8 @@ public class Main {
     private Function1<String, Function1<String, Void>> noAction() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
+
+                System.out.println("line = " + line + " " + line.isEmpty() );
                 return null;
             }
         };

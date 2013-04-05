@@ -108,7 +108,6 @@ public class JavaREPLConsoleRunner {
         consoleExecuteActionHandler = new JavaREPLConsoleExecuteActionHandler(processHandler, consoleHistoryModel, project, false);
 
 
-        // Init a console view
         ProcessTerminatedListener.attach(processHandler);
 
         processHandler.addProcessListener(new ProcessAdapter() {
@@ -125,10 +124,8 @@ public class JavaREPLConsoleRunner {
             }
         });
 
-        // Attach a console view to the process
         languageConsoleView.attachToProcess(processHandler);
 
-        // Runner creating
         final Executor defaultExecutor = ExecutorRegistry.getInstance().getExecutorById(DefaultRunExecutor.EXECUTOR_ID);
         final DefaultActionGroup toolbarActions = new DefaultActionGroup();
         final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, toolbarActions, false);
@@ -140,19 +137,15 @@ public class JavaREPLConsoleRunner {
         final RunContentDescriptor myDescriptor =
                 new RunContentDescriptor(languageConsoleView, processHandler, panel, consoleTitle);
 
-        // tool bar actions
         final AnAction[] actions = fillToolBarActions(toolbarActions, defaultExecutor, myDescriptor);
         registerActionShortcuts(actions, languageConsole.getConsoleEditor().getComponent());
         registerActionShortcuts(actions, panel);
         panel.updateUI();
 
-        // enter action
         createAndRegisterEnterAction(panel);
 
-        // Show in run tool window
         ExecutionManager.getInstance(project).getContentManager().showRunContent(defaultExecutor, myDescriptor);
 
-        // Request focus
         final ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(defaultExecutor.getId());
         window.activate(new Runnable() {
             public void run() {
@@ -160,7 +153,6 @@ public class JavaREPLConsoleRunner {
             }
         });
 
-        // Run
         processHandler.startNotify();
 
         final LanguageConsoleImpl console = languageConsoleView.getConsole();
@@ -201,15 +193,12 @@ public class JavaREPLConsoleRunner {
 
         ArrayList<AnAction> actionList = new ArrayList<AnAction>();
 
-        //stop
         final AnAction stopAction = createStopAction();
         actionList.add(stopAction);
 
-        //close
         final AnAction closeAction = createCloseAction(defaultExecutor, myDescriptor);
         actionList.add(closeAction);
 
-        // run and consoleHistoryModel actions
         ArrayList<AnAction> executionActions = createConsoleExecActions(languageConsole,
                 processHandler, consoleHistoryModel);
         runAction = executionActions.get(0);
@@ -229,7 +218,6 @@ public class JavaREPLConsoleRunner {
             }
         });
 
-        // help action
         actionList.add(CommonActionsManager.getInstance().createHelpAction("interactive_console"));
 
         AnAction[] actions = actionList.toArray(new AnAction[actionList.size()]);
@@ -279,7 +267,6 @@ public class JavaREPLConsoleRunner {
         ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
         OrderEntry[] entries = moduleRootManager.getOrderEntries();
         for (OrderEntry orderEntry : entries) {
-            // Add module sources to classpath
             if (orderEntry instanceof ModuleSourceOrderEntry) {
                 cpVFiles.addAll(Arrays.asList(orderEntry.getFiles(OrderRootType.SOURCES)));
             }
@@ -299,7 +286,6 @@ public class JavaREPLConsoleRunner {
         Map<String, String> envParams = new HashMap<String, String>();
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
-
         line.addParameter("-sc");
 
         return line;

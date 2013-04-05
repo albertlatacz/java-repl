@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>JavaREPL</name>
     <description>Simple Read-Eval-Print-Loop for Java</description>
-    <version>dev-build</version>
+    <version>dev.build</version>
     <vendor>VOXA Software Ltd</vendor>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->

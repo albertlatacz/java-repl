@@ -91,7 +91,6 @@ public class JavaREPLConsoleExecuteActionHandler {
     private void execute(LanguageConsoleImpl languageConsole,
                          ConsoleHistoryModel consoleHistoryModel) {
 
-        // Process input and add to history
         final Document document = languageConsole.getCurrentEditor().getDocument();
         final String text = document.getText();
         final TextRange range = new TextRange(0, document.getTextLength());
@@ -102,7 +101,6 @@ public class JavaREPLConsoleExecuteActionHandler {
         if (!StringUtil.isEmptyOrSpaces(text)) {
             consoleHistoryModel.addToHistory(text);
         }
-        // Send to interpreter / server
         processLine(text);
     }
 

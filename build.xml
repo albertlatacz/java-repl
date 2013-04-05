@@ -66,9 +66,13 @@
     </target>
 
     <target name="plugin">
-        <copy file="${plugin.src}/META-INF/plugin.xml" tofile="${artifacts}/META-INF/plugin.xml"/>
+        <copy file="${plugin.src}/META-INF/plugin.xml" tofile="${artifacts}/plugin.xml.original"/>
+        <replace file="${plugin.src}/META-INF/plugin.xml" token="dev.build" value="${build.number}"/>
+
         <compile.and.jar src="${plugin.src}" jar="${release.plugin.jar.path}" classpathref="all.jars"
                          version="${release.version}"/>
+
+        <move file="${artifacts}/plugin.xml.original" tofile="${plugin.src}/META-INF/plugin.xml"/>
 
         <zip destfile="${release.plugin.zip.path}">
             <zipfileset file="${release.jar.path}" prefix="java-repl/lib"/>
