@@ -16,6 +16,8 @@ import com.intellij.openapi.util.IconLoader;
 
 import java.util.Arrays;
 
+import static javarepl.plugin.JavaREPLConsoleRunner.REPL_TITLE;
+
 public class RunJavaREPLConsoleAction extends AnAction implements DumbAware {
 
     public RunJavaREPLConsoleAction() {
@@ -43,11 +45,10 @@ public class RunJavaREPLConsoleAction extends AnAction implements DumbAware {
 
         final String path = ModuleRootManager.getInstance(module).getContentRoots()[0].getPath();
 
-        final String title = "REPL _WIN";
         try {
             JavaREPLConsoleRunner.run(module, path);
         } catch (CantRunException e) {
-            ExecutionHelper.showErrors(module.getProject(), Arrays.<Exception>asList(e), title, null);
+            ExecutionHelper.showErrors(module.getProject(), Arrays.<Exception>asList(e), REPL_TITLE, null);
         }
 
     }
@@ -68,5 +69,4 @@ public class RunJavaREPLConsoleAction extends AnAction implements DumbAware {
         }
         return module;
     }
-
 }

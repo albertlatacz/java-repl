@@ -17,6 +17,7 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.lang.reflect.Modifier.isPrivate;
@@ -99,16 +100,15 @@ public class Utils {
     }
 
     private static <T> Sequence<Sequence<T>> cartesianProductPower(Sequence<T> items, int times) {
-        if (times == 1) {
-            Sequence<Sequence<T>> sequences = items.cartesianProduct().map(Pair.functions.values()).unsafeCast();
-            return sequences;
-        }
+        if (times == 0)
+            return items.cartesianProduct().map(Pair.functions.values()).unsafeCast();
 
-        return cartesianProductPower(items, times - 1).cartesianProduct(items).map(new Function1<Pair<Sequence<T>, T>, Sequence<T>>() {
-            public Sequence<T> call(Pair<Sequence<T>, T> sequenceObjectPair) throws Exception {
-                return sequenceObjectPair.first().add(sequenceObjectPair.second()).unique();
-            }
-        }).unique();
-
+        return cartesianProductPower(items, times - 1)
+                .cartesianProduct(items)
+                .map(new Function1<Pair<Sequence<T>, T>, Sequence<T>>() {
+                    public Sequence<T> call(Pair<Sequence<T>, T> pair) {
+                        return pair.first().add(pair.second()).unique();
+                    }})
+                .unique();
     }
 }

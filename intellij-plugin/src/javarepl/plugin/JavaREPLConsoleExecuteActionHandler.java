@@ -21,26 +21,26 @@ import java.io.OutputStream;
 
 public class JavaREPLConsoleExecuteActionHandler {
 
-    private final ProcessHandler myProcessHandler;
+    private final ProcessHandler processHandler;
     private ConsoleHistoryModel consoleHistoryModel;
     private final Project project;
     private final IndentHelper indentHelper;
-    private boolean myPreserveMarkup;
+    private boolean preserveMarkup;
 
 
     public JavaREPLConsoleExecuteActionHandler(ProcessHandler processHandler,
                                                ConsoleHistoryModel consoleHistoryModel,
                                                Project project,
                                                boolean preserveMarkup) {
-        myProcessHandler = processHandler;
+        this.processHandler = processHandler;
         this.consoleHistoryModel = consoleHistoryModel;
         this.project = project;
-        myPreserveMarkup = preserveMarkup;
-        indentHelper = IndentHelper.getInstance();
+        this.preserveMarkup = preserveMarkup;
+        this.indentHelper = IndentHelper.getInstance();
     }
 
     public void processLine(String line) {
-        final OutputStream outputStream = myProcessHandler.getProcessInput();
+        final OutputStream outputStream = processHandler.getProcessInput();
         try {
             byte[] bytes = (line + "\n").getBytes("UTF-8");
             outputStream.write(bytes);
@@ -97,7 +97,7 @@ public class JavaREPLConsoleExecuteActionHandler {
         final TextRange range = new TextRange(0, document.getTextLength());
 
         languageConsole.getCurrentEditor().getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
-        languageConsole.addCurrentToHistory(range, false, myPreserveMarkup);
+        languageConsole.addCurrentToHistory(range, false, preserveMarkup);
         languageConsole.setInputText("");
         if (!StringUtil.isEmptyOrSpaces(text)) {
             consoleHistoryModel.addToHistory(text);
