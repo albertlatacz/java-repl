@@ -3,6 +3,7 @@ package javarepl;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
@@ -26,24 +27,19 @@ public class EvaluationContext {
         return new EvaluationContext(Sequences.<Evaluation>empty());
     }
 
-    public Sequence<Evaluation> evaluations() {
-        return evaluations;
-    }
-
     public Option<Evaluation> lastEvaluation() {
         return evaluations().lastOption();
     }
 
-    public Sequence<Evaluation> imports() {
-        return evaluations().filter(where(expression(), instanceOf(Import.class)));
+    public Sequence<Evaluation> evaluations() {
+        return evaluations;
     }
 
-    public Sequence<Evaluation> classes() {
-        return evaluations().filter(where(expression(), instanceOf(Type.class)));
-    }
-
-    public Sequence<Evaluation> methods() {
-        return evaluations().filter(where(expression(), instanceOf(Method.class)));
+    public <T extends Expression> Sequence<T> expressionsOfType(Class<T> type) {
+        return evaluations()
+                .filter(where(expression(), instanceOf(type)))
+                .map(expression())
+                .safeCast(type);
     }
 
     public Sequence<Result> results() {

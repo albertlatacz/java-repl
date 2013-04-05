@@ -1,11 +1,9 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Either;
-import com.googlecode.totallylazy.Files;
-import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.annotations.multimethod;
-import com.googlecode.totallylazy.multi;
 import javarepl.expressions.*;
+import javarepl.expressions.Value;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,10 +18,13 @@ import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Predicates.instanceOf;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
+import static javarepl.Evaluation.functions.expression;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.expressions.Patterns.*;
@@ -58,8 +59,8 @@ public class Evaluator {
         return context.results().toList();
     }
 
-    public List<Evaluation> classes() {
-        return context.classes().toList();
+    public <T extends Expression> Sequence<T> expressionsOfType(Class<T> type) {
+        return context.expressionsOfType(type);
     }
 
     public void clear() {

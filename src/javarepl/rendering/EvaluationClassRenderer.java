@@ -124,8 +124,8 @@ public class EvaluationClassRenderer {
     }
 
     private static String renderPreviousMethods(EvaluationContext context) {
-        return context.methods()
-                .map(expression().then(source()))
+        return context.expressionsOfType(Method.class)
+                .map(source())
                 .toString("\n", "\n\n", "\n")
                 .replaceAll("\n", "\n  ");
     }
@@ -139,8 +139,8 @@ public class EvaluationClassRenderer {
     }
 
     private static String renderUserImports(EvaluationContext context) {
-        return context.imports()
-                .map(expression().then(source()))
+        return context.expressionsOfType(Import.class)
+                .map(source())
                 .toString("", ";\n", ";");
     }
 

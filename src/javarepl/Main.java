@@ -1,11 +1,10 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Rules;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
+import javarepl.expressions.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
+import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
 
 import java.io.BufferedReader;
@@ -22,9 +21,10 @@ import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
 import static javarepl.Evaluation.functions.classSource;
-import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.resolveClasspath;
+import static javarepl.expressions.Expression.functions.source;
+import static javarepl.expressions.WithKey.functions.key;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -81,7 +81,7 @@ public class Main {
                 String help = new StringBuilder().append("Available commands: \n")
                         .append("    :help - display this help\n")
                         .append("    :cp <path> - includes given file or directory in the classpath\n")
-                        .append("    :list <results|types> - list specified values\n")
+                        .append("    :list <results|types|methods|imports> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
                         .append("    :! - evaluate the latest expression\n")
@@ -163,14 +163,27 @@ public class Main {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 String items = line.replace(":list ", "");
+
                 if (items.equals("results")) {
-                    sequence(evaluator.results()).forEach(printlnToOut());
+                    listValues("Results", evaluator.results());
                 }
 
                 if (items.equals("types")) {
-                    sequence(evaluator.classes()).map(expression()).forEach(printlnToOut());
+                    listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key()));
+                }
+
+                if (items.equals("imports")) {
+                    listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source()));
+                }
+
+                if (items.equals("methods")) {
+                    listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key()));
                 }
                 return null;
+            }
+
+            private void listValues(String name, Iterable<?> list) {
+                System.out.println(format(name + ":\n%s", sequence(list).toString("\n")));
             }
         };
     }
@@ -195,7 +208,10 @@ public class Main {
             {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
-                console.addCompleter(new AggregateCompleter(new StringsCompleter(":exit", ":help", ":include", ":list", ":src", ":clear", ":!")));
+                console.addCompleter(new AggregateCompleter(
+                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":!"),
+                        new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types"))
+                ));
             }
 
             public String call(Sequence<String> lines) throws Exception {
