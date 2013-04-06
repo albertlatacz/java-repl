@@ -1,8 +1,21 @@
-<idea-plugin version="2">
-    <name>JavaREPL</name>
-    <description>Simple Read-Eval-Print-Loop for Java</description>
+<idea-plugin version="2" url="https://github.com/albertlatacz/java-repl">
+    <name>Java REPL</name>
     <version>dev.build</version>
     <vendor>VOXA Software Ltd</vendor>
+
+    <description><![CDATA[
+        <h3>Java REPL is a simple Read-Eval-Print-Loop for Java</h3>
+        <br>
+        <b>Features:</b>
+        <br>
+        <ul>
+            <li>Support for most of Java language constructs</li>
+            <li>Create imports, methods, classes, enums and interfaces</li>
+            <li>Load classes from any jar file or directory on file system</li>
+            <li>List previous results and expressions</li>
+            <li>Evaluate last expression</li>
+        </ul>
+        ]]></description>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="107.105"/>

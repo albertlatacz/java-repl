@@ -1,6 +1,6 @@
 # java-repl
 
-java-repl is a simple Read-Eval-Print-Loopfor Java language.
+java-repl is a simple Read-Eval-Print-Loop for Java language.
 
 ## Build
 
@@ -11,7 +11,9 @@ java-repl is a simple Read-Eval-Print-Loopfor Java language.
 
 Download the latest version from http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar and run
 
+```
 java -jar javarepl.jar
+```
 
 ## License
 

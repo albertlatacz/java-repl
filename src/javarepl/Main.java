@@ -13,9 +13,11 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Callables.toString;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.join;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
@@ -61,7 +63,7 @@ public class Main {
                 .addLast(always(), noAction());
 
         do {
-            rules.apply(expressionReader.readExpression());
+            rules.apply(expressionReader.readExpression().getOrNull());
             System.out.println();
         } while (true);
     }
@@ -195,8 +197,8 @@ public class Main {
     private Function1<String, Function1<String, Void>> noAction() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-
-                System.out.println("line = " + line + " " + line.isEmpty() );
+                if (line == null)
+                    System.exit(0);
                 return null;
             }
         };

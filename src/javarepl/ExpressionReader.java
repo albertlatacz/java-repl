@@ -5,8 +5,8 @@ import com.googlecode.totallylazy.*;
 import java.util.LinkedList;
 import java.util.Map;
 
-import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Predicates.nullValue;
+import static com.googlecode.totallylazy.Option.*;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.join;
@@ -22,14 +22,16 @@ public class ExpressionReader {
         this.lineReader = lineReader;
     }
 
-    public String readExpression() {
+    public Option<String> readExpression() {
         Sequence<String> lines = Sequences.empty();
 
         do {
             lines = lines.add(lineReader.apply(lines));
         } while (!expressionIsTerminated(lines));
 
-        return lines.filter(not(nullValue())).toString("\n").trim();
+        return lines.contains(null)
+                ? Option.<String>none()
+                : some(lines.toString("\n").trim());
     }
 
     private boolean expressionIsTerminated(Sequence<String> strings) {
