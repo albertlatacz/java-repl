@@ -20,7 +20,6 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Pair.functions.values;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Sequences.toString;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
