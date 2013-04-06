@@ -63,6 +63,10 @@ public class Evaluator {
         return context.expressionsOfType(type);
     }
 
+    public Sequence<Evaluation> evaluations() {
+        return context.evaluations();
+    }
+
     public void clear() {
         context = emptyEvaluationContext();
     }

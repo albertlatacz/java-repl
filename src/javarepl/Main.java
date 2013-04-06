@@ -1,7 +1,11 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
-import javarepl.expressions.*;
+import com.googlecode.totallylazy.numbers.Numbers;
+import javarepl.expressions.Import;
+import javarepl.expressions.Method;
+import javarepl.expressions.Type;
+import javarepl.expressions.WithKey;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.ArgumentCompleter;
@@ -12,17 +16,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import static com.googlecode.totallylazy.Callables.toString;
-import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Callables.asString;
+import static com.googlecode.totallylazy.Pair.functions.values;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.toString;
 import static com.googlecode.totallylazy.Strings.blank;
-import static com.googlecode.totallylazy.Strings.join;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
 import static javarepl.Evaluation.functions.classSource;
+import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.resolveClasspath;
 import static javarepl.expressions.Expression.functions.source;
@@ -55,6 +60,7 @@ public class Main {
                 .addLast(equalTo(":quit").or(equalTo(null)), quitApplication())
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
+                .addLast(equalTo(":history"), showHistory())
                 .addLast(equalTo(":clear"), clearContext())
                 .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
@@ -68,7 +74,26 @@ public class Main {
         } while (true);
     }
 
-    private static Function1<String, Function1<String, Void>> quitApplication() {
+    private Function1<String, Function1<String, Void>> showHelp() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+                String help = new StringBuilder().append("Available commands: \n")
+                        .append("    :help - display this help\n")
+                        .append("    :cp <path> - includes given file or directory in the classpath\n")
+                        .append("    :history - shows the history\n")
+                        .append("    :list <results|types|methods|imports> - list specified values\n")
+                        .append("    :src - display last compiled source\n")
+                        .append("    :clear - clears all variables\n")
+                        .append("    :! - evaluate the latest expression\n")
+                        .append("    :quit - exits the app\n")
+                        .toString();
+                System.out.println(help);
+                return null;
+            }
+        };
+    }
+
+    private Function1<String, Function1<String, Void>> quitApplication() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 exit(0);
@@ -77,19 +102,15 @@ public class Main {
         };
     }
 
-    private Function1<String, Function1<String, Void>> showHelp() {
+    private Function1<String, Function1<String, Void>> showHistory() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                String help = new StringBuilder().append("Available commands: \n")
-                        .append("    :help - display this help\n")
-                        .append("    :cp <path> - includes given file or directory in the classpath\n")
-                        .append("    :list <results|types|methods|imports> - list specified values\n")
-                        .append("    :src - display last compiled source\n")
-                        .append("    :clear - clears all variables\n")
-                        .append("    :! - evaluate the latest expression\n")
-                        .append("    :quit - exits the app\n")
-                        .toString();
-                System.out.println(help);
+                Sequence<String> history = Numbers.range(1)
+                        .zip(evaluator.evaluations().map(expression().then(source())))
+                        .map(values().then(Sequences.toString("  ")));
+
+                listValues("History", history);
+
                 return null;
             }
         };
@@ -183,11 +204,11 @@ public class Main {
                 }
                 return null;
             }
-
-            private void listValues(String name, Iterable<?> list) {
-                System.out.println(format(name + ":\n%s", sequence(list).toString("\n")));
-            }
         };
+    }
+
+    private void listValues(String name, Iterable<?> list) {
+        System.out.println(format(name + ":\n%s", sequence(list).toString("\n")));
     }
 
     public void evaluateExpression(String expr) {
@@ -213,7 +234,7 @@ public class Main {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(
-                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":!"),
+                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":!", ":history"),
                         new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types"))
                 ));
             }
@@ -239,7 +260,7 @@ public class Main {
     private Function1<Evaluation, Void> printResult() {
         return new Function1<Evaluation, Void>() {
             public Void call(Evaluation result) throws Exception {
-                result.result().map(toString.then(printlnToOut()));
+                result.result().map(asString().then(printlnToOut()));
                 return null;
             }
         };
