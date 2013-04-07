@@ -11,10 +11,7 @@ import jline.console.completer.AggregateCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Pair.functions.values;
@@ -80,7 +77,7 @@ public class Main {
                         .append("    :help - display this help\n")
                         .append("    :cp <path> - includes given file or directory in the classpath\n")
                         .append("    :history - shows the history\n")
-                        .append("    :list <results|types|methods|imports> - list specified values\n")
+                        .append("    :list <results|types|methods|imports|all> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
                         .append("    :! - evaluate the latest expression\n")
@@ -186,28 +183,51 @@ public class Main {
             public Function1<String, Void> call(String line) throws Exception {
                 String items = line.replace(":list ", "");
 
+                if (items.equals("all")) {
+                    listResults();
+                    listTypes();
+                    listImports();
+                    listMethods();
+                }
+
                 if (items.equals("results")) {
-                    listValues("Results", evaluator.results());
+                    listResults();
                 }
 
                 if (items.equals("types")) {
-                    listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key()));
+                    listTypes();
                 }
 
                 if (items.equals("imports")) {
-                    listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source()));
+                    listImports();
                 }
 
                 if (items.equals("methods")) {
-                    listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key()));
+                    listMethods();
                 }
                 return null;
+            }
+
+            private void listMethods() {
+                listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key()));
+            }
+
+            private void listImports() {
+                listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source()));
+            }
+
+            private void listTypes() {
+                listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key()));
+            }
+
+            private void listResults() {
+                listValues("Results", evaluator.results());
             }
         };
     }
 
     private void listValues(String name, Iterable<?> list) {
-        System.out.println(format(name + ":\n%s", sequence(list).toString("\n")));
+        System.out.println(format(name + ":\n    %s\n", sequence(list).toString("\n    ")));
     }
 
     public void evaluateExpression(String expr) {
