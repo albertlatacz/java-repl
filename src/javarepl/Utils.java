@@ -17,9 +17,9 @@ import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
 import static com.googlecode.totallylazy.Sequences.characters;
-import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
+import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.net.URLDecoder.decode;
 
@@ -108,7 +108,12 @@ public class Utils {
                 .map(new Function1<Pair<Sequence<T>, T>, Sequence<T>>() {
                     public Sequence<T> call(Pair<Sequence<T>, T> pair) {
                         return pair.first().add(pair.second()).unique();
-                    }})
+                    }
+                })
                 .unique();
+    }
+
+    public static void listValues(String name, Iterable<?> list) {
+        System.out.println(format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    ")));
     }
 }

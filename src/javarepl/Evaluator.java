@@ -18,13 +18,10 @@ import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.file;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Predicates.instanceOf;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.toURL;
 import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
-import static javarepl.Evaluation.functions.expression;
 import static javarepl.EvaluationContext.emptyEvaluationContext;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.expressions.Patterns.*;
@@ -45,7 +42,7 @@ public class Evaluator {
 
         Expression expression = createExpression(expr);
         Either<? extends Throwable, Evaluation> result = evaluate(expression);
-        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof  Value) {
+        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
             result = evaluate(new Statement(expr));
         }
 
@@ -94,7 +91,6 @@ public class Evaluator {
         if (isValidAssignmentWithType(expr))
             return new AssignmentWithType(expr);
 
-
         if (isValidAssignment(expr))
             return new Assignment(expr);
 
@@ -104,7 +100,8 @@ public class Evaluator {
 
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
-        return new multi() {}.<Either<? extends Throwable, Evaluation>>
+        return new multi() {
+        }.<Either<? extends Throwable, Evaluation>>
                 methodOption(expression).getOrElse(evaluateExpression(expression));
     }
 

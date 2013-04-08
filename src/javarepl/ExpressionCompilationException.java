@@ -1,6 +1,6 @@
 package javarepl;
 
-class ExpressionCompilationException extends Exception {
+public class ExpressionCompilationException extends Exception {
     private final int code;
 
     ExpressionCompilationException(int code, String message) {
