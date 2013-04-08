@@ -16,6 +16,7 @@
             <li>List previous results, imports, created types and methods</li>
             <li>Show history of evaluations</li>
             <li>Search and evaluate expression from history</li>
+            <li>Clear and replay previous evaluations</li>
         </ul>
         ]]></description>
 

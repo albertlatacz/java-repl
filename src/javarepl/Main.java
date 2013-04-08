@@ -60,7 +60,8 @@ public class Main {
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
                 .addLast(startsWith(":history"), showHistory())
-                .addLast(equalTo(":clear"), clearContext())
+                .addLast(equalTo(":clear"), clearAll())
+                .addLast(equalTo(":replay"), replayAll())
                 .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
                 .addLast(startsWith(":h!"), evaluateFromHistory())
@@ -85,7 +86,8 @@ public class Main {
                         .append("    :h? <search_string> - searches the history\n")
                         .append("    :list <results|types|methods|imports|all> - list specified values\n")
                         .append("    :src - display last compiled source\n")
-                        .append("    :clear - clears all variables\n")
+                        .append("    :clear - clear all variables\n")
+                        .append("    :replay - replay all evaluations\n")
                         .append("    :quit - exits the app\n")
                         .toString();
                 System.out.println(help);
@@ -139,7 +141,7 @@ public class Main {
         };
     }
 
-    private Function1<String, Function1<String, Void>> clearContext() {
+    private Function1<String, Function1<String, Void>> clearAll() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 evaluator.clear();
@@ -149,6 +151,24 @@ public class Main {
             }
 
 
+        };
+    }
+
+    private Function1<String, Function1<String, Void>> replayAll() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+                System.out.println("Replaying all evaluations:");
+                Sequence<Evaluation> evaluations = evaluator.evaluations();
+                evaluator.clear();
+                evaluations.forEach(new Function1<Evaluation, Void>() {
+                    public Void call(Evaluation evaluation) throws Exception {
+                        evaluateExpression(evaluation.expression().source());
+                        return null;
+                    }
+                });
+
+                return null;
+            }
         };
     }
 
@@ -273,7 +293,7 @@ public class Main {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(
-                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":history", ":h!", ":h?"),
+                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":replay", ":history", ":h!", ":h?"),
                         new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types", "all"))
                 ));
             }

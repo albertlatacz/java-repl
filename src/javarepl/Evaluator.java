@@ -33,8 +33,8 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
     private final File outputDirectory = temporaryDirectory("JavaREPL");
-    private final EvaluationClassLoader classLoader = new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
 
+    private EvaluationClassLoader classLoader = createClassLoader();
     private EvaluationContext context = emptyEvaluationContext();
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
@@ -70,10 +70,15 @@ public class Evaluator {
 
     public void clear() {
         context = emptyEvaluationContext();
+        classLoader = createClassLoader();
     }
 
     public void addClasspathUrl(URL classpathUrl) {
         classLoader.addURL(classpathUrl);
+    }
+
+    private EvaluationClassLoader createClassLoader() {
+        return new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
     }
 
     private Expression createExpression(String expr) {
