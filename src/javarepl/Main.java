@@ -65,7 +65,7 @@ public class Main {
                 .addLast(equalTo(":clear"), clearContext())
                 .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
-                .addLast(equalTo(":!"), evaluateLatest())
+                .addLast(startsWith(":h!"), evaluateFromHistory())
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
 
@@ -82,10 +82,10 @@ public class Main {
                         .append("    :help - display this help\n")
                         .append("    :cp <path> - includes given file or directory in the classpath\n")
                         .append("    :history [num] - shows the history (optional 'num' is number of evaluations to show)\n")
+                        .append("    :h! [num] - evaluate last expression (optional 'num' to evaluate expression from history)\n")
                         .append("    :list <results|types|methods|imports|all> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
-                        .append("    :! - evaluate the latest expression\n")
                         .append("    :quit - exits the app\n")
                         .toString();
                 System.out.println(help);
@@ -106,8 +106,8 @@ public class Main {
     private Function1<String, Function1<String, Void>> showHistory() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                Sequence<String> sequence = sequence(line.split(" "));
-                Integer limit = (sequence.size() == 2) ? parseInt(sequence.second()) : evaluator.evaluations().size();
+                Sequence<String> splitLine = sequence(line.split(" "));
+                Integer limit = (splitLine.size() == 2) ? parseInt(splitLine.second()) : evaluator.evaluations().size();
 
                 Sequence<String> history = Numbers.range(1)
                         .zip(evaluator.evaluations().map(expression().then(source()).then(replace("\n", "\n   "))))
@@ -126,8 +126,6 @@ public class Main {
                 System.out.println(evaluator.lastEvaluation().map(classSource()).getOrElse("No source"));
                 return null;
             }
-
-
         };
     }
 
@@ -155,14 +153,18 @@ public class Main {
         };
     }
 
-    private Function1<String, Function1<String, Void>> evaluateLatest() {
+    private Function1<String, Function1<String, Void>> evaluateFromHistory() {
         return new Function1<String, Function1<String, Void>>() {
-            public Function1<String, Void> call(String expression) throws Exception {
-                Option<Evaluation> lastEvaluation = evaluator.lastEvaluation();
+            public Function1<String, Void> call(String line) throws Exception {
+                Sequence<String> splitLine = sequence(line.split(" "));
+                Integer historyItem = (splitLine.size() == 2) ? parseInt(splitLine.second()) : evaluator.evaluations().size();
+                Option<Evaluation> lastEvaluation = evaluator.evaluations().drop(historyItem - 1).headOption();
                 if (!lastEvaluation.isEmpty()) {
                     String source = lastEvaluation.get().expression().source();
                     System.out.println(source);
                     evaluateExpression(source);
+                } else {
+                    System.err.println("Expression not found.\n");
                 }
 
                 return null;
@@ -261,8 +263,8 @@ public class Main {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(
-                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":!", ":history"),
-                        new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types"))
+                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":history", ":h!"),
+                        new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types", "all"))
                 ));
             }
 
