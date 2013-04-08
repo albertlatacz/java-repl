@@ -43,8 +43,9 @@ public class Evaluator {
             return right(evaluationOption.get());
         }
 
-        Either<? extends Throwable, Evaluation> result = evaluate(createExpression(expr));
-        if (result.isLeft() && result.left() instanceof ExpressionCompilationException) {
+        Expression expression = createExpression(expr);
+        Either<? extends Throwable, Evaluation> result = evaluate(expression);
+        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof  Value) {
             result = evaluate(new Statement(expr));
         }
 

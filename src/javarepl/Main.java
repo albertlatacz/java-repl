@@ -11,7 +11,9 @@ import jline.console.completer.AggregateCompleter;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Pair.functions.values;
@@ -22,6 +24,7 @@ import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
+import static java.util.regex.Matcher.quoteReplacement;
 import static javarepl.Evaluation.functions.classSource;
 import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.applicationVersion;
@@ -115,7 +118,7 @@ public class Main {
     private Function1<String, Function1<String, Void>> showLastSource() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
-                evaluator.lastEvaluation().map(classSource().then(printlnToOut()));
+                System.out.println(evaluator.lastEvaluation().map(classSource()).getOrElse("No source"));
                 return null;
             }
 
@@ -231,7 +234,7 @@ public class Main {
     }
 
     public void evaluateExpression(String expr) {
-        evaluator.evaluate(expr).map(printlnToErr(), printResult());
+        evaluator.evaluate(expr).map(printError(), printResult());
     }
 
     private Function1<String, Function1<String, Void>> noAction() {
@@ -279,31 +282,29 @@ public class Main {
     private Function1<Evaluation, Void> printResult() {
         return new Function1<Evaluation, Void>() {
             public Void call(Evaluation result) throws Exception {
-                result.result().map(asString().then(printlnToOut()));
+                System.out.println(result.result().map(asString()));
                 return null;
             }
         };
     }
 
-    private Function1<Object, Void> printlnToOut() {
-        return printlnTo(System.out);
-    }
-
-    private Function1<Object, Void> printlnToErr() {
-        return printlnTo(System.err);
-    }
-
-    private Function1<Object, Void> printlnTo(final PrintStream stream) {
-        return new Function1<Object, Void>() {
-            public Void call(Object toPrint) throws Exception {
-                if (toPrint instanceof Throwable)
-                    ((Throwable) toPrint).printStackTrace(stream);
-                else
-                    stream.println(toPrint);
+    private Function1<Throwable, Void> printError() {
+        return new Function1<Throwable, Void>() {
+            public Void call(Throwable error) throws Exception {
+                if (error instanceof ExpressionCompilationException) {
+                    String firstLocation = sequence(error.toString().split(":")).take(3).toString(":").trim() + ": ";
+                    String otherLocations = sequence(error.toString().split(":")).drop(1).take(2).toString(":").trim() + ": ";
+                    String message = error.toString()
+                            .replaceAll(quoteReplacement(firstLocation), "ERROR: ")
+                            .replaceAll(quoteReplacement(otherLocations), "ERROR: ")
+                            .replaceAll("\n", "\n  ")
+                            .replaceAll("  ERROR", "ERROR");
+                    System.err.println(message);
+                } else {
+                     error.printStackTrace(System.err);
+                }
                 return null;
             }
         };
     }
-
-
 }
