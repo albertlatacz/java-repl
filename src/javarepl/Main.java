@@ -19,9 +19,7 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Pair.functions.values;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.blank;
-import static com.googlecode.totallylazy.Strings.replace;
-import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.Strings.*;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.exit;
@@ -66,6 +64,7 @@ public class Main {
                 .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
                 .addLast(startsWith(":h!"), evaluateFromHistory())
+                .addLast(startsWith(":h?"), searchHistory())
                 .addLast(not(blank()), evaluate())
                 .addLast(always(), noAction());
 
@@ -83,6 +82,7 @@ public class Main {
                         .append("    :cp <path> - includes given file or directory in the classpath\n")
                         .append("    :history [num] - shows the history (optional 'num' is number of evaluations to show)\n")
                         .append("    :h! [num] - evaluate last expression (optional 'num' to evaluate expression from history)\n")
+                        .append("    :h? <search_string> - searches the history\n")
                         .append("    :list <results|types|methods|imports|all> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
@@ -108,16 +108,26 @@ public class Main {
             public Function1<String, Void> call(String line) throws Exception {
                 Sequence<String> splitLine = sequence(line.split(" "));
                 Integer limit = (splitLine.size() == 2) ? parseInt(splitLine.second()) : evaluator.evaluations().size();
-
-                Sequence<String> history = Numbers.range(1)
-                        .zip(evaluator.evaluations().map(expression().then(source()).then(replace("\n", "\n   "))))
-                        .map(values().then(Sequences.toString("  ")));
-
-                listValues("History", history.reverse().take(limit).reverse());
-
+                listValues("History", history().reverse().take(limit).reverse());
                 return null;
             }
         };
+    }
+
+    private Function1<String, Function1<String, Void>> searchHistory() {
+        return new Function1<String, Function1<String, Void>>() {
+            public Function1<String, Void> call(String line) throws Exception {
+                String searchStr = sequence(line.split(" ")).tail().toString(" ");
+                listValues("History search for '" + searchStr + "'", history().filter(contains(searchStr)));
+                return null;
+            }
+        };
+    }
+
+    private Sequence<String> history() {
+        return Numbers.range(1)
+                .zip(evaluator.evaluations().map(expression().then(source()).then(replace("\n", "\n   "))))
+                .map(values().then(Sequences.toString("  ")));
     }
 
     private Function1<String, Function1<String, Void>> showLastSource() {
@@ -263,7 +273,7 @@ public class Main {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(
-                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":history", ":h!"),
+                        new StringsCompleter(":exit", ":help", ":include", ":src", ":clear", ":history", ":h!", ":h?"),
                         new ArgumentCompleter(new StringsCompleter(":list"), new StringsCompleter("results", "methods", "imports", "types", "all"))
                 ));
             }
