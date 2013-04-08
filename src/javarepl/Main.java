@@ -22,6 +22,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.System.getProperty;
@@ -60,7 +61,7 @@ public class Main {
                 .addLast(equalTo(":quit").or(equalTo(null)), quitApplication())
                 .addLast(equalTo(":help"), showHelp())
                 .addLast(equalTo(":src"), showLastSource())
-                .addLast(equalTo(":history"), showHistory())
+                .addLast(startsWith(":history"), showHistory())
                 .addLast(equalTo(":clear"), clearContext())
                 .addLast(startsWith(":cp "), addClasspath())
                 .addLast(startsWith(":list "), list())
@@ -80,7 +81,7 @@ public class Main {
                 String help = new StringBuilder().append("Available commands: \n")
                         .append("    :help - display this help\n")
                         .append("    :cp <path> - includes given file or directory in the classpath\n")
-                        .append("    :history - shows the history\n")
+                        .append("    :history [num] - shows the history (optional 'num' is number of evaluations to show)\n")
                         .append("    :list <results|types|methods|imports|all> - list specified values\n")
                         .append("    :src - display last compiled source\n")
                         .append("    :clear - clears all variables\n")
@@ -105,11 +106,14 @@ public class Main {
     private Function1<String, Function1<String, Void>> showHistory() {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
+                Sequence<String> sequence = sequence(line.split(" "));
+                Integer limit = (sequence.size() == 2) ? parseInt(sequence.second()) : evaluator.evaluations().size();
+
                 Sequence<String> history = Numbers.range(1)
                         .zip(evaluator.evaluations().map(expression().then(source()).then(replace("\n", "\n   "))))
                         .map(values().then(Sequences.toString("  ")));
 
-                listValues("History", history);
+                listValues("History", history.reverse().take(limit).reverse());
 
                 return null;
             }
