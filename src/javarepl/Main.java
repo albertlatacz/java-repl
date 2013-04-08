@@ -20,6 +20,7 @@ import static com.googlecode.totallylazy.Pair.functions.values;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
 import static java.lang.System.exit;
@@ -105,7 +106,7 @@ public class Main {
         return new Function1<String, Function1<String, Void>>() {
             public Function1<String, Void> call(String line) throws Exception {
                 Sequence<String> history = Numbers.range(1)
-                        .zip(evaluator.evaluations().map(expression().then(source())))
+                        .zip(evaluator.evaluations().map(expression().then(source()).then(replace("\n", "\n   "))))
                         .map(values().then(Sequences.toString("  ")));
 
                 listValues("History", history);
@@ -230,7 +231,7 @@ public class Main {
     }
 
     private void listValues(String name, Iterable<?> list) {
-        System.out.println(format(name + ":\n    %s\n", sequence(list).toString("\n    ")));
+        System.out.println(format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    ")));
     }
 
     public void evaluateExpression(String expr) {
@@ -282,7 +283,7 @@ public class Main {
     private Function1<Evaluation, Void> printResult() {
         return new Function1<Evaluation, Void>() {
             public Void call(Evaluation result) throws Exception {
-                System.out.println(result.result().map(asString()));
+                System.out.println(result.result().map(asString()).getOrElse(""));
                 return null;
             }
         };
