@@ -16,7 +16,7 @@ import static javarepl.Utils.listValues;
 import static javarepl.expressions.Expression.functions.source;
 
 public class ShowHistory extends Command {
-    private static final String COMMAND = ":history";
+    private static final String COMMAND = ":hist";
 
     public ShowHistory() {
         super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",

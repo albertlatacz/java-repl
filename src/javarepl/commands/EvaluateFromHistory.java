@@ -14,7 +14,7 @@ public class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
 
     public EvaluateFromHistory() {
-        super(COMMAND + "  [num] - evaluate last expression (optional 'num' to evaluate expression from history)",
+        super(COMMAND + " [num] - evaluate last expression (optional 'num' to evaluate expression from history)",
                 startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
