@@ -14,7 +14,8 @@
             <li>Create imports, methods, classes, enums and interfaces</li>
             <li>Load classes from any jar file or directory on file system</li>
             <li>List previous results, imports, created types and methods</li>
-            <li>Show history of evaluations and evaluate expression from history</li>
+            <li>Show history of evaluations</li>
+            <li>Search and evaluate expression from history</li>
         </ul>
         ]]></description>
 
