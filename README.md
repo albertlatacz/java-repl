@@ -1,6 +1,6 @@
-# java-repl
+# Java REPL
 
-java-repl is a simple Read-Eval-Print-Loop for Java language.
+Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 ## Build
 
