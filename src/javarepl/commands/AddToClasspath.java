@@ -15,7 +15,7 @@ public class AddToClasspath extends Command {
     }
 
     public Void call(final Evaluator evaluator, String expression) throws Exception {
-        String path = expression.replace(COMMAND, "").trim();
+        String path = parseStringCommand(expression).second().getOrNull();
         try {
             evaluator.addClasspathUrl(resolveClasspath(path));
             System.out.println(format("Added %s to classpath.", path));

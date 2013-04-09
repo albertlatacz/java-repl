@@ -7,10 +7,8 @@ import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Pair.functions.values;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static java.lang.Integer.parseInt;
 import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.listValues;
 import static javarepl.expressions.Expression.functions.source;
@@ -24,8 +22,7 @@ public class ShowHistory extends Command {
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        Sequence<String> splitLine = sequence(expression.split(" "));
-        Integer limit = (splitLine.size() == 2) ? parseInt(splitLine.second()) : evaluator.evaluations().size();
+        Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
         listValues("History", history(evaluator).reverse().take(limit).reverse());
         return null;
     }

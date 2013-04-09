@@ -3,7 +3,6 @@ package javarepl.commands;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.contains;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.Utils.listValues;
@@ -17,7 +16,7 @@ public class SearchHistory extends Command {
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        String searchTerm = sequence(expression.split(" ")).tail().toString(" ");
+        String searchTerm = parseStringCommand(expression).second().getOrElse("");
         listValues("History search for '" + searchTerm + "'", history(evaluator).filter(contains(searchTerm)));
         return null;
     }
