@@ -18,7 +18,7 @@ public class ShowHelp extends Command {
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        listValues("Available commands", commands.map(functions.description()));
+        listValues("Available commands", commands);
         return null;
     }
 }

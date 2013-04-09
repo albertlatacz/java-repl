@@ -4,18 +4,17 @@ import com.googlecode.totallylazy.*;
 import javarepl.commands.*;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
+import jline.console.completer.Completer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static com.googlecode.totallylazy.Predicates.always;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
-import static javarepl.commands.Command.functions.completer;
 
 public class Main {
 
@@ -72,7 +71,7 @@ public class Main {
     public static final Rules<String, Void> commandsToRules(Sequence<? extends Command> commands, Evaluator evaluator) {
         Rules<String, Void> rules = Rules.rules();
         for (Command command : commands) {
-            rules.addLast(Rule.rule(command.predicate(), command.apply(evaluator)));
+            rules.addLast(Rule.rule(command, command.apply(evaluator)));
         }
         return rules.addLast(Rule.rule(always(), Functions.<String, Void>returns1(null)));
     }
@@ -84,7 +83,7 @@ public class Main {
             {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
-                console.addCompleter(new AggregateCompleter(commandSequence.map(completer()).filter(notNullValue()).toList()));
+                console.addCompleter(new AggregateCompleter(commandSequence.safeCast(Completer.class).toList()));
             }
 
             public String call(Sequence<String> lines) throws Exception {

@@ -1,7 +1,6 @@
 * Add downloading of jar from web
-* Add searching and listing of history
 * Load and compile java files
-* Replay execution of all previous commands
 * Improve expression listing
 * Simple auto-completion
 * add auto-documentation to commands
+* pass output directory to evaluator
