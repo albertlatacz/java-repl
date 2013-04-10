@@ -13,6 +13,8 @@ public class QuitApplication extends Command {
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
+        System.out.println("Terminating...");
+        evaluator.clearOutputDirectory();
         System.exit(0);
         return null;
     }

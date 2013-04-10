@@ -1,11 +1,18 @@
 package javarepl;
 
+import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public class EvaluationClassLoader extends URLClassLoader{
-    public EvaluationClassLoader(URL[] urls) {
+import static com.googlecode.totallylazy.URLs.toURL;
+
+public class EvaluationClassLoader extends URLClassLoader {
+    private EvaluationClassLoader(URL[] urls) {
         super(urls);
+    }
+
+    public static EvaluationClassLoader evaluationClassLoader(File outputDirectory) {
+        return new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
     }
 
     @Override

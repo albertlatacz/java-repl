@@ -4,9 +4,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
-import javarepl.expressions.Import;
-import javarepl.expressions.Method;
-import javarepl.expressions.Type;
 
 import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -23,7 +20,7 @@ public class EvaluationContext {
         this.evaluations = sequence(evaluations);
     }
 
-    public static EvaluationContext emptyEvaluationContext() {
+    public static EvaluationContext evaluationContext() {
         return new EvaluationContext(Sequences.<Evaluation>empty());
     }
 

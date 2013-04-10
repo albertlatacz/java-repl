@@ -13,7 +13,7 @@ public class ClearAllEvaluations extends Command {
     }
 
     public Void call(Evaluator evaluator, String s) throws Exception {
-        evaluator.clear();
+        evaluator.reset();
         System.out.println("All variables has been cleared");
         System.out.println();
         return null;

@@ -15,24 +15,26 @@ import java.util.List;
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
-import static com.googlecode.totallylazy.Files.file;
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.URLs.toURL;
 import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
-import static javarepl.EvaluationContext.emptyEvaluationContext;
+import static javarepl.EvaluationClassLoader.evaluationClassLoader;
+import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
-    private final File outputDirectory = temporaryDirectory("JavaREPL");
+    private EvaluationClassLoader classLoader;
+    private EvaluationContext context;
+    private File outputDirectory;
 
-    private EvaluationClassLoader classLoader = createClassLoader();
-    private EvaluationContext context = emptyEvaluationContext();
+    public Evaluator() {
+        initializeEvaluator();
+    }
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
         Option<Evaluation> evaluationOption = context.evaluationForResult(expr);
@@ -65,17 +67,24 @@ public class Evaluator {
         return context.evaluations();
     }
 
-    public void clear() {
-        context = emptyEvaluationContext();
-        classLoader = createClassLoader();
+    public void reset() {
+        clearOutputDirectory();
+        initializeEvaluator();
+    }
+
+    private void initializeEvaluator() {
+        context = evaluationContext();
+        outputDirectory = randomOutputDirectory();
+        classLoader = evaluationClassLoader(outputDirectory);
+    }
+
+    public void clearOutputDirectory() {
+        deleteFiles(outputDirectory);
+        delete(outputDirectory);
     }
 
     public void addClasspathUrl(URL classpathUrl) {
         classLoader.addURL(classpathUrl);
-    }
-
-    private EvaluationClassLoader createClassLoader() {
-        return new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
     }
 
     private Expression createExpression(String expr) {
@@ -113,7 +122,6 @@ public class Evaluator {
 
         try {
             File outputJavaFile = file(outputDirectory, expression.type() + ".java");
-
             String sources = renderExpressionClass(context, expression.type(), expression);
             Files.write(sources.getBytes(), outputJavaFile);
             compile(outputJavaFile);
@@ -130,10 +138,9 @@ public class Evaluator {
 
     private Either<? extends Throwable, Evaluation> evaluateExpression(Expression expression) {
         String className = randomIdentifier("Evaluation");
-        File outputJavaFile = file(outputDirectory, className + ".java");
-        File outputClassFile = file(outputDirectory, className + ".class");
 
         try {
+            File outputJavaFile = file(outputDirectory, className + ".java");
             String sources = renderExpressionClass(context, className, expression);
             Files.write(sources.getBytes(), outputJavaFile);
 
@@ -157,9 +164,6 @@ public class Evaluator {
             }
         } catch (Throwable e) {
             return left(Utils.unwrapException(e));
-        } finally {
-            outputJavaFile.delete();
-            outputClassFile.delete();
         }
     }
 
@@ -178,5 +182,11 @@ public class Evaluator {
 
         if (errorCode != 0)
             throw new ExpressionCompilationException(errorCode, errorStream.toString());
+    }
+
+    private static File randomOutputDirectory() {
+        File file = temporaryDirectory("JavaREPL/" + randomFilename());
+        file.deleteOnExit();
+        return file;
     }
 }

@@ -3,4 +3,3 @@
 * Improve expression listing
 * Simple auto-completion
 * add auto-documentation to commands
-* pass output directory to evaluator

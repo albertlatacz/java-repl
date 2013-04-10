@@ -17,7 +17,7 @@ public class ReplayAllEvaluations extends Command {
     public Void call(final Evaluator evaluator, String s) throws Exception {
         System.out.println("Replaying all evaluations:");
         Sequence<Evaluation> evaluations = evaluator.evaluations();
-        evaluator.clear();
+        evaluator.reset();
 
         for (Evaluation evaluation : evaluations) {
             EvaluateExpression.evaluate(evaluator, evaluation.expression().source());

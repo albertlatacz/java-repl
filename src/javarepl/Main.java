@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 
-public class Main {
+public class Main implements Runnable {
 
     public static void main(String[] args) throws Exception {
         Sequence<String> arguments = sequence(args);
@@ -36,10 +36,19 @@ public class Main {
         commands = createCommands();
         expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(commands));
 
+        registerShutdownHook();
 
         System.out.println("Type in expression to evaluate.");
         System.out.println("Type :help for more options.");
         System.out.println("");
+    }
+
+    private void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                evaluator.clearOutputDirectory();
+            }
+        });
     }
 
     private Sequence<Command> createCommands() {
@@ -59,7 +68,7 @@ public class Main {
                 .add(new EvaluateExpression());
     }
 
-    public void run() throws IOException {
+    public void run() {
         Rules<String, Void> rules = commandsToRules(commands, evaluator);
 
         do {
