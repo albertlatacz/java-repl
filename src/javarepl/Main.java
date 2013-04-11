@@ -61,7 +61,8 @@ public class Main implements Runnable {
                 .add(new ReplayAllEvaluations())
                 .add(new AddToClasspath())
                 .add(new ListValues())
-                .add(new ShowLastSource());
+                .add(new ShowLastSource())
+                .add(new ShowTypeOfExpression());
 
         return commandSequence
                 .add(new ShowHelp(commandSequence))

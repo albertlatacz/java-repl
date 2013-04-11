@@ -1,9 +1,11 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Option;
 import javarepl.expressions.*;
 import org.junit.Test;
 
 import static javarepl.EvaluationTestHelper.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class EvaluatorTest {
@@ -33,6 +35,13 @@ public class EvaluatorTest {
         assertThat(evaluating("class NewClass {public int field=20;}"), hasNoResult());
         assertThat(evaluating("class NewClass {public int field=20;}", "new NewClass().field"), hasResult(20));
         assertThat(evaluating("int max(int a, int b) { return a > b ? a : b; }", "max(20, 30)"), hasResult(30));
+    }
+
+    @Test
+    public void shouldReturnTypeOfExpression() {
+        assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<Class>some(String.class)));
+        assertThat(new Evaluator().typeOfExpression("12"), is(Option.<Class>some(Integer.class)));
+        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(Option.<Class>none()));
     }
 
 }

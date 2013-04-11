@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class Result {
     private final String key;
@@ -54,7 +53,9 @@ public class Result {
                 (value != null && value.equals(((Result) other).value));
     }
 
-    public static enum functions {;
+    public static enum functions {
+        ;
+
         public static Function1<Result, String> key() {
             return new Function1<Result, String>() {
                 public String call(Result result) throws Exception {

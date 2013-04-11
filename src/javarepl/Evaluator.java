@@ -16,6 +16,7 @@ import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.*;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.io.File.pathSeparator;
@@ -33,7 +34,11 @@ public class Evaluator {
     private File outputDirectory;
 
     public Evaluator() {
-        initializeEvaluator();
+        initializeEvaluator(evaluationContext());
+    }
+
+    private Evaluator(EvaluationContext context) {
+        initializeEvaluator(context);
     }
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
@@ -69,13 +74,29 @@ public class Evaluator {
 
     public void reset() {
         clearOutputDirectory();
-        initializeEvaluator();
+        initializeEvaluator(evaluationContext());
     }
 
-    private void initializeEvaluator() {
-        context = evaluationContext();
+    private void initializeEvaluator(EvaluationContext evaluationContext) {
+        context = evaluationContext;
         outputDirectory = randomOutputDirectory();
         classLoader = evaluationClassLoader(outputDirectory);
+    }
+
+    public final Option<Class> typeOfExpression(String expression) {
+        Evaluator localEvaluator = new Evaluator(context);
+        Either<? extends Throwable, Evaluation> evaluation = localEvaluator.evaluate(expression);
+
+        Option<Class> expressionType = none();
+        if (evaluation.isRight()) {
+            Option<Result> result = evaluation.right().result();
+            if (!result.isEmpty()) {
+                expressionType = some((Class) result.get().value().getClass());
+            }
+        }
+
+        localEvaluator.clearOutputDirectory();
+        return expressionType;
     }
 
     public void clearOutputDirectory() {
