@@ -5,15 +5,14 @@ import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 import javarepl.EvaluationContext;
 import javarepl.EvaluationTemplate;
-import javarepl.expressions.*;
 import javarepl.Result;
+import javarepl.expressions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
-import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.extractType;
 import static javarepl.expressions.Expression.functions.source;
 import static javarepl.rendering.ExpressionRenderer.renderExpression;
@@ -23,7 +22,8 @@ public class EvaluationClassRenderer {
 
     @multimethod
     public static String renderExpressionClass(EvaluationContext context, String className, Expression expression) {
-        return new multi() {}.<String>methodOption(context, className, expression)
+        return new multi() {
+        }.<String>methodOption(context, className, expression)
                 .getOrThrow(new IllegalArgumentException(expression + " not mapped"));
     }
 
@@ -89,8 +89,10 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        writer.println(renderDefaultImports());
-        writer.println(renderUserImports(context));
+        if (!expression.source().contains("package ")) {
+            writer.println(renderDefaultImports());
+            writer.println(renderUserImports(context));
+        }
         writer.println(expression.source());
 
         return outputStream.toString();

@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.toURL;
 
 public class EvaluationClassLoader extends URLClassLoader {
@@ -17,7 +18,8 @@ public class EvaluationClassLoader extends URLClassLoader {
 
     @Override
     public void addURL(URL url) {
-        super.addURL(url);
+        if (!sequence(getURLs()).contains(url))
+            super.addURL(url);
     }
 
     public boolean isClassLoaded(String name) {

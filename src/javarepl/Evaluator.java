@@ -136,16 +136,19 @@ public class Evaluator {
 
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
-        if (classLoader.isClassLoaded(expression.type())) {
+        if (classLoader.isClassLoaded(expression.canonicalName())) {
             return left(new UnsupportedOperationException("Redefining classes not supported"));
         }
 
         try {
-            File outputJavaFile = file(outputDirectory, expression.type() + ".java");
+            File outputPath = directory(outputDirectory, expression.typePackage().getOrElse("").replace('.', File.separatorChar));
+            File outputJavaFile = file(outputPath, expression.type() + ".java");
+
             String sources = renderExpressionClass(context, expression.type(), expression);
             Files.write(sources.getBytes(), outputJavaFile);
             compile(outputJavaFile);
-            classLoader.loadClass(expression.type());
+
+            classLoader.loadClass(expression.canonicalName());
 
             Evaluation evaluation = evaluation(expression.type(), sources, expression, Result.noResult());
             context = context.addEvaluation(evaluation);
