@@ -9,6 +9,7 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 * Show history of evaluations
 * Search and evaluate expression from history
 * Clear and replay previous evaluations
+* Load and evaluate any Java source file
 
 ## Build
 

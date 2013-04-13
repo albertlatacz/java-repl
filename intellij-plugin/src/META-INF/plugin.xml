@@ -17,6 +17,7 @@
             <li>Show history of evaluations</li>
             <li>Search and evaluate expression from history</li>
             <li>Clear and replay previous evaluations</li>
+            <li>Load and evaluate any Java source file</li>
         </ul>
         ]]></description>
 
