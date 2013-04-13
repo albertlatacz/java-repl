@@ -60,19 +60,22 @@ public class PatternsTest {
 
     @Test
     public void shouldMatchClass() {
+        assertTrue(isValidType("package some.pack; public static final class SomeClass extends BaseClass implements Interface1,Interface2{  "));
         assertTrue(isValidType("public static final class SomeClass extends BaseClass implements Interface1,Interface2{  "));
-        assertTrue(isValidType("static public final class SomeClass{"));
+        assertTrue(isValidType("static public final class SomeClass{}"));
         assertTrue(isValidType("final static public class SomeClass{"));
         assertTrue(isValidType("final static class SomeClass{"));
         assertTrue(isValidType("final class SomeClass{"));
+        assertTrue(isValidType("  package some.pack; \n\n   class SomeClass { "));
         assertTrue(isValidType("class SomeClass { "));
         assertTrue(isValidType("class SomeClass{ "));
         assertTrue(isValidType("class SomeClass{\n}"));
         assertFalse(isValidType("class SomeClass "));
         assertFalse(isValidType("class "));
 
-        MatchResult result = typePattern.match("public static final class SomeClass extends BaseClass{");
-        assertThat(result.group(1), is("SomeClass"));
+        MatchResult result = typePattern.match("package some.pack; public static final class SomeClass extends BaseClass{");
+        assertThat(result.group(1), is("some.pack"));
+        assertThat(result.group(2), is("SomeClass"));
     }
 
     @Test
@@ -88,7 +91,7 @@ public class PatternsTest {
         assertFalse(isValidType("interface "));
 
         MatchResult result = typePattern.match("static public final interface SomeInterface {");
-        assertThat(result.group(1), is("SomeInterface"));
+        assertThat(result.group(2), is("SomeInterface"));
     }
 
     @Test
@@ -105,4 +108,15 @@ public class PatternsTest {
         assertThat(result.group(1), is("java.lang.String"));
         assertThat(result.group(2), is("SomeMethod"));
     }
+
+//    @Test
+//    public void shouldMatchSourceFile() {
+//        assertTrue(isValidSourceFile("package aaa.bbb.ccc;public class SomeClass{"));
+//        assertTrue(isValidSourceFile("package aaa;\n\n  interface SomeInterface{"));
+//        assertTrue(isValidSourceFile("   package aaa.bbb.ccc;\n\n  public class SomeClass{ }"));
+//
+//        MatchResult result = sourceFilePattern.match("   package aaa.bbb.ccc;\n\n  public class SomeClass{ }");
+//        assertThat(result.group(1), is("aaa.bbb.ccc"));
+//        assertThat(result.group(2), is("SomeClass"));
+//    }
 }

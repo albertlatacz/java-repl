@@ -3,8 +3,7 @@ package javarepl.expressions;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.regex.Regex;
 
-import static com.googlecode.totallylazy.Predicates.is;
-import static com.googlecode.totallylazy.Sequences.*;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 import static java.util.regex.Pattern.DOTALL;
 import static javarepl.Utils.powerSetPermutations;
@@ -19,15 +18,15 @@ public class Patterns {
     public static final Regex visibilityModifiersPattern = oneOf("private +", "public +", "protected +");
     public static final Regex staticModifierPattern = oneOf("static +");
 
+    public static final Regex packagePattern = join(".*package +", captureGroup("[a-zA-Z0-9\\$_\\.]*"), " *;");
     public static final Regex typeExtensibilityModifiersPattern = oneOf("final +", "abstract +");
     public static final Regex typePrefixPattern = oneOf(regexPermutations(typeExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
     public static final Regex typeKindPattern = oneOf("class +", "interface +", "enum +");
-    public static final Regex typePattern = join(typePrefixPattern, typeKindPattern, identifierPattern, ".*\\{.*");
+    public static final Regex typePattern = join(oneOf(packagePattern, ""), ".*", typePrefixPattern, typeKindPattern, identifierPattern, ".*\\{.*");
 
     public static final Regex methodExtensibilityModifiersPattern = oneOf("final +");
     public static final Regex methodPrefixPattern = oneOf(regexPermutations(methodExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
-    public static final Regex methodPattern = join(methodPrefixPattern, typeNamePattern, " +", identifierPattern, " *\\(.*\\) *\\{.*");
-
+    public static final Regex methodPattern = join(optional(methodPrefixPattern), typeNamePattern, " +", identifierPattern, " *\\(.*\\) *\\{.*");
 
     public static boolean isValidImport(String string) {
         return importPattern.matches(string.trim());
@@ -69,5 +68,9 @@ public class Patterns {
 
     private static Regex oneOf(Object... patterns) {
         return regex(sequence(patterns).toString("(?:", "|", ")"));
+    }
+
+    private static Regex optional(Object pattern) {
+        return oneOf(pattern, "");
     }
 }
