@@ -43,6 +43,10 @@ public class Utils {
         return clazz;
     }
 
+    public static String valueToString(Object value) {
+        return valueToString().apply(value);
+    }
+
     public static Function1<Object, String> valueToString() {
         return new Function1<Object, String>() {
             public String call(Object value) throws Exception {

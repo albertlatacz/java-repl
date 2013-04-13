@@ -42,11 +42,6 @@ public class Evaluator {
     }
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
-        Option<Evaluation> evaluationOption = context.evaluationForResult(expr);
-        if (!evaluationOption.isEmpty()) {
-            return right(evaluationOption.get());
-        }
-
         Expression expression = createExpression(expr);
         Either<? extends Throwable, Evaluation> result = evaluate(expression);
         if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
@@ -62,6 +57,10 @@ public class Evaluator {
 
     public List<Result> results() {
         return context.results().toList();
+    }
+
+    public Option<Result> result(String name) {
+        return context.result(name);
     }
 
     public <T extends Expression> Sequence<T> expressionsOfType(Class<T> type) {

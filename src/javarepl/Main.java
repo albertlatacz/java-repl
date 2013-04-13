@@ -60,6 +60,7 @@ public class Main implements Runnable {
                 .add(new ResetAllEvaluations())
                 .add(new ReplayAllEvaluations())
                 .add(new AddToClasspath())
+                .add(new ShowResult())
                 .add(new ListValues())
                 .add(new ShowLastSource())
                 .add(new ShowTypeOfExpression());

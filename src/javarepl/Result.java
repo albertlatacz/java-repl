@@ -4,7 +4,8 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Option.some;
+import static javarepl.Utils.extractType;
+import static javarepl.Utils.valueToString;
 
 public class Result {
     private final String key;
@@ -19,10 +20,6 @@ public class Result {
         return new Result(key, value);
     }
 
-    public static Option<Result> someResult(String key, Object value) {
-        return some(new Result(key, value));
-    }
-
     public String key() {
         return key;
     }
@@ -35,9 +32,14 @@ public class Result {
         return none();
     }
 
+    public String toString(boolean canonical) {
+        Class<?> type = extractType(value.getClass());
+        return (canonical ? type.getCanonicalName() : type.getSimpleName()) + " " + key + " = " + valueToString(value);
+    }
+
     @Override
     public String toString() {
-        return (value != null ? Utils.extractType(value.getClass()).getSimpleName() + " " : "") + key + " = " + Utils.valueToString().apply(value);
+        return toString(false);
     }
 
     @Override

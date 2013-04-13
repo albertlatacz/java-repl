@@ -9,7 +9,6 @@ import static com.googlecode.totallylazy.Option.functions.get;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Evaluation.functions.expression;
-import static javarepl.Evaluation.functions.result;
 import static javarepl.Result.functions.key;
 import static javarepl.Result.noResult;
 
@@ -41,19 +40,15 @@ public class EvaluationContext {
 
     public Sequence<Result> results() {
         return evaluations()
-                .map(result())
+                .map(Evaluation.functions.result())
                 .filter(is(not(noResult())))
                 .map(get(Result.class))
                 .reverse()
                 .unique(key());
     }
 
-    public Option<Evaluation> evaluationForResult(final String key) {
-        return evaluations()
-                .reverse()
-                .filter(where(result(), is(not(noResult()))).and(
-                        where(result().then(get(Result.class)).then(key()), equalTo(key))))
-                .headOption();
+    public Option<Result> result(final String key) {
+        return results().filter(where(key(), equalTo(key))).headOption();
     }
 
     public String nextResultKey() {
