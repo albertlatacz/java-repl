@@ -57,7 +57,7 @@ public class Main implements Runnable {
                 .add(new ShowHistory())
                 .add(new SearchHistory())
                 .add(new EvaluateFromHistory())
-                .add(new ClearAllEvaluations())
+                .add(new ResetAllEvaluations())
                 .add(new ReplayAllEvaluations())
                 .add(new AddToClasspath())
                 .add(new ListValues())
@@ -66,6 +66,7 @@ public class Main implements Runnable {
 
         return commandSequence
                 .add(new ShowHelp(commandSequence))
+                .add(new NotAValidCommand())
                 .add(new EvaluateExpression());
     }
 

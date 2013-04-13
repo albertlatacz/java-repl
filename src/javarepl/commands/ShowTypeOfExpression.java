@@ -10,7 +10,7 @@ public class ShowTypeOfExpression extends Command {
     private static final String COMMAND = ":type";
 
     public ShowTypeOfExpression() {
-        super(COMMAND + " <expression> - shows the type of an expression without evaluating it", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {

@@ -5,11 +5,11 @@ import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 
-public class ClearAllEvaluations extends Command {
-    private static final String COMMAND = ":clear";
+public class ResetAllEvaluations extends Command {
+    private static final String COMMAND = ":reset";
 
-    public ClearAllEvaluations() {
-        super(COMMAND + " - clear all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ResetAllEvaluations() {
+        super(COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
     public Void call(Evaluator evaluator, String s) throws Exception {

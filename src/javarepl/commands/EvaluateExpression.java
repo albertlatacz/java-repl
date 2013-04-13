@@ -14,7 +14,7 @@ import static java.util.regex.Matcher.quoteReplacement;
 
 public class EvaluateExpression extends Command {
     public EvaluateExpression() {
-        super("", Predicates.<String>not(blank()), null);
+        super(null, Predicates.<String>not(blank()), null);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
