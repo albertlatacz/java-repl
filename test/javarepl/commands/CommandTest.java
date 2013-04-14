@@ -22,7 +22,7 @@ public class CommandTest {
     @Test
     public void shouldParseStringCommand() {
         assertThat(parseStringCommand(":cmd 12"), is(pair(":cmd", some("12"))));
-        assertThat(parseStringCommand(":cmd some params"), is(pair(":cmd", some("some params"))));
+        assertThat(parseStringCommand(":cmd some params  "), is(pair(":cmd", some("some params"))));
         assertThat(parseStringCommand(":cmd"), is(pair(":cmd", none(String.class))));
     }
 }

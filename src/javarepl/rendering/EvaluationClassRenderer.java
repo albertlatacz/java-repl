@@ -89,7 +89,7 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        if (!expression.source().contains("package ")) {
+        if (expression.typePackage().isEmpty()) {
             writer.println(renderDefaultImports());
             writer.println(renderUserImports(context));
         }

@@ -12,7 +12,7 @@ public class ResetAllEvaluations extends Command {
         super(COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public Void call(Evaluator evaluator, String s) throws Exception {
+    public Void call(Evaluator evaluator, String expression) throws Exception {
         evaluator.reset();
         System.out.println("All variables has been cleared");
         System.out.println();

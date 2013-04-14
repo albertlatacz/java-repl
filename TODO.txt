@@ -2,7 +2,9 @@
 * Load and compile java files
 * Improve expression listing
 * Simple auto-completion
-* add auto-documentation to commands
+* Add more feedback when evaluating expressions
+* Export evaluations to source file
+
 
 fix intellij 11
 

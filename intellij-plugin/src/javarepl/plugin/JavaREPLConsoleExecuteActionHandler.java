@@ -65,7 +65,7 @@ public class JavaREPLConsoleExecuteActionHandler {
         final int offset = caretModel.getOffset();
         final String text = document.getText();
 
-        if (!"".equals(text.substring(offset).trim())) {
+        if (!text.substring(offset).trim().isEmpty()) {
             final String before = text.substring(0, offset);
             final String after = text.substring(offset);
             final FileASTNode node = console.getFile().getNode();
