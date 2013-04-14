@@ -72,7 +72,7 @@ public class Main implements Runnable {
 
         if (getSystemJavaCompiler() == null) {
             System.err.println("ERROR: Java compiler not found.\n" +
-                    "   This may happen if JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
+                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
             return;
         }
 
