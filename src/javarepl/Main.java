@@ -15,6 +15,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
+import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main implements Runnable {
 
@@ -30,17 +31,11 @@ public class Main implements Runnable {
     private final Sequence<Command> commands;
 
     public Main(boolean simpleConsole) throws Exception {
-        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
-
         evaluator = new Evaluator();
         commands = createCommands();
         expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(commands));
 
         registerShutdownHook();
-
-        System.out.println("Type in expression to evaluate.");
-        System.out.println("Type :help for more options.");
-        System.out.println("");
     }
 
     private void registerShutdownHook() {
@@ -73,6 +68,18 @@ public class Main implements Runnable {
     }
 
     public void run() {
+        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
+
+        if (getSystemJavaCompiler() == null) {
+            System.err.println("ERROR: Java compiler not found.\n" +
+                    "   This may happen if JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
+            return;
+        }
+
+        System.out.println("Type in expression to evaluate.");
+        System.out.println("Type :help for more options.");
+        System.out.println("");
+
         Rules<String, Void> rules = commandsToRules(commands, evaluator);
 
         do {

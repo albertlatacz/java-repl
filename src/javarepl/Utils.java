@@ -79,17 +79,19 @@ public class Utils {
         }
     }
 
-    public static String applicationVersion() throws Exception {
-        File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
+    public static String applicationVersion() {
 
-        if (!path.isDirectory()) {
-            try {
+        try {
+            File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
+            if (!path.isDirectory()) {
+
                 JarInputStream jarStream = new JarInputStream(new FileInputStream(path));
                 Manifest manifest = jarStream.getManifest();
                 return manifest.getMainAttributes().getValue("Implementation-Version");
-            } catch (Exception e) {
-                // ignore
+
             }
+        } catch (Exception e) {
+            // ignore
         }
 
         return "[unknown]";
