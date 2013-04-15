@@ -8,9 +8,7 @@ import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
 
 import static com.googlecode.totallylazy.Callables.asString;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
-import static java.util.regex.Matcher.quoteReplacement;
 
 public class EvaluateExpression extends Command {
     public EvaluateExpression() {
@@ -39,14 +37,7 @@ public class EvaluateExpression extends Command {
         return new Function1<Throwable, Void>() {
             public Void call(Throwable error) throws Exception {
                 if (error instanceof ExpressionCompilationException) {
-                    String firstLocation = sequence(error.toString().split(":")).take(3).toString(":").trim() + ": ";
-                    String otherLocations = sequence(error.toString().split(":")).drop(1).take(2).toString(":").trim() + ": ";
-                    String message = error.toString()
-                            .replaceAll(quoteReplacement(firstLocation), "ERROR: ")
-                            .replaceAll(quoteReplacement(otherLocations), "ERROR: ")
-                            .replaceAll("\n", "\n  ")
-                            .replaceAll("  ERROR", "ERROR");
-                    System.err.println(message);
+                    System.err.println(error.getMessage());
                 } else {
                     error.printStackTrace(System.err);
                 }

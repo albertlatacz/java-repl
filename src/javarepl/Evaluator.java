@@ -5,9 +5,11 @@ import com.googlecode.totallylazy.annotations.multimethod;
 import javarepl.expressions.*;
 import javarepl.expressions.Value;
 
-import java.io.ByteArrayOutputStream;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
 import java.io.File;
-import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.List;
@@ -20,6 +22,7 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.io.File.pathSeparator;
+import static java.util.Arrays.asList;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
@@ -46,7 +49,8 @@ public class Evaluator {
         Expression expression = createExpression(expr);
         Either<? extends Throwable, Evaluation> result = evaluate(expression);
         if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
-            result = evaluate(new Statement(expr));
+            Either<? extends Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
+            return resultForStatement.isRight() ? resultForStatement : result;
         }
 
         return result;
@@ -202,14 +206,19 @@ public class Evaluator {
     }
 
     private void compile(File file) throws Exception {
-        OutputStream errorStream = new ByteArrayOutputStream();
-        String classpath = sequence(System.getProperty("java.class.path"))
-                .join(sequence(classLoader.getURLs()).map(toString)).toString(pathSeparator);
+        String classpath = sequence(System.getProperty("java.class.path")).join(sequence(classLoader.getURLs()).map(toString)).toString(pathSeparator);
+        JavaCompiler compiler = getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(asList(file));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, asList("-cp", classpath), null, compilationUnits);
 
-        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, "-cp", classpath, file.getCanonicalPath());
-
-        if (errorCode != 0)
-            throw new ExpressionCompilationException(errorCode, errorStream.toString());
+        try {
+            if (!task.call())
+                throw new ExpressionCompilationException(file, diagnostics.getDiagnostics());
+        } finally {
+            fileManager.close();
+        }
     }
 
     private static File randomOutputDirectory() {
