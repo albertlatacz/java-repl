@@ -1,6 +1,5 @@
 package javarepl.commands;
 
-import com.googlecode.totallylazy.Files;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -8,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 
+import static com.googlecode.totallylazy.Files.randomFilename;
 import static com.googlecode.totallylazy.Streams.copyAndClose;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
@@ -29,10 +29,10 @@ public class AddToClasspath extends Command {
             if (isWebUrl(url)) {
                 System.out.println(format("Downloading %s...", path));
 
-                File outputJar = new File(evaluator.outputDirectory(), Files.randomFilename() + ".jar");
-                copyAndClose(url.openStream(), new FileOutputStream(outputJar));
+                File outputFile = new File(evaluator.outputDirectory(), randomFilename());
+                copyAndClose(url.openStream(), new FileOutputStream(outputFile));
 
-                evaluator.addClasspathUrl(outputJar.toURI().toURL());
+                evaluator.addClasspathUrl(outputFile.toURI().toURL());
             } else {
                 evaluator.addClasspathUrl(url);
             }
