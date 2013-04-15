@@ -31,6 +31,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 public class Evaluator {
     private EvaluationClassLoader classLoader;
     private EvaluationContext context;
+
     private File outputDirectory;
 
     public Evaluator() {
@@ -105,6 +106,10 @@ public class Evaluator {
 
     public void addClasspathUrl(URL classpathUrl) {
         classLoader.addURL(classpathUrl);
+    }
+
+    public File outputDirectory() {
+        return outputDirectory;
     }
 
     private Expression createExpression(String expr) {

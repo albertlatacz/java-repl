@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.URLs.url;
 import static javarepl.Utils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 public class UtilsTest {
     @Test
@@ -27,7 +27,7 @@ public class UtilsTest {
     public void returnFormattedValueAsString() {
         assertThat(valueToString().apply(null), equalTo("null"));
         assertThat(valueToString().apply("some string"), equalTo("\"some string\""));
-        assertThat(valueToString().apply(new Object[][]{{42,"str1"},{42d,"str2"}}), equalTo("[[42, \"str1\"], [42.0, \"str2\"]]"));
+        assertThat(valueToString().apply(new Object[][]{{42, "str1"}, {42d, "str2"}}), equalTo("[[42, \"str1\"], [42.0, \"str2\"]]"));
     }
 
     @Test
@@ -51,12 +51,20 @@ public class UtilsTest {
                         sequence(2, 3, 1), sequence(3, 1, 2), sequence(3, 2, 1)));
     }
 
+    @Test
+    public void checkIfUrlIsAWebOne() {
+        assertThat(isWebUrl(url("http://www.google.com")), is(true));
+        assertThat(isWebUrl(url("https://www.google.com")), is(true));
+        assertThat(isWebUrl(url("file:/some/file")), is(false));
+    }
+
     private Matcher<? super Class<?>> equalToClass(Class clazz) {
         return equalTo(clazz);
     }
 
     private Object anonymousInnerArrayList() {
-        return new ArrayList<Object>(){};
+        return new ArrayList<Object>() {
+        };
     }
 
     private Object anonymousInnerRunnable() {

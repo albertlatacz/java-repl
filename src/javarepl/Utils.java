@@ -79,6 +79,10 @@ public class Utils {
         }
     }
 
+    public static boolean isWebUrl(URL classpathUrl) {
+        return sequence("http", "https").contains(classpathUrl.getProtocol());
+    }
+
     public static String applicationVersion() {
 
         try {
