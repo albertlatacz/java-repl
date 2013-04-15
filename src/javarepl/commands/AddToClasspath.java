@@ -25,10 +25,9 @@ public class AddToClasspath extends Command {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                String outputFileName = randomIdentifier("external");
-                System.out.println(format("Downloading %s...", path, outputFileName));
+                System.out.println(format("Downloading %s...", path));
 
-                File outputFile = new File(evaluator.outputDirectory(), outputFileName);
+                File outputFile = new File(evaluator.outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
 
                 evaluator.addClasspathUrl(outputFile.toURI().toURL());
