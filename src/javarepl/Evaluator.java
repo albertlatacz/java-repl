@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.annotations.multimethod;
 import javarepl.expressions.*;
 import javarepl.expressions.Value;
 
-import javax.tools.JavaCompiler;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
@@ -30,7 +29,6 @@ import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
-    private JavaCompiler compiler = getSystemJavaCompiler();
     private EvaluationClassLoader classLoader;
     private EvaluationContext context;
     private File outputDirectory;
@@ -203,7 +201,7 @@ public class Evaluator {
         String classpath = sequence(System.getProperty("java.class.path"))
                 .join(sequence(classLoader.getURLs()).map(toString)).toString(pathSeparator);
 
-        int errorCode = compiler.run(null, null, errorStream, "-cp", classpath, file.getCanonicalPath());
+        int errorCode = getSystemJavaCompiler().run(null, null, errorStream, "-cp", classpath, file.getCanonicalPath());
 
         if (errorCode != 0)
             throw new ExpressionCompilationException(errorCode, errorStream.toString());

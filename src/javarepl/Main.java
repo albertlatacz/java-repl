@@ -70,22 +70,27 @@ public class Main implements Runnable {
     public void run() {
         System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
 
-        if (getSystemJavaCompiler() == null) {
-            System.err.println("ERROR: Java compiler not found.\n" +
-                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
-            return;
+        if (environmentChecksPassed()) {
+            System.out.println("Type in expression to evaluate.");
+            System.out.println("Type :help for more options.");
+            System.out.println("");
+
+            Rules<String, Void> rules = commandsToRules(commands, evaluator);
+
+            do {
+                rules.apply(expressionReader.readExpression().getOrNull());
+                System.out.println();
+            } while (true);
         }
+    }
 
-        System.out.println("Type in expression to evaluate.");
-        System.out.println("Type :help for more options.");
-        System.out.println("");
-
-        Rules<String, Void> rules = commandsToRules(commands, evaluator);
-
-        do {
-            rules.apply(expressionReader.readExpression().getOrNull());
-            System.out.println();
-        } while (true);
+    private boolean environmentChecksPassed() {
+        if (getSystemJavaCompiler() == null) {
+            System.err.println("\nERROR: Java compiler not found.\n" +
+                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
+            return false;
+        }
+        return true;
     }
 
     public static final Rules<String, Void> commandsToRules(Sequence<? extends Command> commands, Evaluator evaluator) {
