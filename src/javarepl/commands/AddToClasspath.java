@@ -7,12 +7,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 
-import static com.googlecode.totallylazy.Files.randomFilename;
 import static com.googlecode.totallylazy.Streams.copyAndClose;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
-import static javarepl.Utils.isWebUrl;
-import static javarepl.Utils.resolveClasspath;
+import static javarepl.Utils.*;
 
 public class AddToClasspath extends Command {
     private static final String COMMAND = ":cp";
@@ -27,9 +25,10 @@ public class AddToClasspath extends Command {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                System.out.println(format("Downloading %s...", path));
+                String outputFileName = randomIdentifier("external");
+                System.out.println(format("Downloading %s...", path, outputFileName));
 
-                File outputFile = new File(evaluator.outputDirectory(), randomFilename());
+                File outputFile = new File(evaluator.outputDirectory(), outputFileName);
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
 
                 evaluator.addClasspathUrl(outputFile.toURI().toURL());
