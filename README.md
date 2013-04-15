@@ -4,7 +4,7 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 * Support for most of Java language constructs
 * Create imports, methods, classes, enums and interfaces
-* Load classes from any jar file or directory on file system
+* Load classes from any jar file or directory (including web urls)
 * List previous results, imports, created types and methods
 * Show history of evaluations
 * Search and evaluate expression from history
