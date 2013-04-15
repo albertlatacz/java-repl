@@ -16,14 +16,29 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 [![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
 
 
-## Usage
+## Download
 
-Download the latest version from http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar and run
+Download the latest version from [here](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar)
+
+Previous releases are available [here](http://albertlatacz.published.s3.amazonaws.com/index.html)
+
+
+## Usage
+To run Java REPL you need to install **Java Development Kit (JDK) 6 or newer**. Download it from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow install instructions. Once JDK is installed and configured you can run   
+
 
 ```
 java -jar javarepl.jar
 ```
 
+If this doesn't work try to run pointing directly to *java* executable within JDK, like so
+
+
+```
+C:\Program Files\Java\jdk1.7.0_17\bin\java -jar javarepl.jar
+```
+
+
 ## License
 
-Distributed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
