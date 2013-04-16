@@ -21,14 +21,13 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         boolean simpleConsole = sequence(args).contains("-sc");
-        ConsoleLogger logger = commandLogger();
-
+        ConsoleLogger logger = systemConsoleLogger();
         Console console = new Console(logger);
         ExpressionReader expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(console.commands()));
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
 
-        if (environmentChecksPassed()) {
+        if (environmentChecksPassed(logger)) {
             logger.logInfo("Type in expression to evaluate.");
             logger.logInfo("Type :help for more options.");
             logger.logInfo("");
@@ -40,7 +39,7 @@ public class Main {
         }
     }
 
-    private static ConsoleLogger commandLogger() {
+    private static ConsoleLogger systemConsoleLogger() {
         return new ConsoleLogger() {
             public Void call(LogType logType, String value) throws Exception {
                 if (logType == LogType.INFO) {
@@ -54,9 +53,9 @@ public class Main {
         };
     }
 
-    private static boolean environmentChecksPassed() {
+    private static boolean environmentChecksPassed(ConsoleLogger logger) {
         if (getSystemJavaCompiler() == null) {
-            System.err.println("\nERROR: Java compiler not found.\n" +
+            logger.logError("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
             return false;
         }

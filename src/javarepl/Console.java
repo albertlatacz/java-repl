@@ -9,12 +9,10 @@ public class Console {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
     private final Rules<String, Void> evaluationRules;
-    private final ConsoleLogger logger;
 
     public Console(ConsoleLogger logger) throws Exception {
-        this.logger = logger;
         evaluator = new Evaluator();
-        commands = createCommands();
+        commands = createCommands(logger);
         evaluationRules = createEvaluationRules(commands, evaluator);
 
         registerShutdownHook();
@@ -36,7 +34,7 @@ public class Console {
         return commands;
     }
 
-    private Sequence<Command> createCommands() {
+    private Sequence<Command> createCommands(ConsoleLogger logger) {
         Sequence<Command> commandSequence = Sequences.<Command>sequence()
                 .add(new QuitApplication(logger))
                 .add(new ShowHistory(logger))
