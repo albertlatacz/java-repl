@@ -1,5 +1,6 @@
 package javarepl.commands;
 
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -9,12 +10,12 @@ import static javarepl.Evaluation.functions.classSource;
 public class ShowLastSource extends Command {
     private static final String COMMAND = ":src";
 
-    public ShowLastSource() {
-        super(COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ShowLastSource(ConsoleLogger logger) {
+        super(COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        System.out.println(evaluator.lastEvaluation().map(classSource()).getOrElse("No source"));
+        logInfo(evaluator.lastEvaluation().map(classSource()).getOrElse("No source"));
         return null;
     }
 }

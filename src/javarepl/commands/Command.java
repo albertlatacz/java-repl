@@ -1,6 +1,7 @@
 package javarepl.commands;
 
 import com.googlecode.totallylazy.*;
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.Completer;
 
@@ -12,20 +13,25 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.Integer.parseInt;
 
 public abstract class Command extends Function2<Evaluator, String, Void> implements Predicate<String>, Completer {
+
+
     public static final String COMMAND_SEPARATOR = " ";
 
     private final String description;
     private final Predicate<String> predicate;
     private final Completer completer;
 
+    private final ConsoleLogger logger;
+
     public final boolean matches(String expression) {
         return predicate.matches(expression);
     }
 
-    protected Command(String description, Predicate<String> predicate, Completer completer) {
+    protected Command(String description, Predicate<String> predicate, Completer completer, ConsoleLogger logger) {
         this.description = description;
         this.predicate = predicate;
         this.completer = completer;
+        this.logger = logger;
     }
 
     public final int complete(String buffer, int index, List<CharSequence> candidates) {
@@ -35,6 +41,14 @@ public abstract class Command extends Function2<Evaluator, String, Void> impleme
     @Override
     public final String toString() {
         return description;
+    }
+
+    public final void logError(String message) {
+        logger.logError(message);
+    }
+
+    public final void logInfo(String message) {
+        logger.logInfo(message);
     }
 
     public static final Pair<String, Option<String>> parseStringCommand(String input) {

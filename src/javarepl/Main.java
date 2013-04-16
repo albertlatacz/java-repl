@@ -1,7 +1,8 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
-import javarepl.commands.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Sequence;
+import javarepl.commands.Command;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.Completer;
@@ -10,81 +11,50 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
-public class Main implements Runnable {
+public class Main {
 
     public static void main(String[] args) throws Exception {
-        Sequence<String> arguments = sequence(args);
-        boolean simpleConsole = arguments.contains("-sc");
+        boolean simpleConsole = sequence(args).contains("-sc");
+        ConsoleLogger logger = commandLogger();
 
-        new Main(simpleConsole).run();
-    }
+        Console console = new Console(logger);
+        ExpressionReader expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(console.commands()));
 
-    private final Evaluator evaluator;
-    private final ExpressionReader expressionReader;
-    private final Sequence<Command> commands;
-
-    public Main(boolean simpleConsole) throws Exception {
-        evaluator = new Evaluator();
-        commands = createCommands();
-        expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(commands));
-
-        registerShutdownHook();
-    }
-
-    private void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                evaluator.clearOutputDirectory();
-            }
-        });
-    }
-
-    private Sequence<Command> createCommands() {
-        Sequence<Command> commandSequence = Sequences.<Command>sequence()
-                .add(new QuitApplication())
-                .add(new ShowHistory())
-                .add(new SearchHistory())
-                .add(new EvaluateFromHistory())
-                .add(new ResetAllEvaluations())
-                .add(new ReplayAllEvaluations())
-                .add(new AddToClasspath())
-                .add(new LoadSourceFile())
-                .add(new ShowResult())
-                .add(new ListValues())
-                .add(new ShowLastSource())
-                .add(new ShowTypeOfExpression());
-
-        return commandSequence
-                .add(new ShowHelp(commandSequence))
-                .add(new NotAValidCommand())
-                .add(new EvaluateExpression());
-    }
-
-    public void run() {
-        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
+        logger.logInfo(format("Welcome to JavaREPL version %s (%s, Java %s)", applicationVersion(), getProperty("java.vm.name"), getProperty("java.version")));
 
         if (environmentChecksPassed()) {
-            System.out.println("Type in expression to evaluate.");
-            System.out.println("Type :help for more options.");
-            System.out.println("");
-
-            Rules<String, Void> rules = commandsToRules(commands, evaluator);
+            logger.logInfo("Type in expression to evaluate.");
+            logger.logInfo("Type :help for more options.");
+            logger.logInfo("");
 
             do {
-                rules.apply(expressionReader.readExpression().getOrNull());
-                System.out.println();
+                console.execute(expressionReader.readExpression().getOrNull());
+                logger.logInfo("");
             } while (true);
         }
     }
 
-    private boolean environmentChecksPassed() {
+    private static ConsoleLogger commandLogger() {
+        return new ConsoleLogger() {
+            public Void call(LogType logType, String value) throws Exception {
+                if (logType == LogType.INFO) {
+                    System.out.println(value);
+                }
+                if (logType == LogType.ERROR) {
+                    System.err.println(value);
+                }
+                return null;
+            }
+        };
+    }
+
+    private static boolean environmentChecksPassed() {
         if (getSystemJavaCompiler() == null) {
             System.err.println("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
@@ -93,15 +63,7 @@ public class Main implements Runnable {
         return true;
     }
 
-    public static final Rules<String, Void> commandsToRules(Sequence<? extends Command> commands, Evaluator evaluator) {
-        Rules<String, Void> rules = Rules.rules();
-        for (Command command : commands) {
-            rules.addLast(Rule.rule(command, command.apply(evaluator)));
-        }
-        return rules.addLast(Rule.rule(always(), Functions.<String, Void>returns1(null)));
-    }
-
-    private Function1<Sequence<String>, String> readFromExtendedConsole(final Sequence<Command> commandSequence) throws IOException {
+    private static Function1<Sequence<String>, String> readFromExtendedConsole(final Sequence<Command> commandSequence) throws IOException {
         return new Function1<Sequence<String>, String>() {
             private final ConsoleReader console;
 
@@ -118,7 +80,7 @@ public class Main implements Runnable {
         };
     }
 
-    private Function1<Sequence<String>, String> readFromSimpleConsole() {
+    private static Function1<Sequence<String>, String> readFromSimpleConsole() {
         return new Function1<Sequence<String>, String>() {
             private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 

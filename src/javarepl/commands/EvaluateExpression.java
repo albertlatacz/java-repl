@@ -1,8 +1,9 @@
 package javarepl.commands;
 
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Predicates;
+import javarepl.ConsoleLogger;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
@@ -11,38 +12,27 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
 public class EvaluateExpression extends Command {
-    public EvaluateExpression() {
-        super(null, Predicates.<String>not(blank()), null);
+    public EvaluateExpression(ConsoleLogger logger) {
+        super(null, Predicates.<String>not(blank()), null, logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        evaluate(evaluator, expression);
+        evaluate(this, evaluator, expression);
         return null;
     }
 
-    public static void evaluate(Evaluator evaluator, String expression) {
-        evaluator.evaluate(expression).map(printError(), printResult());
-    }
+    public static void evaluate(Command command, Evaluator evaluator, String expression) {
+        Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
 
-    private static Function1<Evaluation, Void> printResult() {
-        return new Function1<Evaluation, Void>() {
-            public Void call(Evaluation result) throws Exception {
-                System.out.println(result.result().map(asString()).getOrElse(""));
-                return null;
+        if (evaluation.isRight()) {
+            command.logInfo(evaluation.right().result().map(asString()).getOrElse(""));
+        } else {
+            if (evaluation.left() instanceof ExpressionCompilationException) {
+                command.logError(evaluation.left().getMessage());
+            } else {
+                command.logError(evaluation.left().toString());
             }
-        };
-    }
+        }
 
-    private static Function1<Throwable, Void> printError() {
-        return new Function1<Throwable, Void>() {
-            public Void call(Throwable error) throws Exception {
-                if (error instanceof ExpressionCompilationException) {
-                    System.err.println(error.getMessage());
-                } else {
-                    error.printStackTrace(System.err);
-                }
-                return null;
-            }
-        };
     }
 }

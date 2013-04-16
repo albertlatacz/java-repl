@@ -1,6 +1,7 @@
 package javarepl.commands;
 
 import com.googlecode.totallylazy.Sequence;
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -12,13 +13,13 @@ public class ShowHelp extends Command {
 
     private final Sequence<Command> commands;
 
-    public ShowHelp(Sequence<Command> commands) {
-        super(COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ShowHelp(Sequence<Command> commands, ConsoleLogger logger) {
+        super(COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND), logger);
         this.commands = commands.cons(this);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
-        listValues("Available commands", commands);
+        logInfo(listValues("Available commands", commands));
         return null;
     }
 }

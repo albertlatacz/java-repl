@@ -88,7 +88,6 @@ public class Utils {
         try {
             File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
             if (!path.isDirectory()) {
-
                 JarInputStream jarStream = new JarInputStream(new FileInputStream(path));
                 Manifest manifest = jarStream.getManifest();
                 return manifest.getMainAttributes().getValue("Implementation-Version");
@@ -123,7 +122,7 @@ public class Utils {
                 .unique();
     }
 
-    public static void listValues(String name, Iterable<?> list) {
-        System.out.println(format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    ")));
+    public static String listValues(String name, Iterable<?> list) {
+        return format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    "));
     }
 }

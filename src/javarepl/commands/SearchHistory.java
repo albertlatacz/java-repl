@@ -1,5 +1,6 @@
 package javarepl.commands;
 
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -11,13 +12,13 @@ import static javarepl.commands.ShowHistory.history;
 public class SearchHistory extends Command {
     private static final String COMMAND = ":h?";
 
-    public SearchHistory() {
-        super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public SearchHistory(ConsoleLogger logger) {
+        super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
         String searchTerm = parseStringCommand(expression).second().getOrElse("");
-        listValues("History search for '" + searchTerm + "'", history(evaluator).filter(contains(searchTerm)));
+        logInfo(listValues("History search for '" + searchTerm + "'", history(evaluator).filter(contains(searchTerm))));
         return null;
     }
 }

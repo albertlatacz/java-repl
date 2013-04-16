@@ -1,5 +1,6 @@
 package javarepl.commands;
 
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -15,8 +16,8 @@ import static javarepl.Utils.*;
 public class AddToClasspath extends Command {
     private static final String COMMAND = ":cp";
 
-    public AddToClasspath() {
-        super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public AddToClasspath(ConsoleLogger logger) {
+        super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
     public Void call(final Evaluator evaluator, String expression) throws Exception {
@@ -25,7 +26,7 @@ public class AddToClasspath extends Command {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                System.out.println(format("Downloading %s...", path));
+                logInfo(format("Downloading %s...", path));
 
                 File outputFile = new File(evaluator.outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
@@ -35,9 +36,9 @@ public class AddToClasspath extends Command {
                 evaluator.addClasspathUrl(url);
             }
 
-            System.out.println(format("Added %s to classpath.", path));
+            logInfo(format("Added %s to classpath.", path));
         } catch (Exception e) {
-            System.err.println(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
+            logError(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
         }
 
         return null;

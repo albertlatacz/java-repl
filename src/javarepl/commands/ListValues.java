@@ -1,5 +1,6 @@
 package javarepl.commands;
 
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
@@ -17,9 +18,9 @@ import static javarepl.expressions.WithKey.functions.key;
 public class ListValues extends Command {
     private static final String COMMAND = ":list";
 
-    public ListValues() {
+    public ListValues(ConsoleLogger logger) {
         super(COMMAND + " <results|types|methods|imports|all> - list specified values",
-                startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")));
+                startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")), logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
@@ -51,18 +52,18 @@ public class ListValues extends Command {
     }
 
     private void listMethods(Evaluator evaluator) {
-        listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key()));
+        logInfo(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
     }
 
     private void listImports(Evaluator evaluator) {
-        listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source()));
+        logInfo(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source())));
     }
 
     private void listTypes(Evaluator evaluator) {
-        listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key()));
+        logInfo(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
     }
 
     private void listResults(Evaluator evaluator) {
-        listValues("Results", evaluator.results());
+        logInfo(listValues("Results", evaluator.results()));
     }
 }

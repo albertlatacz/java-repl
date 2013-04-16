@@ -3,6 +3,7 @@ package javarepl.commands;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
@@ -16,14 +17,14 @@ import static javarepl.expressions.Expression.functions.source;
 public class ShowHistory extends Command {
     private static final String COMMAND = ":hist";
 
-    public ShowHistory() {
+    public ShowHistory(ConsoleLogger logger) {
         super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
-                startsWith(COMMAND), new StringsCompleter(COMMAND));
+                startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
         Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
-        listValues("History", history(evaluator).reverse().take(limit).reverse());
+        logInfo(listValues("History", history(evaluator).reverse().take(limit).reverse()));
         return null;
     }
 

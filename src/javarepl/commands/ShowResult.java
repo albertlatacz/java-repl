@@ -1,6 +1,7 @@
 package javarepl.commands;
 
 import com.googlecode.totallylazy.Option;
+import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
 import javarepl.Result;
 import jline.console.completer.StringsCompleter;
@@ -11,8 +12,8 @@ import static java.lang.String.format;
 public class ShowResult extends Command {
     private static final String COMMAND = ":result";
 
-    public ShowResult() {
-        super(COMMAND + " <name> - shows the result of evaluation", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public ShowResult(ConsoleLogger logger) {
+        super(COMMAND + " <name> - shows the result of evaluation", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
@@ -20,9 +21,9 @@ public class ShowResult extends Command {
         Option<Result> result = evaluator.result(key);
 
         if (!result.isEmpty()) {
-            System.out.println(result.get().toString(true));
+            logInfo(result.get().toString(true));
         } else {
-            System.err.println(format("Cannot find result %s.", key));
+            logError(format("Cannot find result %s.", key));
         }
 
         return null;

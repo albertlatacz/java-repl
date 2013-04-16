@@ -50,7 +50,9 @@ public class Evaluator {
         Either<? extends Throwable, Evaluation> result = evaluate(expression);
         if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
             Either<? extends Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
-            return resultForStatement.isRight() ? resultForStatement : result;
+            return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
+                    ? result
+                    : resultForStatement;
         }
 
         return result;
