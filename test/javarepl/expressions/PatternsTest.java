@@ -42,6 +42,8 @@ public class PatternsTest {
     public void shouldMatchValidAssignmentWithType() {
         assertTrue(isValidAssignmentWithType("java.lang.String[]   aaa = 12"));
         assertTrue(isValidAssignmentWithType("Sequence< Object[] > aaa = 12"));
+        assertTrue(isValidAssignmentWithType("Pair< Integer, Integer> aaa  = pair(12, 22)"));
+        assertTrue(isValidAssignmentWithType("Pair<? extends Object & Integer, Long> aaa  = pair(12, 22)"));
         assertFalse(isValidAssignmentWithType("Sequence< Object[] > aaa  12"));
 
         MatchResult result = assignmentWithTypeNamePattern.match("Integer val = 42");
@@ -109,14 +111,4 @@ public class PatternsTest {
         assertThat(result.group(2), is("SomeMethod"));
     }
 
-//    @Test
-//    public void shouldMatchSourceFile() {
-//        assertTrue(isValidSourceFile("package aaa.bbb.ccc;public class SomeClass{"));
-//        assertTrue(isValidSourceFile("package aaa;\n\n  interface SomeInterface{"));
-//        assertTrue(isValidSourceFile("   package aaa.bbb.ccc;\n\n  public class SomeClass{ }"));
-//
-//        MatchResult result = sourceFilePattern.match("   package aaa.bbb.ccc;\n\n  public class SomeClass{ }");
-//        assertThat(result.group(1), is("aaa.bbb.ccc"));
-//        assertThat(result.group(2), is("SomeClass"));
-//    }
 }
