@@ -10,7 +10,7 @@ public class Console {
     private final Sequence<Command> commands;
     private final Rules<String, Void> evaluationRules;
 
-    public Console(ConsoleLogger logger) throws Exception {
+    public Console(ConsoleLogger logger) {
         evaluator = new Evaluator();
         commands = createCommands(logger);
         evaluationRules = createEvaluationRules(commands, evaluator);
