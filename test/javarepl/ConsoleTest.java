@@ -15,12 +15,15 @@ import static org.hamcrest.Matchers.hasItem;
 public class ConsoleTest {
     @Test
     public void supportsListingHistoryOfEvaluations() {
+        assertThat(executing(":hist"), hasLogged(INFO, "No history."));
+
         assertThat(
                 executing("42", "\"test\"", ":hist"),
                 hasLogged(INFO, "History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n"));
     }
+
 
     @Test
     public void supportsSearchingHistory() {
@@ -39,6 +42,13 @@ public class ConsoleTest {
                         "    1  42\n" +
                         "    2  \"test\"\n" +
                         "    3  42\n"));
+    }
+
+    @Test
+    public void supportsResettingAllEvaluations() {
+        assertThat(
+                executing("42", "\"test\"", ":reset", ":hist"),
+                hasLoggedInfo("No history."));
     }
 
 

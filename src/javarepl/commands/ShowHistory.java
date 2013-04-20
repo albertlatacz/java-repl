@@ -24,7 +24,14 @@ public class ShowHistory extends Command {
 
     public Void call(Evaluator evaluator, String expression) throws Exception {
         Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
-        logInfo(listValues("History", history(evaluator).reverse().take(limit).reverse()));
+        Sequence<String> history = history(evaluator).reverse().take(limit).reverse();
+
+        if (!history.isEmpty()) {
+            logInfo(listValues("History", history));
+        } else {
+            logInfo("No history.");
+        }
+
         return null;
     }
 
