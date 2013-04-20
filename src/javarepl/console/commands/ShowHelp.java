@@ -18,8 +18,9 @@ public class ShowHelp extends Command {
         this.commands = commands.cons(this);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
-        logInfo(listValues("Available commands", commands));
-        return null;
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        resultCollector.logInfo(listValues("Available commands", commands));
+        return resultCollector.result();
     }
 }

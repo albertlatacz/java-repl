@@ -20,13 +20,15 @@ public class AddToClasspath extends Command {
         super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(final Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(final Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+
         String path = parseStringCommand(expression).second().getOrNull();
         try {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                logInfo(format("Downloading %s...", path));
+                resultCollector.logInfo(format("Downloading %s...", path));
 
                 File outputFile = new File(evaluator.outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
@@ -36,11 +38,11 @@ public class AddToClasspath extends Command {
                 evaluator.addClasspathUrl(url);
             }
 
-            logInfo(format("Added %s to classpath.", path));
+            resultCollector.logInfo(format("Added %s to classpath.", path));
         } catch (Exception e) {
-            logError(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
+            resultCollector.logError(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
         }
 
-        return null;
+        return resultCollector.result();
     }
 }

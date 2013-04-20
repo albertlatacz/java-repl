@@ -17,21 +17,22 @@ public class LoadSourceFile extends Command {
         super(COMMAND + " <path> - loads source file ", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         Option<String> path = parseStringCommand(expression).second();
 
         if (!path.isEmpty()) {
             try {
                 evaluator.evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
-                logInfo(format("Loaded source file from %s", path.get()));
+                resultCollector.logInfo(format("Loaded source file from %s", path.get()));
             } catch (Exception e) {
-                logError(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
+                resultCollector.logError(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
             }
         } else {
-            logError(format("Path not specified"));
+            resultCollector.logError(format("Path not specified"));
         }
 
-        return null;
+        return resultCollector.result();
     }
 
 

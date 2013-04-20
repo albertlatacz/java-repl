@@ -13,10 +13,11 @@ public class QuitApplication extends Command {
         super(COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
-        logInfo("Terminating...");
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        resultCollector.logInfo("Terminating...");
         evaluator.clearOutputDirectory();
         System.exit(0);
-        return null;
+        return resultCollector.result();
     }
 }

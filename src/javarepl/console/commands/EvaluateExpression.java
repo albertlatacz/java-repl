@@ -16,21 +16,22 @@ public class EvaluateExpression extends Command {
         super(null, Predicates.<String>not(blank()), null, logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
-        evaluate(this, evaluator, expression);
-        return null;
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        evaluate(resultCollector, evaluator, expression);
+        return resultCollector.result();
     }
 
-    public static void evaluate(Command command, Evaluator evaluator, String expression) {
+    public static void evaluate(CommandResultCollector resultCollector, Evaluator evaluator, String expression) {
         Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
 
         if (evaluation.isRight()) {
-            command.logInfo(evaluation.right().result().map(asString()).getOrElse(""));
+            resultCollector.logInfo(evaluation.right().result().map(asString()).getOrElse(""));
         } else {
             if (evaluation.left() instanceof ExpressionCompilationException) {
-                command.logError(evaluation.left().getMessage());
+                resultCollector.logError(evaluation.left().getMessage());
             } else {
-                command.logError(evaluation.left().toString());
+                resultCollector.logError(evaluation.left().toString());
             }
         }
 

@@ -10,8 +10,9 @@ public class NotAValidCommand extends Command {
         super(null, startsWith(":"), null, logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
-        logError(expression + " is not a valid command");
-        return null;
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        resultCollector.logError(expression + " is not a valid command");
+        return resultCollector.result();
     }
 }

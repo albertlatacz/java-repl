@@ -2,6 +2,7 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleLogger;
 import jline.console.completer.Completer;
 
@@ -9,10 +10,13 @@ import java.util.List;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.Integer.parseInt;
+import static javarepl.console.ConsoleLogger.LogType.ERROR;
+import static javarepl.console.ConsoleLogger.LogType.INFO;
 
-public abstract class Command extends Function2<Evaluator, String, Void> implements Predicate<String>, Completer {
+public abstract class Command extends Function2<Evaluator, String, CommandResult> implements Predicate<String>, Completer {
 
 
     public static final String COMMAND_SEPARATOR = " ";
@@ -43,12 +47,8 @@ public abstract class Command extends Function2<Evaluator, String, Void> impleme
         return description;
     }
 
-    public final void logError(String message) {
-        logger.logError(message);
-    }
-
-    public final void logInfo(String message) {
-        logger.logInfo(message);
+    public final CommandResultCollector createResultCollector(String command) {
+        return new CommandResultCollector(logger, command);
     }
 
     public static final Pair<String, Option<String>> parseStringCommand(String input) {
@@ -66,5 +66,33 @@ public abstract class Command extends Function2<Evaluator, String, Void> impleme
         } catch (Exception e) {
             return Pair.pair(splitInput.first(), none(Integer.class));
         }
+    }
+
+    public static final class CommandResultCollector {
+        private final ConsoleLogger logger;
+        private final String command;
+        private Sequence<ConsoleLog> logs = empty();
+
+        private CommandResultCollector(ConsoleLogger logger, String command) {
+            this.logger = logger;
+            this.command = command;
+        }
+
+        public CommandResultCollector logError(String message) {
+            logger.logError(message);
+            logs = logs.add(new ConsoleLog(ERROR, message));
+            return this;
+        }
+
+        public CommandResultCollector logInfo(String message) {
+            logger.logInfo(message);
+            logs = logs.add(new ConsoleLog(INFO, message));
+            return this;
+        }
+
+        public CommandResult result() {
+            return new CommandResult(command, logs);
+        }
+
     }
 }

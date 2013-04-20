@@ -16,15 +16,16 @@ public class ReplayAllEvaluations extends Command {
         super(COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(final Evaluator evaluator, String s) throws Exception {
-        logInfo("Replaying all evaluations:");
+    public CommandResult call(final Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        resultCollector.logInfo("Replaying all evaluations:");
         Sequence<Evaluation> evaluations = evaluator.evaluations();
         evaluator.reset();
 
         for (Evaluation evaluation : evaluations) {
-            evaluate(this, evaluator, evaluation.expression().source());
+            evaluate(resultCollector, evaluator, evaluation.expression().source());
         }
 
-        return null;
+        return resultCollector.result();
     }
 }

@@ -22,17 +22,18 @@ public class ShowHistory extends Command {
                 startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
         Sequence<String> history = history(evaluator).reverse().take(limit).reverse();
 
         if (!history.isEmpty()) {
-            logInfo(listValues("History", history));
+            resultCollector.logInfo(listValues("History", history));
         } else {
-            logInfo("No history.");
+            resultCollector.logInfo("No history.");
         }
 
-        return null;
+        return resultCollector.result();
     }
 
     public static Sequence<String> history(Evaluator evaluator) {

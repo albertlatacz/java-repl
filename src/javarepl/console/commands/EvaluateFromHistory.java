@@ -16,17 +16,18 @@ public class EvaluateFromHistory extends Command {
                 startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         Integer historyItem = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
         Option<Evaluation> evaluation = evaluator.evaluations().drop(historyItem - 1).headOption();
         if (!evaluation.isEmpty()) {
             String source = evaluation.get().expression().source();
-            logInfo(source);
-            EvaluateExpression.evaluate(this, evaluator, source);
+            resultCollector.logInfo(source);
+            EvaluateExpression.evaluate(resultCollector, evaluator, source);
         } else {
-            logError("Expression not found.\n");
+            resultCollector.logError("Expression not found.\n");
         }
 
-        return null;
+        return resultCollector.result();
     }
 }

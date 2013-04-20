@@ -16,17 +16,18 @@ public class ShowResult extends Command {
         super(COMMAND + " <name> - shows the result of evaluation", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         String key = parseStringCommand(expression).second().getOrElse("");
         Option<Result> result = evaluator.result(key);
 
         if (!result.isEmpty()) {
-            logInfo(result.get().toString(true));
+            resultCollector.logInfo(result.get().toString(true));
         } else {
-            logError(format("Cannot find result %s.", key));
+            resultCollector.logError(format("Cannot find result %s.", key));
         }
 
-        return null;
+        return resultCollector.result();
     }
 
 

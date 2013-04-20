@@ -9,7 +9,7 @@ import static com.googlecode.totallylazy.Predicates.always;
 public class Console {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
-    private final Rules<String, Void> evaluationRules;
+    private final Rules<String, CommandResult> evaluationRules;
 
     public Console(ConsoleLogger logger) {
         evaluator = new Evaluator();
@@ -19,8 +19,8 @@ public class Console {
         registerShutdownHook();
     }
 
-    public void execute(String expression) {
-        evaluationRules.apply(expression);
+    public CommandResult execute(String expression) {
+        return evaluationRules.apply(expression);
     }
 
     private void registerShutdownHook() {
@@ -56,11 +56,11 @@ public class Console {
                 .add(new EvaluateExpression(logger));
     }
 
-    private Rules<String, Void> createEvaluationRules(Sequence<Command> commands, Evaluator evaluator) {
-        Rules<String, Void> rules = Rules.rules();
+    private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands, Evaluator evaluator) {
+        Rules<String, CommandResult> rules = Rules.rules();
         for (Command command : commands) {
             rules.addLast(Rule.rule(command, command.apply(evaluator)));
         }
-        return rules.addLast(Rule.rule(always(), Functions.<String, Void>returns1(null)));
+        return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(null)));
     }
 }

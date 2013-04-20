@@ -15,9 +15,10 @@ public class SearchHistory extends Command {
         super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         String searchTerm = parseStringCommand(expression).second().getOrElse("");
-        logInfo(listValues("History search for '" + searchTerm + "'", ShowHistory.history(evaluator).filter(contains(searchTerm))));
-        return null;
+        resultCollector.logInfo(listValues("History search for '" + searchTerm + "'", ShowHistory.history(evaluator).filter(contains(searchTerm))));
+        return resultCollector.result();
     }
 }

@@ -23,47 +23,49 @@ public class ListValues extends Command {
                 startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")), logger);
     }
 
-    public Void call(Evaluator evaluator, String expression) throws Exception {
+    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
+        CommandResultCollector resultCollector = createResultCollector(expression);
         String items = expression.replace(COMMAND, "").trim();
 
         if (items.equals("all")) {
-            listResults(evaluator);
-            listTypes(evaluator);
-            listImports(evaluator);
-            listMethods(evaluator);
+            listResults(evaluator, resultCollector);
+            listTypes(evaluator, resultCollector);
+            listImports(evaluator, resultCollector);
+            listMethods(evaluator, resultCollector);
         }
 
         if (items.equals("results")) {
-            listResults(evaluator);
+            listResults(evaluator, resultCollector);
         }
 
         if (items.equals("types")) {
-            listTypes(evaluator);
+            listTypes(evaluator, resultCollector);
         }
 
         if (items.equals("imports")) {
-            listImports(evaluator);
+            listImports(evaluator, resultCollector);
         }
 
         if (items.equals("methods")) {
-            listMethods(evaluator);
+            listMethods(evaluator, resultCollector);
         }
-        return null;
+
+        return resultCollector.result();
     }
 
-    private void listMethods(Evaluator evaluator) {
-        logInfo(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
+    private void listMethods(Evaluator evaluator, CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
     }
 
-    private void listImports(Evaluator evaluator) {
-        logInfo(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source())));
+    private void listImports(Evaluator evaluator, CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source())));
     }
 
-    private void listTypes(Evaluator evaluator) {
-        logInfo(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
+    private void listTypes(Evaluator evaluator, CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
     }
 
-    private void listResults(Evaluator evaluator) {
-        logInfo(listValues("Results", evaluator.results()));
+    private void listResults(Evaluator evaluator, CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Results", evaluator.results()));
     }
 }
