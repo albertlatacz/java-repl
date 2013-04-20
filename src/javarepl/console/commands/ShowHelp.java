@@ -1,8 +1,8 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;

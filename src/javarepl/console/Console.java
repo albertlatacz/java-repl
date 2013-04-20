@@ -1,7 +1,8 @@
-package javarepl;
+package javarepl.console;
 
 import com.googlecode.totallylazy.*;
-import javarepl.commands.*;
+import javarepl.Evaluator;
+import javarepl.console.commands.*;
 
 import static com.googlecode.totallylazy.Predicates.always;
 
@@ -30,7 +31,7 @@ public class Console {
         });
     }
 
-    Sequence<Command> commands() {
+    public Sequence<Command> commands() {
         return commands;
     }
 

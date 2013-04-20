@@ -1,4 +1,4 @@
-package javarepl;
+package javarepl.console;
 
 import com.googlecode.totallylazy.Function2;
 

@@ -1,12 +1,12 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Predicates;
-import javarepl.ConsoleLogger;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
+import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;

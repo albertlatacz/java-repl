@@ -1,13 +1,12 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
-import javarepl.ConsoleLogger;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.commands.EvaluateExpression.evaluate;
 
 public class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
@@ -23,7 +22,7 @@ public class EvaluateFromHistory extends Command {
         if (!evaluation.isEmpty()) {
             String source = evaluation.get().expression().source();
             logInfo(source);
-            evaluate(this, evaluator, source);
+            EvaluateExpression.evaluate(this, evaluator, source);
         } else {
             logError("Expression not found.\n");
         }

@@ -1,12 +1,12 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Pair.pair;
-import static javarepl.commands.Command.parseNumericCommand;
-import static javarepl.commands.Command.parseStringCommand;
+import static javarepl.console.commands.Command.parseNumericCommand;
+import static javarepl.console.commands.Command.parseStringCommand;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

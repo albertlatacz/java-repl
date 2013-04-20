@@ -1,7 +1,7 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
-import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;

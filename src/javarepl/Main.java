@@ -2,7 +2,9 @@ package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Sequence;
-import javarepl.commands.Command;
+import javarepl.console.Console;
+import javarepl.console.ConsoleLogger;
+import javarepl.console.commands.Command;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 import jline.console.completer.Completer;

@@ -1,4 +1,4 @@
-package javarepl;
+package javarepl.console;
 
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
@@ -7,7 +7,7 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static javarepl.ConsoleLogger.LogType.INFO;
+import static javarepl.console.ConsoleLogger.LogType.INFO;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 

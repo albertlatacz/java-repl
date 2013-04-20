@@ -1,8 +1,8 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
-import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.Completer;
 
 import java.util.List;

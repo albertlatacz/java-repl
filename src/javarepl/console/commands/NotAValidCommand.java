@@ -1,7 +1,7 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
-import javarepl.ConsoleLogger;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 

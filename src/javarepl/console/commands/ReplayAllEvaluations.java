@@ -1,13 +1,13 @@
-package javarepl.commands;
+package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.ConsoleLogger;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
-import static javarepl.commands.EvaluateExpression.evaluate;
+import static javarepl.console.commands.EvaluateExpression.evaluate;
 
 public class ReplayAllEvaluations extends Command {
     private static final String COMMAND = ":replay";
