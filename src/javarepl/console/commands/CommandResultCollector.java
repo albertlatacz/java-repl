@@ -6,13 +6,6 @@ import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Sequences.empty;
 
-/**
- * Created with IntelliJ IDEA.
- * User: voxavion
- * Date: 21/04/2013
- * Time: 09:57
- * To change this template use File | Settings | File Templates.
- */
 public final class CommandResultCollector {
     private final ConsoleLogger logger;
     private final String command;
