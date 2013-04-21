@@ -6,18 +6,16 @@ import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 
-public class QuitApplication extends Command {
+public final class QuitApplication extends Command {
     private static final String COMMAND = ":quit";
 
-    public QuitApplication(ConsoleLogger logger) {
-        super(COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new StringsCompleter(COMMAND), logger);
+    public QuitApplication(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new StringsCompleter(COMMAND));
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
+    void execute(String expression, CommandResultCollector resultCollector) {
         resultCollector.logInfo("Terminating...");
-        evaluator.clearOutputDirectory();
+        evaluator().clearOutputDirectory();
         System.exit(0);
-        return resultCollector.result();
     }
 }

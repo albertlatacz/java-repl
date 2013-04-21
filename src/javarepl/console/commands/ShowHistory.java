@@ -14,26 +14,23 @@ import static javarepl.Evaluation.functions.expression;
 import static javarepl.Utils.listValues;
 import static javarepl.expressions.Expression.functions.source;
 
-public class ShowHistory extends Command {
+public final class ShowHistory extends Command {
     private static final String COMMAND = ":hist";
 
-    public ShowHistory(ConsoleLogger logger) {
-        super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
-                startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
+    public ShowHistory(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
+                startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
-        Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
-        Sequence<String> history = history(evaluator).reverse().take(limit).reverse();
+    void execute(String expression, CommandResultCollector resultCollector) {
+        Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator().evaluations().size());
+        Sequence<String> history = history(evaluator()).reverse().take(limit).reverse();
 
         if (!history.isEmpty()) {
             resultCollector.logInfo(listValues("History", history));
         } else {
             resultCollector.logInfo("No history.");
         }
-
-        return resultCollector.result();
     }
 
     public static Sequence<String> history(Evaluator evaluator) {

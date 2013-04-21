@@ -4,6 +4,18 @@
 * Export evaluations to source file
 * Show the list of recent exceptions
 * Support generic typing where possible
+* Add evaluation timeout
+* Add inactivity timeout
+
+
+
+* WREPL - initial
+    - Make commands return results with logs
+    - Expose console over UI within separate main()
+    - Sandbox rest main using java policies
+    - Refactor tests to check values instead of logger
+
+
 
 
 

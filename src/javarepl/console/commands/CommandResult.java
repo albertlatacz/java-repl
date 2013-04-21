@@ -2,20 +2,24 @@ package javarepl.console.commands;
 
 import javarepl.console.ConsoleLog;
 
-public class CommandResult {
-    private final String command;
-    private final Iterable<ConsoleLog> logs;
+import java.util.List;
 
-    public CommandResult(String command, Iterable<ConsoleLog> logs) {
+import static com.googlecode.totallylazy.Sequences.sequence;
+
+public final class CommandResult {
+    private final String command;
+    private final List<ConsoleLog> logs;
+
+    CommandResult(String command, List<ConsoleLog> logs) {
         this.command = command;
-        this.logs = logs;
+        this.logs = sequence(logs).toList();
     }
 
     public String command() {
         return command;
     }
 
-    public Iterable<ConsoleLog> logs() {
+    public List<ConsoleLog> logs() {
         return logs;
     }
 }

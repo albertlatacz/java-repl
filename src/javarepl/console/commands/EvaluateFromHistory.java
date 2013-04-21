@@ -8,26 +8,23 @@ import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
-public class EvaluateFromHistory extends Command {
+public final class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
 
-    public EvaluateFromHistory(ConsoleLogger logger) {
-        super(COMMAND + " [num] - evaluate last expression (optional 'num' to evaluate expression from history)",
-                startsWith(COMMAND), new StringsCompleter(COMMAND), logger);
+    public EvaluateFromHistory(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, COMMAND + " [num] - evaluate last expression (optional 'num' to evaluate expression from history)",
+                startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
-        Integer historyItem = parseNumericCommand(expression).second().getOrElse(evaluator.evaluations().size());
-        Option<Evaluation> evaluation = evaluator.evaluations().drop(historyItem - 1).headOption();
+    void execute(String expression, CommandResultCollector resultCollector) {
+        Integer historyItem = parseNumericCommand(expression).second().getOrElse(evaluator().evaluations().size());
+        Option<Evaluation> evaluation = evaluator().evaluations().drop(historyItem - 1).headOption();
         if (!evaluation.isEmpty()) {
             String source = evaluation.get().expression().source();
             resultCollector.logInfo(source);
-            EvaluateExpression.evaluate(resultCollector, evaluator, source);
+            EvaluateExpression.evaluate(resultCollector, evaluator(), source);
         } else {
             resultCollector.logError("Expression not found.\n");
         }
-
-        return resultCollector.result();
     }
 }

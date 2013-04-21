@@ -11,15 +11,13 @@ import javarepl.console.ConsoleLogger;
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
-public class EvaluateExpression extends Command {
-    public EvaluateExpression(ConsoleLogger logger) {
-        super(null, Predicates.<String>not(blank()), null, logger);
+public final class EvaluateExpression extends Command {
+    public EvaluateExpression(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, null, Predicates.<String>not(blank()), null);
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
-        evaluate(resultCollector, evaluator, expression);
-        return resultCollector.result();
+    void execute(String expression, CommandResultCollector resultCollector) {
+        evaluate(resultCollector, evaluator(), expression);
     }
 
     public static void evaluate(CommandResultCollector resultCollector, Evaluator evaluator, String expression) {

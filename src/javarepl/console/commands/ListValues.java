@@ -15,57 +15,54 @@ import static javarepl.Utils.listValues;
 import static javarepl.expressions.Expression.functions.source;
 import static javarepl.expressions.WithKey.functions.key;
 
-public class ListValues extends Command {
+public final class ListValues extends Command {
     private static final String COMMAND = ":list";
 
-    public ListValues(ConsoleLogger logger) {
-        super(COMMAND + " <results|types|methods|imports|all> - list specified values",
-                startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")), logger);
+    public ListValues(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, COMMAND + " <results|types|methods|imports|all> - list specified values",
+                startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")));
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
+    void execute(String expression, CommandResultCollector resultCollector) {
         String items = expression.replace(COMMAND, "").trim();
 
         if (items.equals("all")) {
-            listResults(evaluator, resultCollector);
-            listTypes(evaluator, resultCollector);
-            listImports(evaluator, resultCollector);
-            listMethods(evaluator, resultCollector);
+            listResults(resultCollector);
+            listTypes(resultCollector);
+            listImports(resultCollector);
+            listMethods(resultCollector);
         }
 
         if (items.equals("results")) {
-            listResults(evaluator, resultCollector);
+            listResults(resultCollector);
         }
 
         if (items.equals("types")) {
-            listTypes(evaluator, resultCollector);
+            listTypes(resultCollector);
         }
 
         if (items.equals("imports")) {
-            listImports(evaluator, resultCollector);
+            listImports(resultCollector);
         }
 
         if (items.equals("methods")) {
-            listMethods(evaluator, resultCollector);
+            listMethods(resultCollector);
         }
-
-        return resultCollector.result();
     }
 
-    private void listMethods(Evaluator evaluator, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
+    private void listMethods(CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Methods", sequence(evaluator().expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
     }
 
-    private void listImports(Evaluator evaluator, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(source())));
+    private void listImports(CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Imports", sequence(evaluator().expressionsOfType(Import.class)).map(source())));
     }
 
-    private void listTypes(Evaluator evaluator, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
+    private void listTypes(CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Types", sequence(evaluator().expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
     }
 
-    private void listResults(Evaluator evaluator, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(listValues("Results", evaluator.results()));
+    private void listResults(CommandResultCollector resultCollector) {
+        resultCollector.logInfo(listValues("Results", evaluator().results()));
     }
 }

@@ -13,8 +13,8 @@ public class Console {
 
     public Console(ConsoleLogger logger) {
         evaluator = new Evaluator();
-        commands = createCommands(logger);
-        evaluationRules = createEvaluationRules(commands, evaluator);
+        commands = createCommands(logger, evaluator);
+        evaluationRules = createEvaluationRules(commands);
 
         registerShutdownHook();
     }
@@ -35,32 +35,41 @@ public class Console {
         return commands;
     }
 
-    private Sequence<Command> createCommands(ConsoleLogger logger) {
+    private Sequence<Command> createCommands(ConsoleLogger logger, Evaluator evaluator) {
         Sequence<Command> commandSequence = Sequences.<Command>sequence()
-                .add(new QuitApplication(logger))
-                .add(new ShowHistory(logger))
-                .add(new SearchHistory(logger))
-                .add(new EvaluateFromHistory(logger))
-                .add(new ResetAllEvaluations(logger))
-                .add(new ReplayAllEvaluations(logger))
-                .add(new AddToClasspath(logger))
-                .add(new LoadSourceFile(logger))
-                .add(new ShowResult(logger))
-                .add(new ListValues(logger))
-                .add(new ShowLastSource(logger))
-                .add(new ShowTypeOfExpression(logger));
+                .add(new QuitApplication(logger, evaluator))
+                .add(new ShowHistory(logger, evaluator))
+                .add(new SearchHistory(logger, evaluator))
+                .add(new EvaluateFromHistory(logger, evaluator))
+                .add(new ResetAllEvaluations(logger, evaluator))
+                .add(new ReplayAllEvaluations(logger, evaluator))
+                .add(new AddToClasspath(logger, evaluator))
+                .add(new LoadSourceFile(logger, evaluator))
+                .add(new ShowResult(logger, evaluator))
+                .add(new ListValues(logger, evaluator))
+                .add(new ShowLastSource(logger, evaluator))
+                .add(new ShowTypeOfExpression(logger, evaluator));
 
         return commandSequence
-                .add(new ShowHelp(commandSequence, logger))
-                .add(new NotAValidCommand(logger))
-                .add(new EvaluateExpression(logger));
+                .add(new ShowHelp(commandSequence, logger, evaluator))
+                .add(new NotAValidCommand(logger, evaluator))
+                .add(new EvaluateExpression(logger, evaluator));
     }
 
-    private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands, Evaluator evaluator) {
+    private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands) {
         Rules<String, CommandResult> rules = Rules.rules();
         for (Command command : commands) {
-            rules.addLast(Rule.rule(command, command.apply(evaluator)));
+            rules.addLast(Rule.rule(command.predicate(), commandToFunction(command)));
         }
         return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(null)));
+    }
+
+    private Function1<String, CommandResult> commandToFunction(final Command command) {
+        return new Function1<String, CommandResult>() {
+            @Override
+            public CommandResult call(String expression) throws Exception {
+                return command.execute(expression);
+            }
+        };
     }
 }

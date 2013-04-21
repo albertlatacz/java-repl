@@ -5,14 +5,12 @@ import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
-public class NotAValidCommand extends Command {
-    public NotAValidCommand(ConsoleLogger logger) {
-        super(null, startsWith(":"), null, logger);
+public final class NotAValidCommand extends Command {
+    public NotAValidCommand(ConsoleLogger logger, Evaluator evaluator) {
+        super(evaluator, logger, null, startsWith(":"), null);
     }
 
-    public CommandResult call(Evaluator evaluator, String expression) throws Exception {
-        CommandResultCollector resultCollector = createResultCollector(expression);
+    void execute(String expression, CommandResultCollector resultCollector) {
         resultCollector.logError(expression + " is not a valid command");
-        return resultCollector.result();
     }
 }

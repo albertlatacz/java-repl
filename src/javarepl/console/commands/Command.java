@@ -1,23 +1,19 @@
 package javarepl.console.commands;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.Sequence;
 import javarepl.Evaluator;
-import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleLogger;
 import jline.console.completer.Completer;
 
-import java.util.List;
-
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.Integer.parseInt;
-import static javarepl.console.ConsoleLogger.LogType.ERROR;
-import static javarepl.console.ConsoleLogger.LogType.INFO;
 
-public abstract class Command extends Function2<Evaluator, String, CommandResult> implements Predicate<String>, Completer {
-
+public abstract class Command {
 
     public static final String COMMAND_SEPARATOR = " ";
 
@@ -26,25 +22,43 @@ public abstract class Command extends Function2<Evaluator, String, CommandResult
     private final Completer completer;
 
     private final ConsoleLogger logger;
+    private final Evaluator evaluator;
 
-    public final boolean matches(String expression) {
-        return predicate.matches(expression);
-    }
-
-    protected Command(String description, Predicate<String> predicate, Completer completer, ConsoleLogger logger) {
+    protected Command(Evaluator evaluator, ConsoleLogger logger, String description, Predicate<String> predicate, Completer completer) {
         this.description = description;
         this.predicate = predicate;
         this.completer = completer;
         this.logger = logger;
+        this.evaluator = evaluator;
     }
 
-    public final int complete(String buffer, int index, List<CharSequence> candidates) {
-        return (completer != null) ? completer.complete(buffer, index, candidates) : -1;
+    abstract void execute(String expression, CommandResultCollector resultCollector);
+
+    public final Evaluator evaluator() {
+        return evaluator;
+    }
+
+    public final CommandResult execute(String expression) {
+        CommandResultCollector resultCollector = createResultCollector(expression);
+        execute(expression, resultCollector);
+        return resultCollector.result();
+    }
+
+    public final String description() {
+        return description;
+    }
+
+    public final Predicate<String> predicate() {
+        return predicate;
+    }
+
+    public final Completer completer() {
+        return completer;
     }
 
     @Override
     public final String toString() {
-        return description;
+        return description();
     }
 
     public final CommandResultCollector createResultCollector(String command) {
@@ -66,33 +80,5 @@ public abstract class Command extends Function2<Evaluator, String, CommandResult
         } catch (Exception e) {
             return Pair.pair(splitInput.first(), none(Integer.class));
         }
-    }
-
-    public static final class CommandResultCollector {
-        private final ConsoleLogger logger;
-        private final String command;
-        private Sequence<ConsoleLog> logs = empty();
-
-        private CommandResultCollector(ConsoleLogger logger, String command) {
-            this.logger = logger;
-            this.command = command;
-        }
-
-        public CommandResultCollector logError(String message) {
-            logger.logError(message);
-            logs = logs.add(new ConsoleLog(ERROR, message));
-            return this;
-        }
-
-        public CommandResultCollector logInfo(String message) {
-            logger.logInfo(message);
-            logs = logs.add(new ConsoleLog(INFO, message));
-            return this;
-        }
-
-        public CommandResult result() {
-            return new CommandResult(command, logs);
-        }
-
     }
 }

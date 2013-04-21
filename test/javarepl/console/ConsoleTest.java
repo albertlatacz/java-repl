@@ -3,23 +3,26 @@ package javarepl.console;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import javarepl.console.commands.CommandResult;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static javarepl.console.ConsoleLogger.LogType.INFO;
+import java.util.List;
+
+import static javarepl.console.ConsoleLog.Type.INFO;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.contains;
 
 
 public class ConsoleTest {
     @Test
     public void supportsListingHistoryOfEvaluations() {
-        assertThat(executing(":hist"), hasLogged(INFO, "No history."));
+        assertThat(executing(":hist"), hasLoggedInfo("No history."));
 
         assertThat(
                 executing("42", "\"test\"", ":hist"),
-                hasLogged(INFO, "History:\n" +
+                hasLoggedInfo("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n"));
     }
@@ -52,26 +55,26 @@ public class ConsoleTest {
     }
 
 
-    private static MockConsoleLogger executing(String... items) {
+    private static CommandResult executing(String... items) {
         MockConsoleLogger logger = new MockConsoleLogger();
         Console console = new Console(logger);
 
+        CommandResult result = null;
         for (String item : items) {
-            console.execute(item);
+            result = console.execute(item);
         }
 
-        return logger;
+        return result;
     }
 
-    private static Matcher<MockConsoleLogger> hasLoggedInfo(final String message) {
+    private static Matcher<CommandResult> hasLoggedInfo(final String message) {
         return hasLogged(INFO, message);
     }
 
-    private static Matcher<MockConsoleLogger> hasLogged(final ConsoleLogger.LogType logType, final String message) {
-        return new FeatureMatcher<MockConsoleLogger, Iterable<Pair<ConsoleLogger.LogType, String>>>(hasItem(Pair.pair(logType, message)), "", "") {
-            @Override
-            protected Iterable<Pair<ConsoleLogger.LogType, String>> featureValueOf(MockConsoleLogger mockConsoleLogger) {
-                return mockConsoleLogger.logs;
+    private static Matcher<CommandResult> hasLogged(final ConsoleLog.Type logType, final String message) {
+        return new FeatureMatcher<CommandResult, List<ConsoleLog>>(contains(new ConsoleLog(logType, message)), "console log", "console log") {
+            protected List<ConsoleLog> featureValueOf(CommandResult commandResult) {
+                return commandResult.logs();
             }
         };
     }
