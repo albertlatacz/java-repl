@@ -17,6 +17,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
+import static javarepl.console.ConsoleLogger.systemConsoleLogger;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -39,20 +40,6 @@ public class Main {
                 logger.logInfo("");
             } while (true);
         }
-    }
-
-    private static ConsoleLogger systemConsoleLogger() {
-        return new ConsoleLogger() {
-            public Void call(LogType logType, String value) throws Exception {
-                if (logType == LogType.INFO) {
-                    System.out.println(value);
-                }
-                if (logType == LogType.ERROR) {
-                    System.err.println(value);
-                }
-                return null;
-            }
-        };
     }
 
     private static boolean environmentChecksPassed(ConsoleLogger logger) {

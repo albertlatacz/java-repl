@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>JQuery Console Demo</title>
+    <meta name="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="/jquery.js"></script>
+    <script type="text/javascript" src="/jquery.console.js"></script>
+
+    <script type="text/javascript">
+        var requesting = false;
+        $(document).ready(function () {
+            var console1 = $('<div class="console1">');
+            $('body').append(console1);
+            var controller = console1.console({
+                promptLabel: 'java> ',
+                commandValidate: function (line) {
+                    return !requesting;
+
+                },
+                commandHandle: function (line, report) {
+                    $.post('execute', {expression: line}, function (data) {
+                        var messages = [];
+
+                        for (var i = 0; i < data.logs.length; i++) {
+                            var type = data.logs[i].type == "ERROR" ? "jquery-console-message-error" : "jquery-console-message-value";
+                            messages.push({msg: data.logs[i].message, className: type})
+                        }
+
+                        report(messages);
+                        requesting = false;
+                    });
+
+                    return [];
+
+                },
+                welcomeMessage: "Welcome to Java REPL",
+                autofocus: true,
+                animateScroll: true,
+                promptHistory: true,
+                charInsertTrigger: function (keycode, line) {
+                    return true;
+                }
+            });
+        });
+    </script>
+
+    <style type="text/css" media="screen">
+        div.console1, {
+            word-wrap: break-word;
+        }
+
+            /* First console */
+        div.console1 {
+            font-size: 14px
+        }
+
+        div.console1 div.jquery-console-inner {
+            width: 900px;
+            height: 400px;
+            background: #333;
+            padding: 0.5em;
+            overflow: auto
+        }
+
+        div.console1 div.jquery-console-prompt-box {
+            color: #fff;
+            font-family: monospace;
+        }
+
+        div.console1 div.jquery-console-focus span.jquery-console-cursor {
+            background: #fefefe;
+            color: #333;
+            font-weight: bold
+        }
+
+        div.console1 div.jquery-console-welcome {
+            color: #1ad027;
+            font-family: sans-serif;
+            font-weight: bold;
+            padding: 0.1em;
+        }
+
+        div.console1 div.jquery-console-message-error {
+            color: #ef0505;
+            font-family: sans-serif;
+            font-weight: bold;
+            padding: 0.1em;
+        }
+
+        div.console1 div.jquery-console-message-value {
+            color: #1ad027;
+            font-family: monospace;
+            padding: 0.1em;
+        }
+
+        div.console1 div.jquery-console-message-type {
+            color: #52666f;
+            font-family: monospace;
+            padding: 0.1em;
+        }
+
+        div.console1 span.jquery-console-prompt-label {
+            font-weight: bold
+        }
+    </style>
+</head>
+<body>
+<noscript>
+    <p>
+        <strong>Please enable JavaScript or upgrade your browser.</strong>
+    </p>
+</noscript>
+</body>
+</html>

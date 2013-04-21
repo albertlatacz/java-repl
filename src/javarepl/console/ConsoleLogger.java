@@ -16,4 +16,18 @@ public abstract class ConsoleLogger extends Function2<ConsoleLogger.LogType, Str
         apply(LogType.INFO, message);
     }
 
+    public static ConsoleLogger systemConsoleLogger() {
+        return new ConsoleLogger() {
+            public Void call(LogType logType, String value) throws Exception {
+                if (logType == LogType.INFO) {
+                    System.out.println(value);
+                }
+                if (logType == LogType.ERROR) {
+                    System.err.println(value);
+                }
+                return null;
+            }
+        };
+    }
+
 }

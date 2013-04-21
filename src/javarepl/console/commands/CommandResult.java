@@ -6,11 +6,11 @@ import java.util.List;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-public final class CommandResult {
+public class CommandResult {
     private final String command;
     private final List<ConsoleLog> logs;
 
-    CommandResult(String command, List<ConsoleLog> logs) {
+    public CommandResult(String command, List<ConsoleLog> logs) {
         this.command = command;
         this.logs = sequence(logs).toList();
     }

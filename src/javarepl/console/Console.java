@@ -4,6 +4,8 @@ import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
 import javarepl.console.commands.*;
 
+import java.util.Collections;
+
 import static com.googlecode.totallylazy.Predicates.always;
 
 public class Console {
@@ -61,7 +63,7 @@ public class Console {
         for (Command command : commands) {
             rules.addLast(Rule.rule(command.predicate(), commandToFunction(command)));
         }
-        return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(null)));
+        return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(new CommandResult("", Collections.<ConsoleLog>emptyList()))));
     }
 
     private Function1<String, CommandResult> commandToFunction(final Command command) {

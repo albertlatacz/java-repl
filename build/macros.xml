@@ -9,11 +9,32 @@
             <jarjar jarfile="${release.no.libs.jar}" manifest="@{jar}.mf">
                 <zipfileset src="${release.jar.path}"/>
                 <zipgroupfileset dir="${runtime.dependencies.dir}"
-                                 includes="totallylazy-*.jar, jline-*.jar"/>
-                <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.$@1"/>
-                <rule pattern="com.googlecode.totallylazy.**.*" result="javarepl.internal.totallylazy.@1.$@2"/>
-                <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.$@2"/>
-                <rule pattern="jline.*" result="javarepl.internal.jline.$@1"/>
+                                 includes="totallylazy-*.jar, jline-*.jar, antlr-*.jar, cglib-*.jar, funclate-*.jar,
+                                 objenesis-*.jar, utterlyidle-*.jar, yadic-*.jar, stringtemplate-*.jar"/>
+                <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.@1"/>
+                <rule pattern="com.googlecode.totallylazy.**.*" result="javarepl.internal.totallylazy.@1.@2"/>
+
+                <rule pattern="com.googlecode.funclate.*" result="javarepl.internal.funclate.@1"/>
+                <rule pattern="com.googlecode.funclate.**.*" result="javarepl.internal.funclate.@1.@2"/>
+
+                <rule pattern="com.googlecode.lazyparsec.*" result="javarepl.internal.lazyparsec.@1"/>
+                <rule pattern="com.googlecode.lazyparsec.**.*" result="javarepl.internal.lazyparsec.@1.@2"/>
+
+                <rule pattern="com.googlecode.utterlyidle.*" result="javarepl.internal.utterlyidle.@1"/>
+                <rule pattern="com.googlecode.utterlyidle.**.*" result="javarepl.internal.utterlyidle.@1.@2"/>
+
+                <rule pattern="com.googlecode.yadic.*" result="javarepl.internal.yadic.@1"/>
+                <rule pattern="com.googlecode.yadic.**.*" result="javarepl.internal.yadic.@1.@2"/>
+
+                <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.@2"/>
+                <rule pattern="jline.*" result="javarepl.internal.jline.@1"/>
+                <rule pattern="org.fusesource.*" result="javarepl.internal.org.fusesource.@1"/>
+
+                <rule pattern="antlr.*" result="javarepl.internal.antlr.@1"/>
+                <rule pattern="net.sf.cglib.*" result="javarepl.internal.net.sf.cglib.@1"/>
+                <rule pattern="org.objenesis.*" result="javarepl.internal.org.objenesis.@1"/>
+                <rule pattern="org.apache.commons.codec.*" result="javarepl.internal.org.apache.commons.codec.@1"/>
+                <rule pattern="org.antlr.stringtemplate.*" result="javarepl.internal.org.antlr.stringtemplate.@1"/>
             </jarjar>
             <delete file="${release.jar.path}"/>
             <move file="${release.no.libs.jar}" tofile="${release.jar.path}"/>
