@@ -34,14 +34,14 @@ public abstract class Command {
 
     abstract void execute(String expression, CommandResultCollector result);
 
-    public final Evaluator evaluator() {
-        return evaluator;
-    }
-
     public final CommandResult execute(String expression) {
-        CommandResultCollector resultCollector = createResultCollector(expression);
+        CommandResultCollector resultCollector = new CommandResultCollector(logger, expression);
         execute(expression, resultCollector);
         return resultCollector.result();
+    }
+
+    public final Evaluator evaluator() {
+        return evaluator;
     }
 
     public final String description() {
@@ -59,10 +59,6 @@ public abstract class Command {
     @Override
     public final String toString() {
         return description();
-    }
-
-    public final CommandResultCollector createResultCollector(String command) {
-        return new CommandResultCollector(logger, command);
     }
 
     public static final Pair<String, Option<String>> parseStringCommand(String input) {
