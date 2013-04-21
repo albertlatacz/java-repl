@@ -32,7 +32,7 @@ public abstract class Command {
         this.evaluator = evaluator;
     }
 
-    abstract void execute(String expression, CommandResultCollector resultCollector);
+    abstract void execute(String expression, CommandResultCollector result);
 
     public final Evaluator evaluator() {
         return evaluator;

@@ -21,13 +21,13 @@ public final class AddToClasspath extends Command {
     }
 
 
-    void execute(String expression, CommandResultCollector resultCollector) {
+    void execute(String expression, CommandResultCollector result) {
         String path = parseStringCommand(expression).second().getOrNull();
         try {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                resultCollector.logInfo(format("Downloading %s...", path));
+                result.logInfo(format("Downloading %s...", path));
 
                 File outputFile = new File(evaluator().outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
@@ -37,9 +37,9 @@ public final class AddToClasspath extends Command {
                 evaluator().addClasspathUrl(url);
             }
 
-            resultCollector.logInfo(format("Added %s to classpath.", path));
+            result.logInfo(format("Added %s to classpath.", path));
         } catch (Exception e) {
-            resultCollector.logError(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
+            result.logError(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
         }
     }
 }

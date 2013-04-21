@@ -14,7 +14,7 @@ public final class ShowLastSource extends Command {
         super(evaluator, logger, COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(evaluator().lastEvaluation().map(classSource()).getOrElse("No source"));
+    void execute(String expression, CommandResultCollector result) {
+        result.logInfo(evaluator().lastEvaluation().map(classSource()).getOrElse("No source"));
     }
 }

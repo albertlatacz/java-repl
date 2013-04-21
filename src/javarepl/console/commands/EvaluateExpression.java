@@ -16,8 +16,8 @@ public final class EvaluateExpression extends Command {
         super(evaluator, logger, null, Predicates.<String>not(blank()), null);
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
-        evaluate(resultCollector, evaluator(), expression);
+    void execute(String expression, CommandResultCollector result) {
+        evaluate(result, evaluator(), expression);
     }
 
     public static void evaluate(CommandResultCollector resultCollector, Evaluator evaluator, String expression) {

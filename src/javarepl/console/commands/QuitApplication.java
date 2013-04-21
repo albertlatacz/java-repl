@@ -13,8 +13,8 @@ public final class QuitApplication extends Command {
         super(evaluator, logger, COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
-        resultCollector.logInfo("Terminating...");
+    void execute(String expression, CommandResultCollector result) {
+        result.logInfo("Terminating...");
         evaluator().clearOutputDirectory();
         System.exit(0);
     }

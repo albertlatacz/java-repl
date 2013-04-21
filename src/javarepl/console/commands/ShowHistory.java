@@ -22,14 +22,14 @@ public final class ShowHistory extends Command {
                 startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
+    void execute(String expression, CommandResultCollector result) {
         Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator().evaluations().size());
         Sequence<String> history = history(evaluator()).reverse().take(limit).reverse();
 
         if (!history.isEmpty()) {
-            resultCollector.logInfo(listValues("History", history));
+            result.logInfo(listValues("History", history));
         } else {
-            resultCollector.logInfo("No history.");
+            result.logInfo("No history.");
         }
     }
 

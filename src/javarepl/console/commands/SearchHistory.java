@@ -15,8 +15,8 @@ public final class SearchHistory extends Command {
         super(evaluator, logger, COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
+    void execute(String expression, CommandResultCollector result) {
         String searchTerm = parseStringCommand(expression).second().getOrElse("");
-        resultCollector.logInfo(listValues("History search for '" + searchTerm + "'", ShowHistory.history(evaluator()).filter(contains(searchTerm))));
+        result.logInfo(listValues("History search for '" + searchTerm + "'", ShowHistory.history(evaluator()).filter(contains(searchTerm))));
     }
 }

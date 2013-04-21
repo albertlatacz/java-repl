@@ -18,7 +18,7 @@ public final class ShowHelp extends Command {
         this.commands = commands.cons(this);
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
-        resultCollector.logInfo(listValues("Available commands", commands));
+    void execute(String expression, CommandResultCollector result) {
+        result.logInfo(listValues("Available commands", commands));
     }
 }

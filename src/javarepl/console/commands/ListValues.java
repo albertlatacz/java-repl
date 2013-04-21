@@ -23,30 +23,30 @@ public final class ListValues extends Command {
                 startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
+    void execute(String expression, CommandResultCollector result) {
         String items = expression.replace(COMMAND, "").trim();
 
         if (items.equals("all")) {
-            listResults(resultCollector);
-            listTypes(resultCollector);
-            listImports(resultCollector);
-            listMethods(resultCollector);
+            listResults(result);
+            listTypes(result);
+            listImports(result);
+            listMethods(result);
         }
 
         if (items.equals("results")) {
-            listResults(resultCollector);
+            listResults(result);
         }
 
         if (items.equals("types")) {
-            listTypes(resultCollector);
+            listTypes(result);
         }
 
         if (items.equals("imports")) {
-            listImports(resultCollector);
+            listImports(result);
         }
 
         if (items.equals("methods")) {
-            listMethods(resultCollector);
+            listMethods(result);
         }
     }
 

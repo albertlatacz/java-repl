@@ -14,13 +14,13 @@ public final class ShowTypeOfExpression extends Command {
         super(evaluator, logger, COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
+    void execute(String expression, CommandResultCollector result) {
         Option<Class> expressionType = evaluator().typeOfExpression(parseStringCommand(expression).second().getOrElse(""));
 
         if (!expressionType.isEmpty()) {
-            resultCollector.logInfo(expressionType.get().getCanonicalName());
+            result.logInfo(expressionType.get().getCanonicalName());
         } else {
-            resultCollector.logError("Cannot determine the type of this expression.");
+            result.logError("Cannot determine the type of this expression.");
         }
     }
 

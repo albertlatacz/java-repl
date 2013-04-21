@@ -16,13 +16,13 @@ public final class ReplayAllEvaluations extends Command {
         super(evaluator, logger, COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector resultCollector) {
-        resultCollector.logInfo("Replaying all evaluations:");
+    void execute(String expression, CommandResultCollector result) {
+        result.logInfo("Replaying all evaluations:");
         Sequence<Evaluation> evaluations = evaluator().evaluations();
         evaluator().reset();
 
         for (Evaluation evaluation : evaluations) {
-            evaluate(resultCollector, evaluator(), evaluation.expression().source());
+            evaluate(result, evaluator(), evaluation.expression().source());
         }
     }
 }
