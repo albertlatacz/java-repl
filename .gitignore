@@ -2,6 +2,7 @@ build/artifacts
 lib/build
 lib/optional
 lib/runtime
+lib/packaged
 .idea
 .DS_Store
 target

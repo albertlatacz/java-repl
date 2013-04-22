@@ -111,7 +111,7 @@
     </macrodef>
 
 
-    <macrodef name="deploy-s3">
+    <macrodef name="deploy-to-s3">
         <attribute name="source"/>
         <attribute name="destination"/>
 
@@ -130,6 +130,21 @@
             </exec>
 
             <delete file="~/.s3cfg" quiet="true"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="deploy-to-s3-maven-repository">
+        <attribute name="source"/>
+        <attribute name="destination"/>
+
+        <sequential>
+            <deploy-to-s3 source="@{source}" destination="@{destination}"/>
+
+            <checksum file="@{source}" algorithm="sha1"/>
+            <deploy-to-s3 source="@{source}.sha1" destination="@{destination}.sha1"/>
+
+            <checksum file="@{source}" algorithm="md5"/>
+            <deploy-to-s3 source="@{source}.md5" destination="@{destination}.md5"/>
         </sequential>
     </macrodef>
 

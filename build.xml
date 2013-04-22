@@ -18,6 +18,7 @@
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
     <property name="release.pom" value="${release.name}.pom"/>
+    <property name="release.pom.path" value="${artifacts}/${release.pom}"/>
     <property name="release.manifest" value="MANIFEST.MF"/>
     <property name="release.src" value="${release.name}-sources.jar"/>
     <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
@@ -140,18 +141,18 @@
     </target>
 
     <target name="deploy" if="${deploy}">
-        <deploy-s3 source="${release.plugin.zip.path}"
-                   destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij-${release.version}.zip"/>
-        <deploy-s3 source="${release.plugin.zip.path}"
-                   destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij.zip"/>
-        <deploy-s3 source="${release.jar.path}"
-                   destination="s3://albertlatacz.published/javarepl/javarepl-${release.version}.jar"/>
-        <deploy-s3 source="${release.jar.path}" destination="s3://albertlatacz.published/javarepl/javarepl.jar"/>
+        <deploy-to-s3 source="${release.plugin.zip.path}"
+                      destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij-${release.version}.zip"/>
+        <deploy-to-s3 source="${release.plugin.zip.path}"
+                      destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij.zip"/>
+        <deploy-to-s3 source="${release.jar.path}"
+                      destination="s3://albertlatacz.published/javarepl/javarepl-${release.version}.jar"/>
+        <deploy-to-s3 source="${release.jar.path}" destination="s3://albertlatacz.published/javarepl/javarepl.jar"/>
 
-        <deploy-s3 source="${release.jar.path}"
-                   destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.jar"/>
-        <deploy-s3 source="${artifacts}/${release.pom}"
-                   destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.pom"/>
+        <deploy-to-s3-maven-repository source="${release.jar.path}"
+                                       destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.jar"/>
+        <deploy-to-s3-maven-repository source="${release.pom.path}"
+                                       destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.pom"/>
     </target>
 
 
