@@ -13,7 +13,6 @@ import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.execution.ui.actions.CloseAction;
 import com.intellij.ide.CommonActionsManager;
-import com.intellij.ide.DataManager;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -286,7 +285,7 @@ public class JavaREPLConsoleRunner {
         Map<String, String> envParams = new HashMap<String, String>();
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
-        line.addParameter("-sc");
+        line.addParameter("--simple-console");
 
         return line;
     }
