@@ -13,8 +13,8 @@
     <property name="test" value="${basedir}/test"/>
     <property name="release.version" value="${build.number}"/>
     <property name="plugin.src" value="${basedir}/intellij-plugin/src"/>
-    <property name="release.plugin.jar" value="${ant.project.name}-intellij-${release.version}.jar"/>
-    <property name="release.plugin.zip" value="${ant.project.name}-intellij-${release.version}.zip"/>
+    <property name="release.plugin.jar" value="${ant.project.name}-${release.version}-intellij.jar"/>
+    <property name="release.plugin.zip" value="${ant.project.name}-${release.version}-intellij.zip"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
     <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
@@ -129,11 +129,7 @@
     <target name="deploy" if="${deploy}">
         <deploy-to-s3
                 source="${release.plugin.zip.path}"
-                destination="${s3.download.path}/intellij-plugin/${release.plugin.jar}"/>
-
-        <deploy-to-s3
-                source="${release.plugin.zip.path}"
-                destination="${s3.download.path}/intellij-plugin/javarepl-intellij.zip"/>
+                destination="${s3.download.path}/javarepl-intellij.zip"/>
 
         <deploy-to-s3
                 source="${release.jar.path}"
@@ -151,6 +147,10 @@
         <deploy-to-s3-maven-repository
                 source="${release.pom.path}"
                 destination="${s3.repo.path}/${release.pom}"/>
+
+        <deploy-to-s3-maven-repository
+                source="${release.plugin.zip.path}"
+                destination="${s3.repo.path}/${release.plugin.zip}"/>
     </target>
 
 
