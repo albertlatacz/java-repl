@@ -17,14 +17,20 @@
     <property name="release.plugin.zip" value="${ant.project.name}-intellij-${release.version}.zip"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
+    <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
     <property name="release.pom" value="${release.name}.pom"/>
     <property name="release.pom.path" value="${artifacts}/${release.pom}"/>
     <property name="release.manifest" value="MANIFEST.MF"/>
     <property name="release.src" value="${release.name}-sources.jar"/>
-    <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
+    <property name="release.src.path" value="${artifacts}/${release.src}"/>
     <property name="release.manifest.path" value="${artifacts}/${release.manifest}"/>
     <property name="release.plugin.jar.path" value="${artifacts}/${release.plugin.jar}"/>
     <property name="release.plugin.zip.path" value="${artifacts}/${release.plugin.zip}"/>
+
+    <property name="s3.repo.path"
+              value="s3://albertlatacz.published/repo/${ant.project.name}/${ant.project.name}/${release.version}"/>
+    <property name="s3.download.path" value="s3://albertlatacz.published/${ant.project.name}"/>
+
     <property name="tests.jar" value="${release.name}-tests.jar"/>
     <property name="tests.src" value="${release.name}-test-sources.jar"/>
     <property name="tests.jar.path" value="${artifacts}/${tests.jar}"/>
@@ -111,26 +117,6 @@
         </exec>
         <property file="${artifacts}/git.properties" prefix="git"/>
 
-        <propertyfile file="${artifacts}/release.properties">
-            <entry key="release.version" value="${release.version}"/>
-            <entry key="project.name" value="${ant.project.name}"/>
-            <entry key="release.name" value="${release.name}"/>
-            <entry key="release.path" value="${ant.project.name}/${ant.project.name}/${release.version}/"/>
-            <entry key="release.files" value="${release.jar},${release.pom},${release.src},${tests.jar},${tests.src}"/>
-            <entry key="${release.jar}.description"
-                   value="${git.summary} build:${build.number} changeset:${git.changeset} user:${git.user}"/>
-            <entry key="${release.jar}.labels" value="Jar"/>
-            <entry key="${release.pom}.description" value="Maven POM file build:${build.number}"/>
-            <entry key="${release.pom}.labels" value="POM"/>
-            <entry key="${release.src}.description" value="Source file build:${build.number}"/>
-            <entry key="${release.src}.labels" value="Source"/>
-            <entry key="${tests.jar}.description" value="Tests jar build:${build.number}"/>
-            <entry key="${tests.jar}.labels" value="Tests"/>
-
-            <entry key="${tests.src}.description" value="Test sources jar build:${build.number}"/>
-            <entry key="${tests.src}.labels" value="Test Sources"/>
-        </propertyfile>
-
         <generate.pom artifact.uri="mvn:${ant.project.name}:${ant.project.name}:jar:${release.version}"
                       dependencies="build/runtime.dependencies"
                       directory="${artifacts}"/>
@@ -141,18 +127,30 @@
     </target>
 
     <target name="deploy" if="${deploy}">
-        <deploy-to-s3 source="${release.plugin.zip.path}"
-                      destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij-${release.version}.zip"/>
-        <deploy-to-s3 source="${release.plugin.zip.path}"
-                      destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij.zip"/>
-        <deploy-to-s3 source="${release.jar.path}"
-                      destination="s3://albertlatacz.published/javarepl/javarepl-${release.version}.jar"/>
-        <deploy-to-s3 source="${release.jar.path}" destination="s3://albertlatacz.published/javarepl/javarepl.jar"/>
+        <deploy-to-s3
+                source="${release.plugin.zip.path}"
+                destination="${s3.download.path}/intellij-plugin/${release.plugin.jar}"/>
 
-        <deploy-to-s3-maven-repository source="${release.jar.path}"
-                                       destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.jar"/>
-        <deploy-to-s3-maven-repository source="${release.pom.path}"
-                                       destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.pom"/>
+        <deploy-to-s3
+                source="${release.plugin.zip.path}"
+                destination="${s3.download.path}/intellij-plugin/javarepl-intellij.zip"/>
+
+        <deploy-to-s3
+                source="${release.jar.path}"
+                destination="${s3.download.path}/javarepl.jar"/>
+
+
+        <deploy-to-s3-maven-repository
+                source="${release.jar.path}"
+                destination="${s3.repo.path}/${release.jar}"/>
+
+        <deploy-to-s3-maven-repository
+                source="${release.src.path}"
+                destination="${s3.repo.path}/${release.src}"/>
+
+        <deploy-to-s3-maven-repository
+                source="${release.pom.path}"
+                destination="${s3.repo.path}/${release.pom}"/>
     </target>
 
 
