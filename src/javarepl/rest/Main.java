@@ -23,6 +23,7 @@ public class Main extends RestApplication {
     }
 
     public static void main(String[] args) throws Exception {
-        new RestServer(new Main(basePath("/")), defaultConfiguration().port(8001));
+        Main application = new Main(basePath("/"));
+        new RestServer(application, defaultConfiguration().port(8001));
     }
 }

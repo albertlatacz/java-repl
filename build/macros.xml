@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
+    <property environment="env"/>
     <macrodef name="embed.libs">
         <attribute name="jar"/>
         <sequential>
@@ -8,7 +9,7 @@
             <property name="release.no.libs.jar" value="${artifacts}/${release.name}-nolibs.jar"/>
             <jarjar jarfile="${release.no.libs.jar}" manifest="@{jar}.mf">
                 <zipfileset src="${release.jar.path}"/>
-                <zipgroupfileset dir="${runtime.dependencies.dir}"
+                <zipgroupfileset dir="${packaged.dependencies.dir}"
                                  includes="totallylazy-*.jar, jline-*.jar, antlr-*.jar, cglib-*.jar, funclate-*.jar,
                                  objenesis-*.jar, utterlyidle-*.jar, yadic-*.jar, stringtemplate-*.jar"/>
                 <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.@1"/>
@@ -106,6 +107,29 @@
 
             <delete dir="${unzipped.jar}"/>
             <fail message="Tests failed" if="failed"/>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="deploy-s3">
+        <attribute name="source"/>
+        <attribute name="destination"/>
+
+        <sequential>
+            <echo file="~/.s3cfg">[default]
+                access_key = ${env.AWS_KEY}
+                secret_key = ${env.AWS_SECRET}
+            </echo>
+
+            <exec executable="s3cmd">
+                <arg value="-c"/>
+                <arg value="~/.s3cfg"/>
+                <arg value="put"/>
+                <arg value="@{source}"/>
+                <arg value="@{destination}"/>
+            </exec>
+
+            <delete file="~/.s3cfg"/>
         </sequential>
     </macrodef>
 

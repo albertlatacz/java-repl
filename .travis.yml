@@ -9,5 +9,4 @@ install:
  - sudo apt-get install -qq s3cmd
 
 script:
-    - ant
-    - ./bin/push.sh
+    - ant -Ddeploy=true

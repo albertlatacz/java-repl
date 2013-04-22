@@ -11,6 +11,19 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/packaged" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/lib/packaged" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib/packaged" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/packaged" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="file://$MODULE_DIR$/lib/runtime" />
         </CLASSES>
         <JAVADOC />

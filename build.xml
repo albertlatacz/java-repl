@@ -3,7 +3,7 @@
     <property environment="env"/>
 
     <condition property="build.number" value="${env.JAVAREPL_BUILD_NUMBER}" else="dev.build">
-        <isset property="env.JAVAREPL_BUILD_NUMBER" />
+        <isset property="env.JAVAREPL_BUILD_NUMBER"/>
     </condition>
 
     <property name="build" value="${basedir}/build"/>
@@ -30,6 +30,7 @@
 
     <property name="build.dependencies.dir" value="lib/build"/>
     <property name="runtime.dependencies.dir" value="lib/runtime"/>
+    <property name="packaged.dependencies.dir" value="lib/packaged"/>
     <property name="optional.dependencies.dir" value="lib/optional"/>
     <property name="manual.dependencies.dir" value="lib/manual"/>
 
@@ -39,6 +40,7 @@
     <path id="all.dependancies">
         <fileset dir="${build.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${runtime.dependencies.dir}" includes="**/*.jar"/>
+        <fileset dir="${packaged.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${optional.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${manual.dependencies.dir}" includes="**/*.jar"/>
     </path>
@@ -56,6 +58,8 @@
                     directory="${build.dependencies.dir}"/>
             <update dependencies="build/runtime.dependencies"
                     directory="${runtime.dependencies.dir}"/>
+            <update dependencies="build/packaged.dependencies"
+                    directory="${packaged.dependencies.dir}"/>
             <update dependencies="build/optional.dependencies"
                     directory="${optional.dependencies.dir}"/>
         </parallel>
@@ -81,7 +85,8 @@
     </target>
 
     <target name="compile">
-        <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies" version="${release.version}"/>
+        <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies"
+                         version="${release.version}"/>
 
         <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
 
@@ -92,18 +97,58 @@
         <test jar="${tests.jar.path}" classpathref="all.jars" reports="${reports}"/>
     </target>
 
+
     <target name="package">
         <mkdir dir="${artifacts}"/>
 
         <zip destfile="${artifacts}/${release.src}" basedir="src"/>
 
         <zip destfile="${artifacts}/${tests.src}" basedir="test"/>
+
+        <exec executable="git" output="${artifacts}/git.properties">
+            <arg line="log -1 --pretty=format:summary:%s%nchangeset:%H%nuser:%cn"/>
+        </exec>
+        <property file="${artifacts}/git.properties" prefix="git"/>
+
+        <propertyfile file="${artifacts}/release.properties">
+            <entry key="release.version" value="${release.version}"/>
+            <entry key="project.name" value="${ant.project.name}"/>
+            <entry key="release.name" value="${release.name}"/>
+            <entry key="release.path" value="${ant.project.name}/${ant.project.name}/${release.version}/"/>
+            <entry key="release.files" value="${release.jar},${release.pom},${release.src},${tests.jar},${tests.src}"/>
+            <entry key="${release.jar}.description"
+                   value="${git.summary} build:${build.number} changeset:${git.changeset} user:${git.user}"/>
+            <entry key="${release.jar}.labels" value="Jar"/>
+            <entry key="${release.pom}.description" value="Maven POM file build:${build.number}"/>
+            <entry key="${release.pom}.labels" value="POM"/>
+            <entry key="${release.src}.description" value="Source file build:${build.number}"/>
+            <entry key="${release.src}.labels" value="Source"/>
+            <entry key="${tests.jar}.description" value="Tests jar build:${build.number}"/>
+            <entry key="${tests.jar}.labels" value="Tests"/>
+
+            <entry key="${tests.src}.description" value="Test sources jar build:${build.number}"/>
+            <entry key="${tests.src}.labels" value="Test Sources"/>
+        </propertyfile>
+
+        <generate.pom artifact.uri="mvn:${ant.project.name}:${ant.project.name}:jar:${release.version}"
+                      dependencies="build/runtime.dependencies"
+                      directory="${artifacts}"/>
     </target>
 
     <target name="embed">
         <embed.libs jar="${release.jar.path}"/>
     </target>
 
+    <target name="deploy" if="${deploy}">
+        <deploy-s3 source="${release.plugin.zip.path}"
+                   destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij-${release.version}.zip"/>
+        <deploy-s3 source="${release.plugin.zip.path}"
+                   destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij.zip"/>
+
+        <deploy-s3 source="${release.jar.path}"
+                   destination="s3://albertlatacz.published/javarepl/javarepl-${release.version}.jar"/>
+        <deploy-s3 source="${release.jar.path}" destination="s3://albertlatacz.published/javarepl/javarepl.jar"/>
+    </target>
 
 
     <target name="build" description="build all">
@@ -119,6 +164,7 @@
 
         <antcall target="embed"/>
         <antcall target="plugin"/>
+        <antcall target="deploy"/>
     </target>
 
 </project>
