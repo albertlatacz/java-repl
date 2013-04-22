@@ -144,10 +144,14 @@
                    destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij-${release.version}.zip"/>
         <deploy-s3 source="${release.plugin.zip.path}"
                    destination="s3://albertlatacz.published/javarepl/intellij-plugin/javarepl-intellij.zip"/>
-
         <deploy-s3 source="${release.jar.path}"
                    destination="s3://albertlatacz.published/javarepl/javarepl-${release.version}.jar"/>
         <deploy-s3 source="${release.jar.path}" destination="s3://albertlatacz.published/javarepl/javarepl.jar"/>
+
+        <deploy-s3 source="${release.jar.path}"
+                   destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.jar"/>
+        <deploy-s3 source="${artifacts}/${release.pom}"
+                   destination="s3://albertlatacz.repo/javarepl/javarepl/${release.version}/javarepl-${release.version}.pom"/>
     </target>
 
 

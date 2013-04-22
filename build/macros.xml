@@ -129,7 +129,7 @@
                 <arg value="@{destination}"/>
             </exec>
 
-            <delete file="~/.s3cfg"/>
+            <delete file="~/.s3cfg" quiet="true"/>
         </sequential>
     </macrodef>
 
