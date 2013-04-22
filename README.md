@@ -20,7 +20,7 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 [Latest version](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar)
 
-[Latest IntelliJ IDEA plugin](http://albertlatacz.published.s3.amazonaws.com/javarepl/intellij-plugin/javarepl-intellij.zip)
+[Latest IntelliJ IDEA plugin](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl-intellij.zip)
 
 [Previous releases](http://albertlatacz.published.s3.amazonaws.com/index.html)
 
