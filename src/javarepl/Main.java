@@ -7,7 +7,6 @@ import javarepl.console.ConsoleLogger;
 import javarepl.console.commands.Command;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
-import jline.console.completer.Completer;
 
 import java.io.BufferedReader;
 import java.io.FilePermission;
@@ -21,11 +20,13 @@ import java.security.Permissions;
 import java.security.Policy;
 import java.util.PropertyPermission;
 
+import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.console.ConsoleLogger.systemConsoleLogger;
+import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -104,7 +105,7 @@ public class Main {
             {
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
-                console.addCompleter(new AggregateCompleter(commandSequence.safeCast(Completer.class).toList()));
+                console.addCompleter(new AggregateCompleter(commandSequence.map(completer()).filter(notNullValue()).toList()));
             }
 
             public String call(Sequence<String> lines) throws Exception {

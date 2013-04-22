@@ -61,12 +61,12 @@ public class Console {
     private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands) {
         Rules<String, CommandResult> rules = Rules.rules();
         for (Command command : commands) {
-            rules.addLast(Rule.rule(command.predicate(), commandToFunction(command)));
+            rules.addLast(Rule.rule(command.predicate(), asFunction(command)));
         }
         return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(new CommandResult("", Collections.<ConsoleLog>emptyList()))));
     }
 
-    private Function1<String, CommandResult> commandToFunction(final Command command) {
+    private Function1<String, CommandResult> asFunction(final Command command) {
         return new Function1<String, CommandResult>() {
             @Override
             public CommandResult call(String expression) throws Exception {

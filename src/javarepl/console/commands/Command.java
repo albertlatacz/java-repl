@@ -1,9 +1,6 @@
 package javarepl.console.commands;
 
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
 import jline.console.completer.Completer;
@@ -76,5 +73,19 @@ public abstract class Command {
         } catch (Exception e) {
             return Pair.pair(splitInput.first(), none(Integer.class));
         }
+    }
+
+    public static enum functions {
+        ;
+
+        public static Function1<Command, Completer> completer() {
+            return new Function1<Command, Completer>() {
+                public Completer call(Command command) throws Exception {
+                    return command.completer;
+                }
+            };
+        }
+
+
     }
 }
