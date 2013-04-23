@@ -4,7 +4,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.httpserver.RestServer;
-import javarepl.console.ConsoleI;
+import javarepl.console.Console;
 import javarepl.console.commands.Command;
 import javarepl.console.commands.CommandResult;
 
@@ -12,12 +12,12 @@ import static com.googlecode.utterlyidle.BasePath.basePath;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 import static javarepl.Utils.randomServerPort;
 
-public class RestConsole implements ConsoleI {
+public class RestConsole implements Console {
 
-    private final ConsoleI console;
+    private final Console console;
     private final RestServer server;
 
-    public RestConsole(ConsoleI console, Option<Integer> port) throws Exception {
+    public RestConsole(Console console, Option<Integer> port) throws Exception {
         this.console = console;
 
         ServerConfiguration configuration = defaultConfiguration().port(port.getOrElse(randomServerPort()));

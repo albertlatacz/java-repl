@@ -8,7 +8,7 @@ import java.util.Collections;
 
 import static com.googlecode.totallylazy.Predicates.always;
 
-public final class SimpleConsole implements ConsoleI {
+public final class SimpleConsole implements Console {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
     private final Rules<String, CommandResult> evaluationRules;

@@ -6,7 +6,7 @@ import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
-import javarepl.console.ConsoleI;
+import javarepl.console.Console;
 import javarepl.console.ConsoleLog;
 import javarepl.console.commands.CommandResult;
 
@@ -15,9 +15,9 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 
 @Path("/javarepl")
 public class RestConsoleResource {
-    private final ConsoleI console;
+    private final Console console;
 
-    public RestConsoleResource(ConsoleI console) {
+    public RestConsoleResource(Console console) {
         this.console = console;
     }
 

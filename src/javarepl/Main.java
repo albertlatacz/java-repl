@@ -3,7 +3,7 @@ package javarepl;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import javarepl.console.ConsoleI;
+import javarepl.console.Console;
 import javarepl.console.ConsoleLogger;
 import javarepl.console.SimpleConsole;
 import javarepl.console.commands.Command;
@@ -46,7 +46,7 @@ public class Main {
         Option<Integer> port = port(args);
 
         ConsoleLogger logger = systemConsoleLogger();
-        ConsoleI console = new RestConsole(new SimpleConsole(logger), port);
+        Console console = new RestConsole(new SimpleConsole(logger), port);
         ExpressionReader expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(console.commands()));
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
