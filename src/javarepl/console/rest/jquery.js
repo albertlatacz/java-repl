@@ -607,8 +607,8 @@
         i.done(function () {
             e = "resolved"
         }, c.disable, d.lock).fail(function () {
-            e = "rejected"
-        }, b.disable, d.lock), a && a.call(i, i);
+                e = "rejected"
+            }, b.disable, d.lock), a && a.call(i, i);
         return i
     }, when: function (a) {
         function m(a) {
@@ -2146,13 +2146,13 @@
         return this.map(function () {
             return this.elements ? f.makeArray(this.elements) : this
         }).filter(function () {
-            return this.name && !this.disabled && (this.checked || bO.test(this.nodeName) || bI.test(this.type))
-        }).map(function (a, b) {
-            var c = f(this).val();
-            return c == null ? null : f.isArray(c) ? f.map(c, function (a, c) {
-                return{name: b.name, value: a.replace(bF, "\r\n")}
-            }) : {name: b.name, value: c.replace(bF, "\r\n")}
-        }).get()
+                return this.name && !this.disabled && (this.checked || bO.test(this.nodeName) || bI.test(this.type))
+            }).map(function (a, b) {
+                var c = f(this).val();
+                return c == null ? null : f.isArray(c) ? f.map(c, function (a, c) {
+                    return{name: b.name, value: a.replace(bF, "\r\n")}
+                }) : {name: b.name, value: c.replace(bF, "\r\n")}
+            }).get()
     }}), f.each("ajaxStart ajaxStop ajaxComplete ajaxError ajaxSuccess ajaxSend".split(" "), function (a, b) {
         f.fn[b] = function (a) {
             return this.on(b, a)

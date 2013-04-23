@@ -8,12 +8,12 @@ import java.util.Collections;
 
 import static com.googlecode.totallylazy.Predicates.always;
 
-public class Console {
+public final class SimpleConsole implements ConsoleI {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
     private final Rules<String, CommandResult> evaluationRules;
 
-    public Console(ConsoleLogger logger) {
+    public SimpleConsole(ConsoleLogger logger) {
         evaluator = new Evaluator();
         commands = createCommands(logger, evaluator);
         evaluationRules = createEvaluationRules(commands);
@@ -25,16 +25,16 @@ public class Console {
         return evaluationRules.apply(expression);
     }
 
+    public Sequence<Command> commands() {
+        return commands;
+    }
+
     private void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 evaluator.clearOutputDirectory();
             }
         });
-    }
-
-    public Sequence<Command> commands() {
-        return commands;
     }
 
     private Sequence<Command> createCommands(ConsoleLogger logger, Evaluator evaluator) {

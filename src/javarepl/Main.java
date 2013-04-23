@@ -1,10 +1,13 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import javarepl.console.Console;
+import javarepl.console.ConsoleI;
 import javarepl.console.ConsoleLogger;
+import javarepl.console.SimpleConsole;
 import javarepl.console.commands.Command;
+import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
 
@@ -12,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
 import java.security.CodeSource;
@@ -20,8 +24,13 @@ import java.security.Permissions;
 import java.security.Policy;
 import java.util.PropertyPermission;
 
+import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.replaceAll;
+import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.numbers.Numbers.intValue;
+import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
@@ -32,11 +41,12 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        boolean simpleConsole = sequence(args).contains("--simple-console");
-        boolean sandboxed = sequence(args).contains("--sandboxed");
+        boolean simpleConsole = isSimpleConsole(args);
+        boolean sandboxed = isSandboxed(args);
+        Option<Integer> port = port(args);
 
         ConsoleLogger logger = systemConsoleLogger();
-        Console console = new Console(logger);
+        ConsoleI console = new RestConsole(new SimpleConsole(logger), port);
         ExpressionReader expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(console.commands()));
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
@@ -61,6 +71,18 @@ public class Main {
         }
     }
 
+    private static boolean isSimpleConsole(String[] args) {
+        return sequence(args).contains("--simple-console");
+    }
+
+    private static boolean isSandboxed(String[] args) {
+        return sequence(args).contains("--sandboxed");
+    }
+
+    private static Option<Integer> port(String[] args) {
+        return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue)));
+    }
+
     private static boolean environmentChecksPassed(ConsoleLogger logger) {
         if (getSystemJavaCompiler() == null) {
             logger.logError("\nERROR: Java compiler not found.\n" +
@@ -83,6 +105,7 @@ public class Main {
                 permissions.add(new RuntimePermission("closeClassLoader"));
                 permissions.add(new RuntimePermission("modifyThreadGroup"));
                 permissions.add(new RuntimePermission("getStackTrace"));
+                permissions.add(new ManagementPermission("monitor"));
                 permissions.add(new ReflectPermission("suppressAccessChecks"));
                 permissions.add(new PropertyPermission("*", "read"));
                 permissions.add(new FilePermission("/var/folders/1x/q0fyq22n6n54qsjw97vknhrw0000gn/T/JavaREPL/-", "read, write, delete"));

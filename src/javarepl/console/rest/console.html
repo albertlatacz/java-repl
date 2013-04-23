@@ -4,8 +4,8 @@
 <head>
     <title>JQuery Console Demo</title>
     <meta name="Content-Type" content="text/html; charset=UTF-8">
-    <script type="text/javascript" src="/jquery.js"></script>
-    <script type="text/javascript" src="/jquery.console.js"></script>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="jquery.console.js"></script>
 
     <script type="text/javascript">
         var requesting = false;
@@ -19,7 +19,7 @@
 
                 },
                 commandHandle: function (line, report) {
-                    $.post('execute', {expression: line}, function (data) {
+                    $.post('/javarepl/execute', {expression: line}, function (data) {
                         var messages = [];
 
                         for (var i = 0; i < data.logs.length; i++) {

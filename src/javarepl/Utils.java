@@ -8,6 +8,7 @@ import com.googlecode.totallylazy.Sequences;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -124,5 +125,16 @@ public class Utils {
 
     public static String listValues(String name, Iterable<?> list) {
         return format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    "));
+    }
+
+    public static int randomServerPort() {
+        try {
+            ServerSocket serverSocket = new ServerSocket(0);
+            Integer serverPort = serverSocket.getLocalPort();
+            serverSocket.close();
+            return serverPort;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

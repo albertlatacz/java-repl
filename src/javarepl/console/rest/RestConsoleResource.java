@@ -1,23 +1,23 @@
-package javarepl.rest;
+package javarepl.console.rest;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.annotations.FormParam;
-import com.googlecode.utterlyidle.annotations.POST;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Produces;
-import javarepl.console.Console;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Responses;
+import com.googlecode.utterlyidle.annotations.*;
+import javarepl.console.ConsoleI;
 import javarepl.console.ConsoleLog;
 import javarepl.console.commands.CommandResult;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-public class ConsoleResource {
-    private final Console console;
+@Path("/javarepl")
+public class RestConsoleResource {
+    private final ConsoleI console;
 
-    public ConsoleResource(Console console) {
+    public RestConsoleResource(ConsoleI console) {
         this.console = console;
     }
 
@@ -31,7 +31,13 @@ public class ConsoleResource {
                 .add("logs", sequence(result.logs()).map(commandResultToModel()));
     }
 
-    private Function1<ConsoleLog, Model> commandResultToModel() {
+    @GET
+    @Path("console")
+    public Response console() {
+        return Responses.seeOther("javarepl/console.html");
+    }
+
+    private static Function1<ConsoleLog, Model> commandResultToModel() {
         return new Function1<ConsoleLog, Model>() {
             public Model call(ConsoleLog consoleLog) throws Exception {
                 return model().add("type", consoleLog.type())

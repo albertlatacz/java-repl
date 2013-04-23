@@ -15,7 +15,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
 
-public class ConsoleTest {
+public class SimpleConsoleTest {
     @Test
     public void supportsListingHistoryOfEvaluations() {
         assertThat(executing(":hist"), hasLoggedInfo("No history."));
@@ -57,7 +57,7 @@ public class ConsoleTest {
 
     private static CommandResult executing(String... items) {
         MockConsoleLogger logger = new MockConsoleLogger();
-        Console console = new Console(logger);
+        SimpleConsole console = new SimpleConsole(logger);
 
         CommandResult result = null;
         for (String item : items) {
