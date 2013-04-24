@@ -15,6 +15,15 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 [![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
 
+Building Java REPL requires the [ant build tool](http://ant.apache.org/).
+
+After cloning the git repository, navigate over to it and issue the following ant commands:
+
+```
+$ ant update compile embed package
+```
+
+After this completes, the jar completed with bundled dependencies will be located at build/artifacts/javarepl-dev.build.jar
 
 ## Downloads
 
