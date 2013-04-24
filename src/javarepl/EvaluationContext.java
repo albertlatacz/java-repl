@@ -44,7 +44,8 @@ public class EvaluationContext {
                 .filter(is(not(noResult())))
                 .map(get(Result.class))
                 .reverse()
-                .unique(key());
+                .unique(key())
+                .reverse();
     }
 
     public Option<Result> result(final String key) {
