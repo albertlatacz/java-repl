@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-    <title>JQuery Console Demo</title>
+    <title>Java REPL</title>
     <meta name="Content-Type" content="text/html; charset=UTF-8">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="jquery.console.js"></script>
@@ -19,7 +19,7 @@
 
                 },
                 commandHandle: function (line, report) {
-                    $.post('/javarepl/execute', {expression: line}, function (data) {
+                    $.post('/execute', {expression: line}, function (data) {
                         var messages = [];
 
                         for (var i = 0; i < data.logs.length; i++) {

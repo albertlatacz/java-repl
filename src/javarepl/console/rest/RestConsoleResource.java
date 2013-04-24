@@ -13,7 +13,6 @@ import javarepl.console.commands.CommandResult;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-@Path("/javarepl")
 public class RestConsoleResource {
     private final Console console;
 
@@ -34,7 +33,13 @@ public class RestConsoleResource {
     @GET
     @Path("console")
     public Response console() {
-        return Responses.seeOther("javarepl/console.html");
+        return Responses.seeOther("console.html");
+    }
+
+    @GET
+    @Path("")
+    public Response main() {
+        return Responses.seeOther("console.html");
     }
 
     private static Function1<ConsoleLog, Model> commandResultToModel() {

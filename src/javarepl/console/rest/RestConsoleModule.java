@@ -10,6 +10,6 @@ import static com.googlecode.utterlyidle.dsl.StaticBindingBuilder.in;
 public class RestConsoleModule implements ResourcesModule {
     @Override
     public Resources addResources(Resources resources) throws Exception {
-        return resources.add(bindings(in(packageUrl(RestConsoleResource.class)).path("/javarepl")));
+        return resources.add(bindings(in(packageUrl(RestConsoleResource.class)).path("")));
     }
 }
