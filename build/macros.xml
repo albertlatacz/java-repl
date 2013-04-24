@@ -112,39 +112,34 @@
 
 
     <macrodef name="deploy-to-s3">
+        <attribute name="config"/>
         <attribute name="source"/>
         <attribute name="destination"/>
 
         <sequential>
-            <echo file="~/.s3cfg">[default]
-                access_key = ${env.AWS_KEY}
-                secret_key = ${env.AWS_SECRET}
-            </echo>
-
             <exec executable="s3cmd">
                 <arg value="-c"/>
-                <arg value="~/.s3cfg"/>
+                <arg value="@{config}"/>
                 <arg value="put"/>
                 <arg value="@{source}"/>
                 <arg value="@{destination}"/>
             </exec>
-
-            <delete file="~/.s3cfg" quiet="true"/>
         </sequential>
     </macrodef>
 
     <macrodef name="deploy-to-s3-maven-repository">
+        <attribute name="config"/>
         <attribute name="source"/>
         <attribute name="destination"/>
 
         <sequential>
-            <deploy-to-s3 source="@{source}" destination="@{destination}"/>
+            <deploy-to-s3 config="@{config}" source="@{source}" destination="@{destination}"/>
 
             <checksum file="@{source}" algorithm="sha1"/>
-            <deploy-to-s3 source="@{source}.sha1" destination="@{destination}.sha1"/>
+            <deploy-to-s3 config="@{config}" source="@{source}.sha1" destination="@{destination}.sha1"/>
 
             <checksum file="@{source}" algorithm="md5"/>
-            <deploy-to-s3 source="@{source}.md5" destination="@{destination}.md5"/>
+            <deploy-to-s3 config="@{config}" source="@{source}.md5" destination="@{destination}.md5"/>
         </sequential>
     </macrodef>
 

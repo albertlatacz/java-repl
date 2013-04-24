@@ -127,30 +127,45 @@
     </target>
 
     <target name="deploy" if="${deploy}">
+        <property name="s3.config" value="~/.s3cfg"/>
+
+        <echo file="${s3.config}">[default]
+            access_key = ${env.AWS_KEY}
+            secret_key = ${env.AWS_SECRET}
+        </echo>
+
         <deploy-to-s3
+                config="${s3.config}"
                 source="${release.plugin.zip.path}"
                 destination="${s3.download.path}/javarepl-intellij.zip"/>
 
         <deploy-to-s3
+                config="${s3.config}"
                 source="${release.jar.path}"
                 destination="${s3.download.path}/javarepl.jar"/>
 
 
         <deploy-to-s3-maven-repository
+                config="${s3.config}"
                 source="${release.jar.path}"
                 destination="${s3.repo.path}/${release.jar}"/>
 
         <deploy-to-s3-maven-repository
+                config="${s3.config}"
                 source="${release.src.path}"
                 destination="${s3.repo.path}/${release.src}"/>
 
         <deploy-to-s3-maven-repository
+                config="${s3.config}"
                 source="${release.pom.path}"
                 destination="${s3.repo.path}/${release.pom}"/>
 
         <deploy-to-s3-maven-repository
+                config="${s3.config}"
                 source="${release.plugin.zip.path}"
                 destination="${s3.repo.path}/${release.plugin.zip}"/>
+
+        <delete file="${s3.config}" quiet="true"/>
     </target>
 
 
