@@ -13,6 +13,8 @@
     <property name="test" value="${basedir}/test"/>
     <property name="release.version" value="${build.number}"/>
     <property name="plugin.src" value="${basedir}/intellij-plugin/src"/>
+    <property name="release.install.script" value="ec2-install.sh"/>
+    <property name="release.install.script.path" value="${basedir}/bin/${release.install.script}"/>
     <property name="release.plugin.jar" value="${ant.project.name}-${release.version}-intellij.jar"/>
     <property name="release.plugin.zip" value="${ant.project.name}-${release.version}-intellij.zip"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
@@ -144,6 +146,10 @@
                 source="${release.jar.path}"
                 destination="${s3.download.path}/javarepl.jar"/>
 
+        <deploy-to-s3
+                config="${s3.config}"
+                source="${release.install.script.path}"
+                destination="${s3.download.path}/${release.install.script}"/>
 
         <deploy-to-s3-maven-repository
                 config="${s3.config}"

@@ -1,0 +1,11 @@
+#cloud-config
+apt_upgrade: true
+apt_sources:
+ - source: "ppa:smoser/ppa"
+
+packages:
+ - openjdk-7-jre-headless
+
+runcmd:
+ - [ wget, 'http://albertlatacz.published.s3.amazonaws.com/javarepl/ec2-install.sh', -O, /home/ubuntu/ec2-install.sh ]
+ - /bin/sh /home/ubuntu/ec2-install.sh
