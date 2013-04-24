@@ -25,6 +25,7 @@ import java.security.Policy;
 import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
+import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
@@ -97,7 +98,6 @@ public class Main {
             private final PermissionCollection permissions = new Permissions();
 
             {
-                java.security.Security.setProperty("package.access", Thread.class.getCanonicalName());
                 permissions.add(new SocketPermission("*", "connect, listen, resolve, accept"));
                 permissions.add(new RuntimePermission("getProtectionDomain"));
                 permissions.add(new RuntimePermission("accessDeclaredMembers"));
@@ -108,7 +108,7 @@ public class Main {
                 permissions.add(new ManagementPermission("monitor"));
                 permissions.add(new ReflectPermission("suppressAccessChecks"));
                 permissions.add(new PropertyPermission("*", "read"));
-                permissions.add(new FilePermission("/var/folders/1x/q0fyq22n6n54qsjw97vknhrw0000gn/T/JavaREPL/-", "read, write, delete"));
+                permissions.add(new FilePermission(temporaryDirectory("JavaREPL").getAbsolutePath() + "/-", "read, write, delete"));
                 permissions.add(new FilePermission("<<ALL FILES>>", "read"));
             }
 
