@@ -10,11 +10,9 @@ import javarepl.console.commands.Command;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
+import jline.console.history.FileHistory;
 
-import java.io.BufferedReader;
-import java.io.FilePermission;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
@@ -41,7 +39,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
         ConsoleLogger logger = systemConsoleLogger();
         Console console = new RestConsole(new SimpleConsole(logger), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
@@ -128,16 +126,36 @@ public class Main {
     private static Function1<Sequence<String>, String> readFromExtendedConsole(final Sequence<Command> commandSequence) throws IOException {
         return new Function1<Sequence<String>, String>() {
             private final ConsoleReader console;
+            private final FileHistory history;
 
             {
+                history = new FileHistory(new File(System.getProperty("user.home"), ".javarepl.history"));
+
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(commandSequence.map(completer()).filter(notNullValue()).toList()));
+                console.setHistory(history);
+
+                shutdownConsoleOnExit();
             }
 
             public String call(Sequence<String> lines) throws Exception {
                 console.setPrompt(lines.isEmpty() ? "java> " : "    | ");
                 return console.readLine();
+            }
+
+
+            private void shutdownConsoleOnExit() {
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    public void run() {
+                        try {
+                            console.shutdown();
+                            history.flush();
+                        } catch (Exception e) {
+                            //ignore
+                        }
+                    }
+                });
             }
         };
     }
