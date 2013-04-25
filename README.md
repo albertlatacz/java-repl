@@ -17,10 +17,10 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 Building Java REPL requires the [ant build tool](http://ant.apache.org/).
 
-After cloning the git repository, navigate over to it and issue the following ant commands:
+After cloning the git repository, navigate over to it and run:
 
 ```
-$ ant update compile embed package
+$ ant
 ```
 
 After this completes, the jar completed with bundled dependencies will be located at build/artifacts/javarepl-dev.build.jar
@@ -35,18 +35,18 @@ After this completes, the jar completed with bundled dependencies will be locate
 
 
 ## Usage
-To run Java REPL you need to install **Java Development Kit (JDK) 6 or newer**. Download it from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow install instructions. Once JDK is installed and configured you can run   
+To run Java REPL you need to install **Java Development Kit (JDK) 6 or newer**. Download it from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow install instructions. Once JDK is installed and configured you can run:   
 
 
 ```
-java -jar javarepl.jar
+$ java -jar javarepl.jar
 ```
 
 If this doesn't work try to run pointing directly to *java* executable within JDK, like so
 
 
 ```
-C:\Program Files\Java\jdk1.7.0_17\bin\java -jar javarepl.jar
+$ <PATH_TO_JDK>/bin/java -jar javarepl.jar
 ```
 
 
