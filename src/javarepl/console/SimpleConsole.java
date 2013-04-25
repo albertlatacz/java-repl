@@ -50,7 +50,8 @@ public final class SimpleConsole implements Console {
                 .add(new ShowResult(logger, evaluator))
                 .add(new ListValues(logger, evaluator))
                 .add(new ShowLastSource(logger, evaluator))
-                .add(new ShowTypeOfExpression(logger, evaluator));
+                .add(new ShowTypeOfExpression(logger, evaluator))
+								.add(new GarbageCollection(logger, evaluator));
 
         return commandSequence
                 .add(new ShowHelp(commandSequence, logger, evaluator))
