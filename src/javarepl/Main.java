@@ -10,11 +10,9 @@ import javarepl.console.commands.Command;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
+import jline.console.history.FileHistory;
 
-import java.io.BufferedReader;
-import java.io.FilePermission;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
@@ -25,6 +23,7 @@ import java.security.Policy;
 import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
+import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
@@ -40,22 +39,18 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
-        boolean simpleConsole = isSimpleConsole(args);
-        boolean sandboxed = isSandboxed(args);
-        Option<Integer> port = port(args);
-
+    public static void main(String... args) throws Exception {
         ConsoleLogger logger = systemConsoleLogger();
-        Console console = new RestConsole(new SimpleConsole(logger), port);
-        ExpressionReader expressionReader = new ExpressionReader(simpleConsole ? readFromSimpleConsole() : readFromExtendedConsole(console.commands()));
+        Console console = new RestConsole(new SimpleConsole(logger), port(args));
+        ExpressionReader expressionReader = expressionReader(args, console);
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
                 applicationVersion(),
-                sandboxed ? "sandboxed" : "unrestricted",
+                isSandboxed(args) ? "sandboxed" : "unrestricted",
                 getProperty("java.vm.name"),
                 getProperty("java.version")));
 
-        if (sandboxed) {
+        if (isSandboxed(args)) {
             sandboxApplication();
         }
 
@@ -71,8 +66,14 @@ public class Main {
         }
     }
 
-    private static boolean isSimpleConsole(String[] args) {
-        return sequence(args).contains("--simple-console");
+    private static ExpressionReader expressionReader(String[] args, Console console) throws IOException {
+        if (sequence(args).contains("--simple-console"))
+            return new ExpressionReader(readFromSimpleConsole());
+
+        if (sequence(args).contains("--ignore-console"))
+            return new ExpressionReader(ignoreConsoleInput());
+
+        return new ExpressionReader(readFromExtendedConsole(console.commands()));
     }
 
     private static boolean isSandboxed(String[] args) {
@@ -97,8 +98,9 @@ public class Main {
             private final PermissionCollection permissions = new Permissions();
 
             {
-                java.security.Security.setProperty("package.access", Thread.class.getCanonicalName());
                 permissions.add(new SocketPermission("*", "connect, listen, resolve, accept"));
+                permissions.add(new RuntimePermission("accessClassInPackage.sun.misc.*"));
+                permissions.add(new RuntimePermission("accessClassInPackage.sun.misc"));
                 permissions.add(new RuntimePermission("getProtectionDomain"));
                 permissions.add(new RuntimePermission("accessDeclaredMembers"));
                 permissions.add(new RuntimePermission("createClassLoader"));
@@ -108,7 +110,7 @@ public class Main {
                 permissions.add(new ManagementPermission("monitor"));
                 permissions.add(new ReflectPermission("suppressAccessChecks"));
                 permissions.add(new PropertyPermission("*", "read"));
-                permissions.add(new FilePermission("/var/folders/1x/q0fyq22n6n54qsjw97vknhrw0000gn/T/JavaREPL/-", "read, write, delete"));
+                permissions.add(new FilePermission(temporaryDirectory("JavaREPL").getAbsolutePath() + "/-", "read, write, delete"));
                 permissions.add(new FilePermission("<<ALL FILES>>", "read"));
             }
 
@@ -124,16 +126,36 @@ public class Main {
     private static Function1<Sequence<String>, String> readFromExtendedConsole(final Sequence<Command> commandSequence) throws IOException {
         return new Function1<Sequence<String>, String>() {
             private final ConsoleReader console;
+            private final FileHistory history;
 
             {
+                history = new FileHistory(new File(getProperty("user.home"), ".javarepl.history"));
+
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
                 console.addCompleter(new AggregateCompleter(commandSequence.map(completer()).filter(notNullValue()).toList()));
+                console.setHistory(history);
+
+                shutdownConsoleOnExit();
             }
 
             public String call(Sequence<String> lines) throws Exception {
                 console.setPrompt(lines.isEmpty() ? "java> " : "    | ");
                 return console.readLine();
+            }
+
+
+            private void shutdownConsoleOnExit() {
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    public void run() {
+                        try {
+                            console.shutdown();
+                            history.flush();
+                        } catch (Exception e) {
+                            //ignore
+                        }
+                    }
+                });
             }
         };
     }
@@ -144,6 +166,16 @@ public class Main {
 
             public String call(Sequence<String> lines) throws Exception {
                 return reader.readLine();
+            }
+        };
+    }
+
+    private static Function1<Sequence<String>, String> ignoreConsoleInput() {
+        return new Function1<Sequence<String>, String>() {
+            public String call(Sequence<String> strings) throws Exception {
+                while (true) {
+                    Thread.sleep(1000);
+                }
             }
         };
     }

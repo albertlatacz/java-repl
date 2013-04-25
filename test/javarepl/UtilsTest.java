@@ -24,13 +24,6 @@ public class UtilsTest {
     }
 
     @Test
-    public void returnFormattedValueAsString() {
-        assertThat(valueToString().apply(null), equalTo("null"));
-        assertThat(valueToString().apply("some string"), equalTo("\"some string\""));
-        assertThat(valueToString().apply(new Object[][]{{42, "str1"}, {42d, "str2"}}), equalTo("[[42, \"str1\"], [42.0, \"str2\"]]"));
-    }
-
-    @Test
     public void returnsResolvedClasspath() {
         assertThat(resolveClasspath("file:/aaa/bbb").toString(), equalTo("file:/aaa/bbb"));
         assertThat(resolveClasspath("http://aaa/bbb").toString(), equalTo("http://aaa/bbb"));

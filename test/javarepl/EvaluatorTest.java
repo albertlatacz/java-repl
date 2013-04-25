@@ -44,6 +44,7 @@ public class EvaluatorTest {
     @Test
     public void shouldShadowPreviousResult() {
         assertThat(evaluating("test = 21", "test = 42", "test"), hasResult(42));
+        assertThat(evaluating("test = 21", "test++", "test"), hasResult(22));
     }
 
     @Test

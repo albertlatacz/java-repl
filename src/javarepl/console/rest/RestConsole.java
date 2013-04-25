@@ -15,14 +15,13 @@ import static javarepl.Utils.randomServerPort;
 public class RestConsole implements Console {
 
     private final Console console;
-    private final RestServer server;
 
     public RestConsole(Console console, Option<Integer> port) throws Exception {
         this.console = console;
 
         ServerConfiguration configuration = defaultConfiguration().port(port.getOrElse(randomServerPort()));
         RestConsoleApplication application = new RestConsoleApplication(basePath("/"), console);
-        this.server = new RestServer(application, configuration);
+        new RestServer(application, configuration);
     }
 
     public CommandResult execute(String expression) {

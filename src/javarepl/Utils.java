@@ -44,27 +44,6 @@ public class Utils {
         return clazz;
     }
 
-    public static String valueToString(Object value) {
-        return valueToString().apply(value);
-    }
-
-    public static Function1<Object, String> valueToString() {
-        return new Function1<Object, String>() {
-            public String call(Object value) throws Exception {
-                if (value == null)
-                    return "null";
-
-                if (value instanceof String)
-                    return "\"" + value + "\"";
-
-                if (value.getClass().isArray())
-                    return sequence((Object[]) value).map(valueToString()).toString("[", ", ", "]");
-
-                return value.toString();
-            }
-        };
-    }
-
     public static Throwable unwrapException(Throwable e) {
         if (e instanceof InvocationTargetException)
             return unwrapException(((InvocationTargetException) e).getTargetException());

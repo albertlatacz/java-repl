@@ -13,7 +13,6 @@ import javarepl.console.commands.CommandResult;
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
-@Path("/javarepl")
 public class RestConsoleResource {
     private final Console console;
 
@@ -25,16 +24,26 @@ public class RestConsoleResource {
     @Path("execute")
     @Produces(MediaType.APPLICATION_JSON)
     public Model execute(@FormParam("expression") String expression) {
-        CommandResult result = console.execute(expression);
-        return model()
-                .add("expression", result.command())
-                .add("logs", sequence(result.logs()).map(commandResultToModel()));
+        return resultToModel(console.execute(expression));
     }
 
     @GET
     @Path("console")
     public Response console() {
-        return Responses.seeOther("javarepl/console.html");
+        return Responses.seeOther("console.html");
+    }
+
+    @GET
+    @Path("")
+    public Response main() {
+        return Responses.seeOther("console.html");
+    }
+
+
+    public static Model resultToModel(CommandResult result) {
+        return model()
+                .add("expression", result.command())
+                .add("logs", sequence(result.logs()).map(commandResultToModel()));
     }
 
     private static Function1<ConsoleLog, Model> commandResultToModel() {
@@ -45,4 +54,5 @@ public class RestConsoleResource {
             }
         };
     }
+
 }

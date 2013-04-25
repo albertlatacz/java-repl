@@ -10,10 +10,11 @@
 
 
 * WREPL - initial
-    - Make commands return results with logs
-    - Expose console over UI within separate main()
+    - Expose consoles over UI within separate main()
     - Sandbox rest main using java policies
-    - Refactor tests to check values instead of logger
+    - Push automatically to ec2
+    - Create simple service to spawn multiple consoles and redirect requests locally
+
 
 
 
