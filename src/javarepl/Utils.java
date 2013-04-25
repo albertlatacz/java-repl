@@ -44,45 +44,6 @@ public class Utils {
         return clazz;
     }
 
-    public static String valueToString(Object value) {
-        return valueToString().apply(value);
-    }
-
-    public static Function1<Object, String> valueToString() {
-        return new Function1<Object, String>() {
-            public String call(Object value) throws Exception {
-                if (value == null)
-                    return "null";
-
-                if (value instanceof String)
-                    return "\"" + value + "\"";
-
-                if (value.getClass().isArray()) {
-										// Java array types have names such as:
-										// [Ljava.lang.Object;
-										// [I
-										// [J
-										// etc, if we look at the second character, we can determine its type.
-										// If the second character is '[' (nested array), or 'L' (class or interface),
-										// then the existing logic is fine
-										char arrayType = value.getClass().getName().charAt(1);
-										if (arrayType == '[' || arrayType == 'L') {
-											return sequence((Object[]) value).map(valueToString()).toString("[", ", ", "]");
-										} else if (arrayType == 'Z') { return java.util.Arrays.toString((boolean[])value); }
-										else if (arrayType == 'B') { return java.util.Arrays.toString((byte[])value); }
-										else if (arrayType == 'C') { return java.util.Arrays.toString((char[])value); }
-										else if (arrayType == 'D') { return java.util.Arrays.toString((double[])value); }
-										else if (arrayType == 'F') { return java.util.Arrays.toString((float[])value); }
-										else if (arrayType == 'I') { return java.util.Arrays.toString((int[])value); }
-										else if (arrayType == 'J') { return java.util.Arrays.toString((long[])value); }
-										else if (arrayType == 'S') { return java.util.Arrays.toString((short[])value); }
-								}
-
-                return value.toString();
-            }
-        };
-    }
-
     public static Throwable unwrapException(Throwable e) {
         if (e instanceof InvocationTargetException)
             return unwrapException(((InvocationTargetException) e).getTargetException());
