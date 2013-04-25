@@ -41,18 +41,13 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
 
-    public static enum ConsoleType {
-        simple, extended, detached
-    }
-
     public static void main(String[] args) throws Exception {
-        ConsoleType consoleType = consoleType(args);
         boolean sandboxed = isSandboxed(args);
         Option<Integer> port = port(args);
 
         ConsoleLogger logger = systemConsoleLogger();
         Console console = new RestConsole(new SimpleConsole(logger), port);
-        ExpressionReader expressionReader = expressionReader(consoleType, console);
+        ExpressionReader expressionReader = expressionReader(args, console);
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
                 applicationVersion(),
@@ -76,33 +71,14 @@ public class Main {
         }
     }
 
-    private static ExpressionReader expressionReader(ConsoleType consoleType, Console console) throws IOException {
-        switch (consoleType) {
-            case simple:
-                return new ExpressionReader(readFromSimpleConsole());
-            case extended:
-                return new ExpressionReader(readFromExtendedConsole(console.commands()));
-            case detached:
-                return new ExpressionReader(new Function1<Sequence<String>, String>() {
-                    public String call(Sequence<String> strings) throws Exception {
-                        while (true) {
-                            Thread.sleep(1000);
-                        }
-                    }
-                });
-            default:
-                return new ExpressionReader(readFromExtendedConsole(console.commands()));
-        }
-    }
-
-    private static ConsoleType consoleType(String[] args) {
+    private static ExpressionReader expressionReader(String[] args, Console console) throws IOException {
         if (sequence(args).contains("--simple-console"))
-            return ConsoleType.simple;
+            return new ExpressionReader(readFromSimpleConsole());
 
-        if (sequence(args).contains("--detached-console"))
-            return ConsoleType.detached;
+        if (sequence(args).contains("--ignore-console"))
+            return new ExpressionReader(ignoreConsoleInput());
 
-        return ConsoleType.extended;
+        return new ExpressionReader(readFromExtendedConsole(console.commands()));
     }
 
     private static boolean isSandboxed(String[] args) {
@@ -173,6 +149,16 @@ public class Main {
 
             public String call(Sequence<String> lines) throws Exception {
                 return reader.readLine();
+            }
+        };
+    }
+
+    private static Function1<Sequence<String>, String> ignoreConsoleInput() {
+        return new Function1<Sequence<String>, String>() {
+            public String call(Sequence<String> strings) throws Exception {
+                while (true) {
+                    Thread.sleep(1000);
+                }
             }
         };
     }
