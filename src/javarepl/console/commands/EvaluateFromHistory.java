@@ -7,6 +7,7 @@ import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.console.commands.ShowHistory.history;
 
 public final class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
@@ -18,7 +19,8 @@ public final class EvaluateFromHistory extends Command {
 
     void execute(String expression, CommandResultCollector result) {
         Integer historyItem = parseNumericCommand(expression).second().getOrElse(evaluator().evaluations().size());
-        Option<Evaluation> evaluation = evaluator().evaluations().drop(historyItem - 1).headOption();
+        Option<Evaluation> evaluation = history(evaluator()).drop(historyItem - 1).headOption();
+
         if (!evaluation.isEmpty()) {
             String source = evaluation.get().expression().source();
             result.logInfo(source);

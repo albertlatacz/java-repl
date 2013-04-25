@@ -4,7 +4,7 @@ import java.util.regex.MatchResult;
 
 import static javarepl.expressions.Patterns.assignmentWithTypeNamePattern;
 
-public final  class AssignmentWithType extends Expression implements WithKey{
+public final class AssignmentWithType extends Expression implements WithKey {
     private final String type;
     private final String key;
     private final String value;

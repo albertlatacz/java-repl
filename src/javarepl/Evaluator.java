@@ -195,10 +195,13 @@ public class Evaluator {
                     .foldLeft(Sequences.<Evaluation>empty(), new Function2<Sequence<Evaluation>, Field, Sequence<Evaluation>>() {
                         public Sequence<Evaluation> call(Sequence<Evaluation> evaluations, Field field) throws Exception {
                             Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
+
                             if (result.isEmpty())
                                 return evaluations;
 
-                            return evaluations.add(evaluation(className, sources, expression, some(Result.result(field.getName(), field.get(expressionInstance)))));
+                            return evaluations.add(evaluation(className, sources,
+                                    new ExternalAssignment(expression.source(), field.getName(), result.value(), field.get(expressionInstance)),
+                                    some(Result.result(field.getName(), field.get(expressionInstance)))));
 
                         }
                     });
