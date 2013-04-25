@@ -5,7 +5,7 @@ import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static javarepl.Utils.extractType;
-import static javarepl.rendering.ValueFormatter.valueToString;
+import static javarepl.rendering.ValueRenderer.renderValue;
 
 public class Result {
     private final String key;
@@ -34,7 +34,7 @@ public class Result {
 
     public String toString(boolean canonical) {
         Class<?> type = extractType(value.getClass());
-        return (canonical ? type.getCanonicalName() : type.getSimpleName()) + " " + key + " = " + valueToString(value);
+        return (canonical ? type.getCanonicalName() : type.getSimpleName()) + " " + key + " = " + renderValue(value);
     }
 
     @Override
