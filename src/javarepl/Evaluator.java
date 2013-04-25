@@ -11,6 +11,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
 
@@ -20,12 +21,16 @@ import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Predicates.equalTo;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.predicates.Not.not;
 import static java.io.File.pathSeparator;
 import static java.util.Arrays.asList;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
+import static javarepl.Result.functions.value;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
@@ -170,30 +175,43 @@ public class Evaluator {
         }
     }
 
-    private Either<? extends Throwable, Evaluation> evaluateExpression(Expression expression) {
-        String className = randomIdentifier("Evaluation");
+    private Either<? extends Throwable, Evaluation> evaluateExpression(final Expression expression) {
+        final String className = randomIdentifier("Evaluation");
 
         try {
             File outputJavaFile = file(outputDirectory, className + ".java");
-            String sources = renderExpressionClass(context, className, expression);
+            final String sources = renderExpressionClass(context, className, expression);
             Files.write(sources.getBytes(), outputJavaFile);
 
             compile(outputJavaFile);
 
             Class<?> expressionClass = classLoader.loadClass(className);
             Constructor<?> constructor = expressionClass.getDeclaredConstructor(EvaluationContext.class);
-            Object expressionInstance = constructor.newInstance(context);
+            final Object expressionInstance = constructor.newInstance(context);
 
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
+            Sequence<Evaluation> modifiedResults = sequence(expressionInstance.getClass().getDeclaredFields())
+                    .foldLeft(Sequences.<Evaluation>empty(), new Function2<Sequence<Evaluation>, Field, Sequence<Evaluation>>() {
+                        public Sequence<Evaluation> call(Sequence<Evaluation> evaluations, Field field) throws Exception {
+                            Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
+                            if (result.isEmpty())
+                                return evaluations;
+
+                            return evaluations.add(evaluation(className, sources, expression, some(Result.result(field.getName(), field.get(expressionInstance)))));
+
+                        }
+                    });
+
+
             if (resultObject != null) {
                 Evaluation evaluation = evaluation(className, sources, expression, some(Result.result(nextResultKeyFor(expression), resultObject)));
-                context = context.addEvaluation(evaluation);
+                context = context.addEvaluations(modifiedResults.add(evaluation));
                 return right(evaluation);
             } else {
                 Evaluation evaluation = evaluation(className, sources, expression, Result.noResult());
 
-                context = context.addEvaluation(evaluation);
+                context = context.addEvaluations(modifiedResults.add(evaluation));
                 return right(evaluation);
             }
         } catch (Throwable e) {

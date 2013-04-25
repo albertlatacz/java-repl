@@ -56,7 +56,11 @@ public class EvaluationContext {
         return "res" + results().size();
     }
 
-    public EvaluationContext addEvaluation(Evaluation evaluation) {
-        return new EvaluationContext(evaluations().add(evaluation));
+    public EvaluationContext addEvaluation(Evaluation evaluationIn) {
+        return addEvaluations(sequence(evaluationIn));
+    }
+
+    public EvaluationContext addEvaluations(Iterable<Evaluation> evaluationIn) {
+        return new EvaluationContext(evaluations().join(sequence(evaluationIn)));
     }
 }
