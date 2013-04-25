@@ -23,7 +23,7 @@ After cloning the git repository, navigate over to it and run:
 $ ant
 ```
 
-After this completes, the jar completed with bundled dependencies will be located at build/artifacts/javarepl-dev.build.jar
+After this completes, the jar completed with bundled dependencies will be located at **build/artifacts/javarepl-dev.build.jar**
 
 ## Downloads
 
