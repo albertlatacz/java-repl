@@ -1,8 +1,8 @@
-package javarepl;
+package javarepl.rendering;
 
 import org.junit.Test;
 
-import static javarepl.ValueFormatter.valueToString;
+import static javarepl.rendering.ValueFormatter.valueToString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 

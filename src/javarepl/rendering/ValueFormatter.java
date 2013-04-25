@@ -1,4 +1,4 @@
-package javarepl;
+package javarepl.rendering;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.annotations.multimethod;

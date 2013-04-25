@@ -5,7 +5,7 @@ import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
 import static javarepl.Utils.extractType;
-import static javarepl.ValueFormatter.valueToString;
+import static javarepl.rendering.ValueFormatter.valueToString;
 
 public class Result {
     private final String key;
