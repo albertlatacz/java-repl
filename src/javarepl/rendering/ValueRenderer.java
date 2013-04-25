@@ -4,6 +4,8 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 
+import java.util.Arrays;
+
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class ValueRenderer {
@@ -27,42 +29,42 @@ public class ValueRenderer {
 
     @multimethod
     private static String renderValue(boolean[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(byte[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(char[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(double[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(float[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(int[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(short[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     @multimethod
     private static String renderValue(long[] value) {
-        return java.util.Arrays.toString(value);
+        return Arrays.toString(value);
     }
 
     public static Function1<Object, String> renderValue() {
