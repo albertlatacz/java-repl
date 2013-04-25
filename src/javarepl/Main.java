@@ -129,7 +129,7 @@ public class Main {
             private final FileHistory history;
 
             {
-                history = new FileHistory(new File(System.getProperty("user.home"), ".javarepl.history"));
+                history = new FileHistory(new File(getProperty("user.home"), ".javarepl.history"));
 
                 console = new ConsoleReader(System.in, System.out);
                 console.setHistoryEnabled(true);
