@@ -42,20 +42,17 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        boolean sandboxed = isSandboxed(args);
-        Option<Integer> port = port(args);
-
         ConsoleLogger logger = systemConsoleLogger();
-        Console console = new RestConsole(new SimpleConsole(logger), port);
+        Console console = new RestConsole(new SimpleConsole(logger), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
         logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
                 applicationVersion(),
-                sandboxed ? "sandboxed" : "unrestricted",
+                isSandboxed(args) ? "sandboxed" : "unrestricted",
                 getProperty("java.vm.name"),
                 getProperty("java.version")));
 
-        if (sandboxed) {
+        if (isSandboxed(args)) {
             sandboxApplication();
         }
 
