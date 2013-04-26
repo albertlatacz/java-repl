@@ -37,6 +37,7 @@ import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
+
     private EvaluationClassLoader classLoader;
     private EvaluationContext context;
 
