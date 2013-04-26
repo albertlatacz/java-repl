@@ -11,6 +11,10 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 * Clear and replay previous evaluations
 * Load and evaluate any Java source file
 
+
+Web version is available at [www.javarepl.com](http://www.javarepl.com/).
+
+
 ## Build
 
 [![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
