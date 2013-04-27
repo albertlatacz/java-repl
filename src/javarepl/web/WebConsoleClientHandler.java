@@ -45,7 +45,7 @@ public class WebConsoleClientHandler {
                 String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
                 port = randomServerPort();
                 ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Main.class.getCanonicalName(),
-                        "--sandboxed", "--ignoreConsole", "--port=" + port, "--expressionTimeout=15", "--inactivityTimeout=60");
+                        "--sandboxed", "--ignoreConsole", "--port=" + port, "--expressionTimeout=15", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
                 process = builder.start();
 
