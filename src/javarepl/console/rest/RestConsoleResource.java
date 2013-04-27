@@ -2,6 +2,7 @@ package javarepl.console.rest;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.POST;
@@ -13,19 +14,27 @@ import javarepl.console.commands.CommandResult;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.console.commands.CommandResult.emptyResult;
 
 public class RestConsoleResource {
     private final Console console;
+    private final RestConsoleExpressionReader expressionReader;
 
-    public RestConsoleResource(Console console) {
+    public RestConsoleResource(Console console, RestConsoleExpressionReader expressionReader) {
         this.console = console;
+        this.expressionReader = expressionReader;
     }
 
     @POST
     @Path("execute")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model execute(@FormParam("expression") String expression) {
-        return resultToModel(console.execute(expression));
+    public Model execute(@FormParam("expression") String expr) {
+        Option<String> expression = expressionReader.readExpression(expr);
+
+        if (expression.isEmpty())
+            return resultToModel(emptyResult());
+        else
+            return resultToModel(console.execute(expression.get()));
     }
 
     public static Model resultToModel(CommandResult result) {

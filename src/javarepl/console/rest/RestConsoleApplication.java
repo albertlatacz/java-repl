@@ -12,7 +12,8 @@ public class RestConsoleApplication extends RestApplication {
     public RestConsoleApplication(BasePath basePath, Console console) {
         super(basePath,
                 bindingsModule(annotatedClass(RestConsoleResource.class)),
-                applicationInstance(Console.class, console));
+                applicationInstance(Console.class, console),
+                applicationInstance(new RestConsoleExpressionReader()));
 
         add(new RestConsoleModule());
     }

@@ -3,6 +3,7 @@ package javarepl.console.commands;
 import javarepl.console.ConsoleLog;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandResult {
@@ -20,5 +21,9 @@ public class CommandResult {
 
     public List<ConsoleLog> logs() {
         return logs;
+    }
+
+    public static CommandResult emptyResult() {
+        return new CommandResult("", Collections.<ConsoleLog>emptyList());
     }
 }
