@@ -26,10 +26,6 @@ public class SimpleConsoleTest {
         assertThat(
                 executing("42", "\"test\"", "res1"),
                 hasLogged(info("java.lang.String res1 = \"test\"")));
-
-        assertThat(
-                executing("42", "\"test\"", "res1"),
-                hasLogged(info("java.lang.String res1 = \"test\"")));
     }
 
     @Test
