@@ -3,9 +3,10 @@ package javarepl.console.rest;
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Responses;
-import com.googlecode.utterlyidle.annotations.*;
+import com.googlecode.utterlyidle.annotations.FormParam;
+import com.googlecode.utterlyidle.annotations.POST;
+import com.googlecode.utterlyidle.annotations.Path;
+import com.googlecode.utterlyidle.annotations.Produces;
 import javarepl.console.Console;
 import javarepl.console.ConsoleLog;
 import javarepl.console.commands.CommandResult;
@@ -26,19 +27,6 @@ public class RestConsoleResource {
     public Model execute(@FormParam("expression") String expression) {
         return resultToModel(console.execute(expression));
     }
-
-    @GET
-    @Path("console")
-    public Response console() {
-        return Responses.seeOther("console.html");
-    }
-
-    @GET
-    @Path("")
-    public Response main() {
-        return Responses.seeOther("console.html");
-    }
-
 
     public static Model resultToModel(CommandResult result) {
         return model()
