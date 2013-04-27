@@ -54,9 +54,6 @@ public class WebConsoleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response remove(@FormParam("id") String id) {
         Option<WebConsoleClientHandler> clientHandler = agent.removeClient(id);
-
-        System.out.println("clientHandler = " + clientHandler);
-
         if (!clientHandler.isEmpty()) {
             return response(OK);
         } else {

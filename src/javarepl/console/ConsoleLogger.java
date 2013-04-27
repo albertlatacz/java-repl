@@ -1,33 +1,22 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Function2;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 
-public abstract class ConsoleLogger extends Function2<ConsoleLogger.LogType, String, Void> {
+import java.util.List;
 
-    public static enum LogType {
-        ERROR, INFO
+public final class ConsoleLogger {
+    private Sequence<ConsoleLog> logs = Sequences.empty();
+
+    public final void log(ConsoleLog log) {
+        logs = logs.cons(log);
     }
 
-    public final void logError(String message) {
-        apply(LogType.ERROR, message);
+    public final List<ConsoleLog> logs() {
+        return logs.toList();
     }
 
-    public final void logInfo(String message) {
-        apply(LogType.INFO, message);
+    public final void reset() {
+        logs = Sequences.empty();
     }
-
-    public static ConsoleLogger systemConsoleLogger() {
-        return new ConsoleLogger() {
-            public Void call(LogType logType, String value) throws Exception {
-                if (logType == LogType.INFO) {
-                    System.out.println(value);
-                }
-                if (logType == LogType.ERROR) {
-                    System.err.println(value);
-                }
-                return null;
-            }
-        };
-    }
-
 }

@@ -1,8 +1,5 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import javarepl.console.commands.CommandResult;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -11,12 +8,13 @@ import org.junit.Test;
 import java.util.List;
 
 import static javarepl.console.ConsoleLog.Type;
+import static javarepl.console.ConsoleLog.Type.ERROR;
+import static javarepl.console.ConsoleLog.Type.INFO;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItems;
 
 
 public class SimpleConsoleTest {
-
     @Test
     public void supportsDisplayingSingleResult() {
         assertThat(
@@ -155,7 +153,9 @@ public class SimpleConsoleTest {
 
 
     private static CommandResult executing(String... items) {
-        MockConsoleLogger logger = new MockConsoleLogger();
+        ConsoleLogger logger = new ConsoleLogger();
+        System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
+        System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
         SimpleConsole console = new SimpleConsole(logger);
 
         CommandResult result = null;
@@ -171,19 +171,10 @@ public class SimpleConsoleTest {
     }
 
     private static Matcher<CommandResult> hasLogged(final ConsoleLog... logs) {
-        return new FeatureMatcher<CommandResult, List<ConsoleLog>>(contains(logs), "console log", "console log") {
+        return new FeatureMatcher<CommandResult, List<ConsoleLog>>(hasItems(logs), "console log", "console log") {
             protected List<ConsoleLog> featureValueOf(CommandResult commandResult) {
                 return commandResult.logs();
             }
         };
-    }
-
-    private static class MockConsoleLogger extends ConsoleLogger {
-        private Sequence<Pair<LogType, String>> logs = Sequences.empty();
-
-        public Void call(LogType logType, String message) throws Exception {
-            logs = logs.add(Pair.pair(logType, message));
-            return null;
-        }
     }
 }

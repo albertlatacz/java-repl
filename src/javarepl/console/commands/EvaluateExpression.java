@@ -6,30 +6,29 @@ import com.googlecode.totallylazy.Predicates;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
-import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
 public final class EvaluateExpression extends Command {
-    public EvaluateExpression(ConsoleLogger logger, Evaluator evaluator) {
-        super(evaluator, logger, null, Predicates.<String>not(blank()), null);
+    public EvaluateExpression(Evaluator evaluator) {
+        super(evaluator, null, Predicates.<String>not(blank()), null);
     }
 
-    void execute(String expression, CommandResultCollector result) {
-        evaluate(result, evaluator(), expression);
+    public void execute(String expression) {
+        evaluate(evaluator(), expression);
     }
 
-    public static void evaluate(CommandResultCollector resultCollector, Evaluator evaluator, String expression) {
+    public static void evaluate(Evaluator evaluator, String expression) {
         Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
 
         if (evaluation.isRight()) {
-            resultCollector.logInfo(evaluation.right().result().map(asString()).getOrElse(""));
+            System.out.println(evaluation.right().result().map(asString()).getOrElse(""));
         } else {
             if (evaluation.left() instanceof ExpressionCompilationException) {
-                resultCollector.logError(evaluation.left().getMessage());
+                System.err.println(evaluation.left().getMessage());
             } else {
-                resultCollector.logError(evaluation.left().toString());
+                System.err.println(evaluation.left().toString());
             }
         }
 

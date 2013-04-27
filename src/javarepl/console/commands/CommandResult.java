@@ -2,9 +2,8 @@ package javarepl.console.commands;
 
 import javarepl.console.ConsoleLog;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class CommandResult {
     private final String command;
@@ -12,7 +11,7 @@ public class CommandResult {
 
     public CommandResult(String command, List<ConsoleLog> logs) {
         this.command = command;
-        this.logs = sequence(logs).toList();
+        this.logs = new ArrayList<ConsoleLog>(logs);
     }
 
     public String command() {

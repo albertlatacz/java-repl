@@ -33,7 +33,7 @@ public class WebConsoleClientHandler {
                 File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
                 String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
                 port = randomServerPort();
-                ProcessBuilder builder = new ProcessBuilder("java", "-cp", classpath, Main.class.getCanonicalName(), "--sandboxed", "--detached-console", "--port=" + port);
+                ProcessBuilder builder = new ProcessBuilder("java", "-cp", classpath, Main.class.getCanonicalName(), "--sandboxed", "--ignore-console", "--port=" + port);
                 builder.redirectErrorStream(true);
                 process = builder.start();
 

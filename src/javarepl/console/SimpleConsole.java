@@ -12,10 +12,12 @@ public final class SimpleConsole implements Console {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
     private final Rules<String, CommandResult> evaluationRules;
+    private final ConsoleLogger logger;
 
     public SimpleConsole(ConsoleLogger logger) {
+        this.logger = logger;
         evaluator = new Evaluator();
-        commands = createCommands(logger, evaluator);
+        commands = createCommands(evaluator);
         evaluationRules = createEvaluationRules(commands);
 
         registerShutdownHook();
@@ -37,25 +39,25 @@ public final class SimpleConsole implements Console {
         });
     }
 
-    private Sequence<Command> createCommands(ConsoleLogger logger, Evaluator evaluator) {
+    private Sequence<Command> createCommands(Evaluator evaluator) {
         Sequence<Command> commandSequence = Sequences.<Command>sequence()
-                .add(new QuitApplication(logger, evaluator))
-                .add(new ShowHistory(logger, evaluator))
-                .add(new SearchHistory(logger, evaluator))
-                .add(new EvaluateFromHistory(logger, evaluator))
-                .add(new ResetAllEvaluations(logger, evaluator))
-                .add(new ReplayAllEvaluations(logger, evaluator))
-                .add(new AddToClasspath(logger, evaluator))
-                .add(new LoadSourceFile(logger, evaluator))
-                .add(new ShowResult(logger, evaluator))
-                .add(new ListValues(logger, evaluator))
-                .add(new ShowLastSource(logger, evaluator))
-                .add(new ShowTypeOfExpression(logger, evaluator));
+                .add(new QuitApplication(evaluator))
+                .add(new ShowHistory(evaluator))
+                .add(new SearchHistory(evaluator))
+                .add(new EvaluateFromHistory(evaluator))
+                .add(new ResetAllEvaluations(evaluator))
+                .add(new ReplayAllEvaluations(evaluator))
+                .add(new AddToClasspath(evaluator))
+                .add(new LoadSourceFile(evaluator))
+                .add(new ShowResult(evaluator))
+                .add(new ListValues(evaluator))
+                .add(new ShowLastSource(evaluator))
+                .add(new ShowTypeOfExpression(evaluator));
 
         return commandSequence
-                .add(new ShowHelp(commandSequence, logger, evaluator))
-                .add(new NotAValidCommand(logger, evaluator))
-                .add(new EvaluateExpression(logger, evaluator));
+                .add(new ShowHelp(commandSequence, evaluator))
+                .add(new NotAValidCommand(evaluator))
+                .add(new EvaluateExpression(evaluator));
     }
 
     private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands) {
@@ -70,7 +72,10 @@ public final class SimpleConsole implements Console {
         return new Function1<String, CommandResult>() {
             @Override
             public CommandResult call(String expression) throws Exception {
-                return command.execute(expression);
+                logger.reset();
+                command.execute(expression);
+                CommandResult result = new CommandResult(expression, logger.logs());
+                return result;
             }
         };
     }

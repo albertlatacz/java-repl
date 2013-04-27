@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
+import javarepl.console.ConsoleLogOutputStream;
 import javarepl.console.ConsoleLogger;
 import javarepl.console.SimpleConsole;
 import javarepl.console.commands.Command;
@@ -33,47 +34,63 @@ import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
-import static javarepl.console.ConsoleLogger.systemConsoleLogger;
+import static javarepl.console.ConsoleLog.Type.ERROR;
+import static javarepl.console.ConsoleLog.Type.INFO;
 import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
-
     public static void main(String... args) throws Exception {
-        ConsoleLogger logger = systemConsoleLogger();
+        ConsoleLogger logger = new ConsoleLogger();
+
+        System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
+        System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
+
         Console console = new RestConsole(new SimpleConsole(logger), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
-        logger.logInfo(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
-                applicationVersion(),
-                isSandboxed(args) ? "sandboxed" : "unrestricted",
-                getProperty("java.vm.name"),
-                getProperty("java.version")));
+        if (!ignoreConsole(args)) {
+            System.out.println(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
+                    applicationVersion(),
+                    isSandboxed(args) ? "sandboxed" : "unrestricted",
+                    getProperty("java.vm.name"),
+                    getProperty("java.version")));
+        }
 
         if (isSandboxed(args)) {
             sandboxApplication();
         }
 
         if (environmentChecksPassed(logger)) {
-            logger.logInfo("Type in expression to evaluate.");
-            logger.logInfo("Type :help for more options.");
-            logger.logInfo("");
+            if (!ignoreConsole(args)) {
+                System.out.println("Type in expression to evaluate.");
+                System.out.println("Type :help for more options.");
+                System.out.println("");
+            }
 
             do {
                 console.execute(expressionReader.readExpression().getOrNull());
-                logger.logInfo("");
+                System.out.println("");
             } while (true);
         }
     }
 
     private static ExpressionReader expressionReader(String[] args, Console console) throws IOException {
-        if (sequence(args).contains("--simple-console"))
+        if (simpleConsole(args))
             return new ExpressionReader(readFromSimpleConsole());
 
-        if (sequence(args).contains("--ignore-console"))
+        if (ignoreConsole(args))
             return new ExpressionReader(ignoreConsoleInput());
 
         return new ExpressionReader(readFromExtendedConsole(console.commands()));
+    }
+
+    private static boolean simpleConsole(String[] args) {
+        return sequence(args).contains("--simple-console");
+    }
+
+    private static boolean ignoreConsole(String[] args) {
+        return sequence(args).contains("--ignore-console");
     }
 
     private static boolean isSandboxed(String[] args) {
@@ -86,7 +103,7 @@ public class Main {
 
     private static boolean environmentChecksPassed(ConsoleLogger logger) {
         if (getSystemJavaCompiler() == null) {
-            logger.logError("\nERROR: Java compiler not found.\n" +
+            System.err.println("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
             return false;
         }

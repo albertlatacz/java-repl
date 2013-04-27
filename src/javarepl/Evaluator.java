@@ -147,8 +147,7 @@ public class Evaluator {
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
         return new multi() {
-        }.<Either<? extends Throwable, Evaluation>>
-                methodOption(expression).getOrElse(evaluateExpression(expression));
+        }.<Either<? extends Throwable, Evaluation>>methodOption(expression).getOrElse(evaluateExpression(expression));
     }
 
     @multimethod

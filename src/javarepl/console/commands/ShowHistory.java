@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
-import javarepl.console.ConsoleLogger;
 import javarepl.expressions.ExternalAssignment;
 import jline.console.completer.StringsCompleter;
 
@@ -22,19 +21,19 @@ import static javarepl.expressions.Expression.functions.source;
 public final class ShowHistory extends Command {
     private static final String COMMAND = ":hist";
 
-    public ShowHistory(ConsoleLogger logger, Evaluator evaluator) {
-        super(evaluator, logger, COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
+    public ShowHistory(Evaluator evaluator) {
+        super(evaluator, COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
                 startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    void execute(String expression, CommandResultCollector result) {
+    public void execute(String expression) {
         Integer limit = parseNumericCommand(expression).second().getOrElse(evaluator().evaluations().size());
         Sequence<String> numberedHistory = numberedHistory(evaluator()).reverse().take(limit).reverse();
 
         if (!numberedHistory.isEmpty()) {
-            result.logInfo(listValues("History", numberedHistory));
+            System.out.println(listValues("History", numberedHistory));
         } else {
-            result.logInfo("No history.");
+            System.out.println("No history.");
         }
     }
 

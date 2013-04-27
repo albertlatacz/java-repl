@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
-import javarepl.console.ConsoleLogger;
 import jline.console.completer.Completer;
 
 import static com.googlecode.totallylazy.Option.none;
@@ -18,24 +17,16 @@ public abstract class Command {
     private final Predicate<String> predicate;
     private final Completer completer;
 
-    private final ConsoleLogger logger;
     private final Evaluator evaluator;
 
-    protected Command(Evaluator evaluator, ConsoleLogger logger, String description, Predicate<String> predicate, Completer completer) {
+    protected Command(Evaluator evaluator, String description, Predicate<String> predicate, Completer completer) {
         this.description = description;
         this.predicate = predicate;
         this.completer = completer;
-        this.logger = logger;
         this.evaluator = evaluator;
     }
 
-    abstract void execute(String expression, CommandResultCollector result);
-
-    public final CommandResult execute(String expression) {
-        CommandResultCollector resultCollector = new CommandResultCollector(logger, expression);
-        execute(expression, resultCollector);
-        return resultCollector.result();
-    }
+    public abstract void execute(String expression);
 
     public final Evaluator evaluator() {
         return evaluator;
