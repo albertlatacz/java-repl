@@ -49,13 +49,13 @@ public final class SimpleConsole implements Console {
                 .add(new ReplayAllEvaluations(evaluator))
                 .add(new AddToClasspath(evaluator))
                 .add(new LoadSourceFile(evaluator))
-                .add(new ShowResult(evaluator))
                 .add(new ListValues(evaluator))
                 .add(new ShowLastSource(evaluator))
                 .add(new ShowTypeOfExpression(evaluator));
 
         return commandSequence
                 .add(new ShowHelp(commandSequence, evaluator))
+                .add(new ShowResult(evaluator))
                 .add(new NotAValidCommand(evaluator))
                 .add(new EvaluateExpression(evaluator));
     }

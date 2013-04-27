@@ -24,7 +24,11 @@ public class SimpleConsoleTest {
     @Test
     public void supportsDisplayingSingleResult() {
         assertThat(
-                executing("42", "\"test\"", ":result res1"),
+                executing("42", "\"test\"", "res1"),
+                hasLogged(info("java.lang.String res1 = \"test\"")));
+
+        assertThat(
+                executing("42", "\"test\"", "res1"),
                 hasLogged(info("java.lang.String res1 = \"test\"")));
     }
 
@@ -153,7 +157,7 @@ public class SimpleConsoleTest {
     public void supportsReevaluatingAllExpression() {
         reevaluationCounter = 0;
         assertThat(
-                executing("++javarepl.console.SimpleConsoleTest.reevaluationCounter", ":replay", ":result res0"),
+                executing("++javarepl.console.SimpleConsoleTest.reevaluationCounter", ":replay", "res0"),
                 hasLogged(info("java.lang.Integer res0 = 2")));
     }
 
