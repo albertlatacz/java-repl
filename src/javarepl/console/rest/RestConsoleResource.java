@@ -8,7 +8,6 @@ import com.googlecode.utterlyidle.annotations.FormParam;
 import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
-import javarepl.console.Console;
 import javarepl.console.ConsoleLog;
 import javarepl.console.commands.CommandResult;
 
@@ -17,10 +16,10 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.commands.CommandResult.emptyResult;
 
 public class RestConsoleResource {
-    private final Console console;
+    private final RestConsole console;
     private final RestConsoleExpressionReader expressionReader;
 
-    public RestConsoleResource(Console console, RestConsoleExpressionReader expressionReader) {
+    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader) {
         this.console = console;
         this.expressionReader = expressionReader;
     }

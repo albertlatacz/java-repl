@@ -80,8 +80,8 @@ public class WebConsoleResource {
         return new Function1<WebConsoleClientHandler, Model>() {
             public Model call(WebConsoleClientHandler webConsoleClientHandler) throws Exception {
                 return model()
-                        .add("id", webConsoleClientHandler.id)
-                        .add("port", webConsoleClientHandler.port);
+                        .add("id", webConsoleClientHandler.id())
+                        .add("port", webConsoleClientHandler.port());
             }
         };
     }

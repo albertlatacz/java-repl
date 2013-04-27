@@ -4,9 +4,7 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
-import javarepl.console.ConsoleLogOutputStream;
-import javarepl.console.ConsoleLogger;
-import javarepl.console.SimpleConsole;
+import javarepl.console.*;
 import javarepl.console.commands.Command;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
@@ -34,6 +32,7 @@ import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
+import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
 import static javarepl.console.commands.Command.functions.completer;
@@ -46,7 +45,7 @@ public class Main {
         System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
         System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
 
-        Console console = new RestConsole(new SimpleConsole(logger), port(args));
+        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger), expressionTimeout(args), inactivityTimeout(args)), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
         if (!ignoreConsole(args)) {
@@ -86,19 +85,27 @@ public class Main {
     }
 
     private static boolean simpleConsole(String[] args) {
-        return sequence(args).contains("--simple-console");
+        return sequence(args).contains("--simpleConsole");
     }
 
     private static boolean ignoreConsole(String[] args) {
-        return sequence(args).contains("--ignore-console");
+        return sequence(args).contains("--ignoreConsole");
     }
 
     private static boolean isSandboxed(String[] args) {
         return sequence(args).contains("--sandboxed");
     }
 
-    private static Option<Integer> port(String[] args) {
-        return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue)));
+    private static Integer port(String[] args) {
+        return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue))).getOrElse(randomServerPort());
+    }
+
+    private static Option<Integer> expressionTimeout(String[] args) {
+        return sequence(args).find(startsWith("--expressionTimeout=")).map(compose(replaceAll("--expressionTimeout=", ""), compose(valueOf, intValue)));
+    }
+
+    private static Option<Integer> inactivityTimeout(String[] args) {
+        return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
     }
 
     private static boolean environmentChecksPassed(ConsoleLogger logger) {

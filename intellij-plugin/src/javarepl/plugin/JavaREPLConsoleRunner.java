@@ -285,7 +285,7 @@ public class JavaREPLConsoleRunner {
         Map<String, String> envParams = new HashMap<String, String>();
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
-        line.addParameter("--simple-console");
+        line.addParameter("--simpleConsole");
 
         return line;
     }

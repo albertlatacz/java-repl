@@ -12,7 +12,7 @@ public class WebConsole {
 
     public Option<WebConsoleClientHandler> createClient() {
         WebConsoleClientHandler clientHandler = new WebConsoleClientHandler();
-        clients = clients.put(clientHandler.id, clientHandler);
+        clients = clients.put(clientHandler.id(), clientHandler);
         return some(clientHandler);
     }
 
@@ -22,7 +22,7 @@ public class WebConsole {
 
         if (!clientHandler.isEmpty()) {
             clientHandler.get().shutdown();
-            clients = clients.remove(clientHandler.get().id);
+            clients = clients.remove(clientHandler.get().id());
         }
 
         return clientHandler;
