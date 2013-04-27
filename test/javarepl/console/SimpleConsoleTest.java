@@ -16,6 +16,12 @@ import static org.hamcrest.Matchers.hasItems;
 
 public class SimpleConsoleTest {
     @Test
+    public void supportsPrintingToSystemStreams() {
+        assertThat(executing("System.out.println(\"test\")"), hasLogged(info("test")));
+        assertThat(executing("System.err.println(\"test\")"), hasLogged(error("test")));
+    }
+
+    @Test
     public void supportsDisplayingSingleResult() {
         assertThat(
                 executing("42", "\"test\"", ":result res1"),
@@ -168,6 +174,10 @@ public class SimpleConsoleTest {
 
     private static ConsoleLog info(String messages) {
         return new ConsoleLog(Type.INFO, messages);
+    }
+
+    private static ConsoleLog error(String messages) {
+        return new ConsoleLog(Type.ERROR, messages);
     }
 
     private static Matcher<CommandResult> hasLogged(final ConsoleLog... logs) {
