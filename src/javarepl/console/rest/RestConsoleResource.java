@@ -30,11 +30,7 @@ public class RestConsoleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Model execute(@FormParam("expression") String expr) {
         Option<String> expression = expressionReader.readExpression(expr);
-
-        if (expression.isEmpty())
-            return resultToModel(emptyResult());
-        else
-            return resultToModel(console.execute(expression.get()));
+        return resultToModel(expression.isEmpty() ? emptyResult() : console.execute(expression.get()));
     }
 
     public static Model resultToModel(CommandResult result) {
