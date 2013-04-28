@@ -45,7 +45,7 @@ public class WebConsoleClientHandler {
                 String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
                 port = randomServerPort();
                 ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Main.class.getCanonicalName(),
-                        "--sandboxed", "--ignoreConsole", "--port=" + port, "--expressionTimeout=15", "--inactivityTimeout=300");
+                        "--sandboxed", "--ignoreConsole", "--port=" + port, "--expressionTimeout=5", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
                 process = builder.start();
 
@@ -60,11 +60,6 @@ public class WebConsoleClientHandler {
     public void shutdown() {
         if (process != null) {
             process.destroy();
-            try {
-                process.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
             process = null;
         }
     }
@@ -83,7 +78,7 @@ public class WebConsoleClientHandler {
         if (response.status() == Status.OK)
             return response;
 
-        int exitCode = waitForProcessToExit();
+        int exitCode = processExitCode();
         switch (exitCode) {
             case EXPRESSION_TIMEOUT:
             case INACTIVITY_TIMEOUT: {
@@ -95,15 +90,12 @@ public class WebConsoleClientHandler {
         }
     }
 
-    private int waitForProcessToExit() {
-        for (int attempt = 0; attempt < 10; attempt++) {
-            try {
-                Thread.sleep(100);
-                return process.exitValue();
-            } catch (Exception e) {
-            }
+    private int processExitCode() {
+        try {
+            Thread.sleep(100);
+            return process.exitValue();
+        } catch (Exception e) {
+            return -1;
         }
-
-        return -1;
     }
 }
