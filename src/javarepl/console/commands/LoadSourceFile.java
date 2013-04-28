@@ -2,7 +2,7 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Files.asFile;
@@ -12,8 +12,8 @@ import static java.lang.String.format;
 public final class LoadSourceFile extends Command {
     private static final String COMMAND = ":load";
 
-    public LoadSourceFile(Evaluator evaluator) {
-        super(evaluator, COMMAND + " <path> - loads source file ", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public LoadSourceFile(Console console) {
+        super(console, COMMAND + " <path> - loads source file ", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
     public void execute(String expression) {

@@ -5,6 +5,7 @@ import javarepl.Evaluator;
 import javarepl.console.commands.*;
 
 import static com.googlecode.totallylazy.Predicates.always;
+import static javarepl.console.ConsoleHistory.emptyHistory;
 import static javarepl.console.ConsoleResult.emptyResult;
 
 public final class SimpleConsole implements Console {
@@ -13,21 +14,35 @@ public final class SimpleConsole implements Console {
     private final Rules<String, ConsoleResult> evaluationRules;
     private final ConsoleLogger logger;
 
+    private ConsoleHistory history;
+
     public SimpleConsole(ConsoleLogger logger) {
         this.logger = logger;
+
         evaluator = new Evaluator();
-        commands = createCommands(evaluator);
+        history = emptyHistory();
+
+        commands = createCommands();
         evaluationRules = createEvaluationRules(commands);
 
         registerShutdownHook();
     }
 
     public ConsoleResult execute(String expression) {
+        history = history.add(expression);
         return evaluationRules.apply(expression);
     }
 
     public Sequence<Command> commands() {
         return commands;
+    }
+
+    public ConsoleHistory history() {
+        return history;
+    }
+
+    public Evaluator evaluator() {
+        return evaluator;
     }
 
     private void registerShutdownHook() {
@@ -38,25 +53,25 @@ public final class SimpleConsole implements Console {
         });
     }
 
-    private Sequence<Command> createCommands(Evaluator evaluator) {
+    private Sequence<Command> createCommands() {
         Sequence<Command> commandSequence = Sequences.<Command>sequence()
-                .add(new QuitApplication(evaluator))
-                .add(new ShowHistory(evaluator))
-                .add(new SearchHistory(evaluator))
-                .add(new EvaluateFromHistory(evaluator))
-                .add(new ResetAllEvaluations(evaluator))
-                .add(new ReplayAllEvaluations(evaluator))
-                .add(new AddToClasspath(evaluator))
-                .add(new LoadSourceFile(evaluator))
-                .add(new ListValues(evaluator))
-                .add(new ShowLastSource(evaluator))
-                .add(new ShowTypeOfExpression(evaluator));
+                .add(new QuitApplication(this))
+                .add(new ShowHistory(this))
+                .add(new SearchHistory(this))
+                .add(new EvaluateFromHistory(this))
+                .add(new ResetAllEvaluations(this))
+                .add(new ReplayAllEvaluations(this))
+                .add(new AddToClasspath(this))
+                .add(new LoadSourceFile(this))
+                .add(new ListValues(this))
+                .add(new ShowLastSource(this))
+                .add(new ShowTypeOfExpression(this));
 
         return commandSequence
-                .add(new ShowHelp(commandSequence, evaluator))
-                .add(new ShowResult(evaluator))
-                .add(new NotAValidCommand(evaluator))
-                .add(new EvaluateExpression(evaluator));
+                .add(new ShowHelp(commandSequence, this))
+                .add(new ShowResult(this))
+                .add(new NotAValidCommand(this))
+                .add(new EvaluateExpression(this));
     }
 
     private Rules<String, ConsoleResult> createEvaluationRules(Sequence<Command> commands) {

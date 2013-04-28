@@ -1,6 +1,6 @@
 package javarepl.console.commands;
 
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
@@ -17,8 +17,8 @@ import static javarepl.expressions.WithKey.functions.key;
 public final class ListValues extends Command {
     private static final String COMMAND = ":list";
 
-    public ListValues(Evaluator evaluator) {
-        super(evaluator, COMMAND + " <results|types|methods|imports|all> - list specified values",
+    public ListValues(Console console) {
+        super(console, COMMAND + " <results|types|methods|imports|all> - list specified values",
                 startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")));
     }
 

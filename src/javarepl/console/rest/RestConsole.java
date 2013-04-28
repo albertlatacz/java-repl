@@ -3,7 +3,9 @@ package javarepl.console.rest;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.httpserver.RestServer;
+import javarepl.Evaluator;
 import javarepl.console.Console;
+import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleResult;
 import javarepl.console.commands.Command;
 
@@ -28,5 +30,13 @@ public class RestConsole implements Console {
 
     public Sequence<Command> commands() {
         return console.commands();
+    }
+
+    public ConsoleHistory history() {
+        return console.history();
+    }
+
+    public Evaluator evaluator() {
+        return console.evaluator();
     }
 }

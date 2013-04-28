@@ -1,7 +1,7 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
@@ -12,8 +12,8 @@ public final class ShowHelp extends Command {
 
     private final Sequence<Command> commands;
 
-    public ShowHelp(Sequence<Command> commands, Evaluator evaluator) {
-        super(evaluator, COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ShowHelp(Sequence<Command> commands, Console console) {
+        super(console, COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
         this.commands = commands.cons(this);
     }
 

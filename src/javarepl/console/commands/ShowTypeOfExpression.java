@@ -1,7 +1,7 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
@@ -9,8 +9,8 @@ import static com.googlecode.totallylazy.Strings.startsWith;
 public final class ShowTypeOfExpression extends Command {
     private static final String COMMAND = ":type";
 
-    public ShowTypeOfExpression(Evaluator evaluator) {
-        super(evaluator, COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public ShowTypeOfExpression(Console console) {
+        super(console, COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
     public void execute(String expression) {

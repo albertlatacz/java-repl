@@ -2,10 +2,11 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Predicate;
 import javarepl.Evaluator;
+import javarepl.console.Console;
 
 public final class ShowResult extends Command {
-    public ShowResult(Evaluator evaluator) {
-        super(evaluator, null, containsResult(evaluator), null);
+    public ShowResult(Console console) {
+        super(console, null, containsResult(console.evaluator()), null);
     }
 
     public void execute(String expression) {

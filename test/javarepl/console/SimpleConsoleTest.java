@@ -142,8 +142,8 @@ public class SimpleConsoleTest {
     @Test
     public void supportsResettingAllEvaluations() {
         assertThat(
-                executing("42", "\"test\"", ":reset", ":hist"),
-                hasLogged(info("No history.")));
+                executing("42", "\"test\"", ":reset", ":list results"),
+                hasLogged(info("Results:\n    \n")));
     }
 
     public static int reevaluationCounter;

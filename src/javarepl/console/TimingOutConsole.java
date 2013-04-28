@@ -2,6 +2,7 @@ package javarepl.console;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import javarepl.Evaluator;
 import javarepl.console.commands.Command;
 
 import java.util.concurrent.Callable;
@@ -66,5 +67,13 @@ public class TimingOutConsole implements Console {
 
     public Sequence<Command> commands() {
         return console.commands();
+    }
+
+    public ConsoleHistory history() {
+        return console.history();
+    }
+
+    public Evaluator evaluator() {
+        return console.evaluator();
     }
 }

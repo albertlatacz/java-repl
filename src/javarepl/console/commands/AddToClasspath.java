@@ -1,6 +1,6 @@
 package javarepl.console.commands;
 
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
 import java.io.File;
@@ -15,8 +15,8 @@ import static javarepl.Utils.*;
 public final class AddToClasspath extends Command {
     private static final String COMMAND = ":cp";
 
-    public AddToClasspath(Evaluator evaluator) {
-        super(evaluator, COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public AddToClasspath(Console console) {
+        super(console, COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
 

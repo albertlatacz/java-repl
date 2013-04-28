@@ -1,6 +1,6 @@
 package javarepl.console.commands;
 
-import javarepl.Evaluator;
+import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
@@ -8,8 +8,8 @@ import static com.googlecode.totallylazy.Predicates.equalTo;
 public final class ResetAllEvaluations extends Command {
     private static final String COMMAND = ":reset";
 
-    public ResetAllEvaluations(Evaluator evaluator) {
-        super(evaluator, COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ResetAllEvaluations(Console console) {
+        super(console, COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
     public void execute(String expression) {

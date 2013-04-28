@@ -6,13 +6,14 @@ import com.googlecode.totallylazy.Predicates;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
+import javarepl.console.Console;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
 public final class EvaluateExpression extends Command {
-    public EvaluateExpression(Evaluator evaluator) {
-        super(evaluator, null, Predicates.<String>not(blank()), null);
+    public EvaluateExpression(Console console) {
+        super(console, null, Predicates.<String>not(blank()), null);
     }
 
     public void execute(String expression) {
