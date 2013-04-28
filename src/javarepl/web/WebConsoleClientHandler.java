@@ -60,6 +60,11 @@ public class WebConsoleClientHandler {
     public void shutdown() {
         if (process != null) {
             process.destroy();
+            try {
+                process.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             process = null;
         }
     }
@@ -81,9 +86,10 @@ public class WebConsoleClientHandler {
         int exitCode = waitForProcessToExit();
         switch (exitCode) {
             case EXPRESSION_TIMEOUT:
+            case INACTIVITY_TIMEOUT: {
+                shutdown();
                 return response(GATEWAY_TIMEOUT);
-            case INACTIVITY_TIMEOUT:
-                return response(GATEWAY_TIMEOUT);
+            }
             default:
                 return response;
         }
