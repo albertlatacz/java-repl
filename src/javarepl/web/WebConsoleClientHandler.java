@@ -68,25 +68,36 @@ public class WebConsoleClientHandler {
         createProcess();
 
         try {
-            return reportProcessErrors(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port + "/" + "execute").form("expression", expression).build()));
+            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port + "/" + "execute").form("expression", expression).build()));
         } catch (Exception e) {
             return response(INTERNAL_SERVER_ERROR);
         }
     }
 
-    private Response reportProcessErrors(Response response) {
-        if (response.status() != Status.OK) {
+    private Response reportProcessError(Response response) {
+        if (response.status() == Status.OK)
+            return response;
+
+        int exitCode = waitForProcessToExit();
+        switch (exitCode) {
+            case EXPRESSION_TIMEOUT:
+                return response(GATEWAY_TIMEOUT);
+            case INACTIVITY_TIMEOUT:
+                return response(GATEWAY_TIMEOUT);
+            default:
+                return response;
+        }
+    }
+
+    private int waitForProcessToExit() {
+        for (int attempt = 0; attempt < 10; attempt++) {
             try {
-                switch (process.exitValue()) {
-                    case EXPRESSION_TIMEOUT:
-                        return response(GATEWAY_TIMEOUT);
-                    case INACTIVITY_TIMEOUT:
-                        return response(GATEWAY_TIMEOUT);
-                }
+                Thread.sleep(100);
+                return process.exitValue();
             } catch (Exception e) {
             }
         }
 
-        return response;
+        return -1;
     }
 }

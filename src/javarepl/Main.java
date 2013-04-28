@@ -48,6 +48,10 @@ public class Main {
         Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger), expressionTimeout(args), inactivityTimeout(args)), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
+        if (isSandboxed(args)) {
+            sandboxApplication();
+        }
+
         if (!ignoreConsole(args)) {
             System.out.println(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
                     applicationVersion(),
@@ -56,11 +60,7 @@ public class Main {
                     getProperty("java.version")));
         }
 
-        if (isSandboxed(args)) {
-            sandboxApplication();
-        }
-
-        if (environmentChecksPassed(logger)) {
+        if (environmentChecksPassed()) {
             if (!ignoreConsole(args)) {
                 System.out.println("Type in expression to evaluate.");
                 System.out.println("Type :help for more options.");
@@ -108,7 +108,7 @@ public class Main {
         return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
     }
 
-    private static boolean environmentChecksPassed(ConsoleLogger logger) {
+    private static boolean environmentChecksPassed() {
         if (getSystemJavaCompiler() == null) {
             System.err.println("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
