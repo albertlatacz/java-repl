@@ -5,12 +5,12 @@ import javarepl.Evaluator;
 import javarepl.console.commands.*;
 
 import static com.googlecode.totallylazy.Predicates.always;
-import static javarepl.console.commands.CommandResult.emptyResult;
+import static javarepl.console.ConsoleResult.emptyResult;
 
 public final class SimpleConsole implements Console {
     private final Evaluator evaluator;
     private final Sequence<Command> commands;
-    private final Rules<String, CommandResult> evaluationRules;
+    private final Rules<String, ConsoleResult> evaluationRules;
     private final ConsoleLogger logger;
 
     public SimpleConsole(ConsoleLogger logger) {
@@ -22,7 +22,7 @@ public final class SimpleConsole implements Console {
         registerShutdownHook();
     }
 
-    public CommandResult execute(String expression) {
+    public ConsoleResult execute(String expression) {
         return evaluationRules.apply(expression);
     }
 
@@ -59,21 +59,21 @@ public final class SimpleConsole implements Console {
                 .add(new EvaluateExpression(evaluator));
     }
 
-    private Rules<String, CommandResult> createEvaluationRules(Sequence<Command> commands) {
-        Rules<String, CommandResult> rules = Rules.rules();
+    private Rules<String, ConsoleResult> createEvaluationRules(Sequence<Command> commands) {
+        Rules<String, ConsoleResult> rules = Rules.rules();
         for (Command command : commands) {
             rules.addLast(Rule.rule(command.predicate(), asFunction(command)));
         }
-        return rules.addLast(Rule.rule(always(), Functions.<String, CommandResult>returns1(emptyResult())));
+        return rules.addLast(Rule.rule(always(), Functions.<String, ConsoleResult>returns1(emptyResult())));
     }
 
-    private Function1<String, CommandResult> asFunction(final Command command) {
-        return new Function1<String, CommandResult>() {
+    private Function1<String, ConsoleResult> asFunction(final Command command) {
+        return new Function1<String, ConsoleResult>() {
             @Override
-            public CommandResult call(String expression) throws Exception {
+            public ConsoleResult call(String expression) throws Exception {
                 logger.reset();
                 command.execute(expression);
-                CommandResult result = new CommandResult(expression, logger.logs());
+                ConsoleResult result = new ConsoleResult(expression, logger.logs());
                 return result;
             }
         };

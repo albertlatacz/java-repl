@@ -4,7 +4,6 @@ import javarepl.Evaluator;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
-import static javarepl.Evaluation.functions.classSource;
 
 public final class ShowLastSource extends Command {
     private static final String COMMAND = ":src";
@@ -14,6 +13,6 @@ public final class ShowLastSource extends Command {
     }
 
     public void execute(String expression) {
-        System.out.println(evaluator().lastEvaluation().map(classSource()).getOrElse("No source"));
+        System.out.println(evaluator().lastSource().getOrElse("No source"));
     }
 }

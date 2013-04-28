@@ -3,7 +3,6 @@ package javarepl.console;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.commands.Command;
-import javarepl.console.commands.CommandResult;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
@@ -30,7 +29,7 @@ public class TimingOutConsole implements Console {
         scheduleInactivityTimeout();
     }
 
-    public CommandResult execute(final String expression) {
+    public ConsoleResult execute(final String expression) {
         scheduleInactivityTimeout();
 
         ScheduledFuture<Object> timedOut = null;
@@ -38,7 +37,7 @@ public class TimingOutConsole implements Console {
             timedOut = scheduler.schedule(exitWithCode(EXPRESSION_TIMEOUT), expressionTimeout.get(), SECONDS);
         }
 
-        CommandResult result = console.execute(expression);
+        ConsoleResult result = console.execute(expression);
 
         if (!expressionTimeout.isEmpty()) {
             timedOut.cancel(true);

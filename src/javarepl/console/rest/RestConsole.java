@@ -4,8 +4,8 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 import javarepl.console.Console;
+import javarepl.console.ConsoleResult;
 import javarepl.console.commands.Command;
-import javarepl.console.commands.CommandResult;
 
 import static com.googlecode.utterlyidle.BasePath.basePath;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
@@ -22,7 +22,7 @@ public class RestConsole implements Console {
         new RestServer(application, configuration);
     }
 
-    public CommandResult execute(String expression) {
+    public ConsoleResult execute(String expression) {
         return console.execute(expression);
     }
 

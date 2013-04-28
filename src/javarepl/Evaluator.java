@@ -64,8 +64,8 @@ public class Evaluator {
         return result;
     }
 
-    public Option<Evaluation> lastEvaluation() {
-        return context.lastEvaluation();
+    public Option<String> lastSource() {
+        return context.lastSource();
     }
 
     public List<Result> results() {
@@ -166,8 +166,8 @@ public class Evaluator {
 
             classLoader.loadClass(expression.canonicalName());
 
-            Evaluation evaluation = evaluation(expression.type(), sources, expression, Result.noResult());
-            context = context.addEvaluation(evaluation);
+            Evaluation evaluation = evaluation(expression, Result.noResult());
+            context = context.addEvaluation(evaluation, some(sources));
 
             return right(evaluation);
         } catch (Exception e) {
@@ -199,7 +199,7 @@ public class Evaluator {
                             if (result.isEmpty())
                                 return evaluations;
 
-                            return evaluations.add(evaluation(className, sources,
+                            return evaluations.add(evaluation(
                                     new ExternalAssignment(expression.source(), field.getName(), result.value(), field.get(expressionInstance)),
                                     some(Result.result(field.getName(), field.get(expressionInstance)))));
 
@@ -208,13 +208,13 @@ public class Evaluator {
 
 
             if (resultObject != null) {
-                Evaluation evaluation = evaluation(className, sources, expression, some(Result.result(nextResultKeyFor(expression), resultObject)));
-                context = context.addEvaluations(modifiedResults.add(evaluation));
+                Evaluation evaluation = evaluation(expression, some(Result.result(nextResultKeyFor(expression), resultObject)));
+                context = context.addEvaluations(modifiedResults.add(evaluation), some(sources));
                 return right(evaluation);
             } else {
-                Evaluation evaluation = evaluation(className, sources, expression, Result.noResult());
+                Evaluation evaluation = evaluation(expression, Result.noResult());
 
-                context = context.addEvaluations(modifiedResults.add(evaluation));
+                context = context.addEvaluations(modifiedResults.add(evaluation), some(sources));
                 return right(evaluation);
             }
         } catch (Throwable e) {

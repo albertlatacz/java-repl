@@ -9,11 +9,11 @@ import com.googlecode.utterlyidle.annotations.POST;
 import com.googlecode.utterlyidle.annotations.Path;
 import com.googlecode.utterlyidle.annotations.Produces;
 import javarepl.console.ConsoleLog;
-import javarepl.console.commands.CommandResult;
+import javarepl.console.ConsoleResult;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.console.commands.CommandResult.emptyResult;
+import static javarepl.console.ConsoleResult.emptyResult;
 
 public class RestConsoleResource {
     private final RestConsole console;
@@ -32,9 +32,9 @@ public class RestConsoleResource {
         return resultToModel(expression.isEmpty() ? emptyResult() : console.execute(expression.get()));
     }
 
-    public static Model resultToModel(CommandResult result) {
+    public static Model resultToModel(ConsoleResult result) {
         return model()
-                .add("expression", result.command())
+                .add("expression", result.expression())
                 .add("logs", sequence(result.logs()).map(commandResultToModel()));
     }
 

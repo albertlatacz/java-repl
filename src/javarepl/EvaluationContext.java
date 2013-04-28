@@ -14,17 +14,19 @@ import static javarepl.Result.noResult;
 
 public class EvaluationContext {
     private final Sequence<Evaluation> evaluations;
+    private final Option<String> lastSource;
 
-    private EvaluationContext(Sequence<Evaluation> evaluations) {
+    private EvaluationContext(Sequence<Evaluation> evaluations, Option<String> lastSource) {
         this.evaluations = sequence(evaluations);
+        this.lastSource = lastSource;
     }
 
     public static EvaluationContext evaluationContext() {
-        return new EvaluationContext(Sequences.<Evaluation>empty());
+        return new EvaluationContext(Sequences.<Evaluation>empty(), Option.<String>none());
     }
 
-    public Option<Evaluation> lastEvaluation() {
-        return evaluations().lastOption();
+    public Option<String> lastSource() {
+        return lastSource;
     }
 
     public Sequence<Evaluation> evaluations() {
@@ -56,11 +58,13 @@ public class EvaluationContext {
         return "res" + results().size();
     }
 
-    public EvaluationContext addEvaluation(Evaluation evaluationIn) {
-        return addEvaluations(sequence(evaluationIn));
+    public EvaluationContext addEvaluation(Evaluation evaluationIn, Option<String> lastSource) {
+        return addEvaluations(sequence(evaluationIn), lastSource);
     }
 
-    public EvaluationContext addEvaluations(Iterable<Evaluation> evaluationIn) {
-        return new EvaluationContext(evaluations().join(sequence(evaluationIn)));
+    public EvaluationContext addEvaluations(Iterable<Evaluation> evaluationIn, Option<String> lastSource) {
+        return new EvaluationContext(evaluations().join(sequence(evaluationIn)), lastSource);
     }
+
+
 }

@@ -1,6 +1,5 @@
 package javarepl.console;
 
-import javarepl.console.commands.CommandResult;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -158,13 +157,13 @@ public class SimpleConsoleTest {
     }
 
 
-    private static CommandResult executing(String... items) {
+    private static ConsoleResult executing(String... items) {
         ConsoleLogger logger = new ConsoleLogger();
         System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
         System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
         SimpleConsole console = new SimpleConsole(logger);
 
-        CommandResult result = null;
+        ConsoleResult result = null;
         for (String item : items) {
             result = console.execute(item);
         }
@@ -180,10 +179,10 @@ public class SimpleConsoleTest {
         return new ConsoleLog(Type.ERROR, messages);
     }
 
-    private static Matcher<CommandResult> hasLogged(final ConsoleLog... logs) {
-        return new FeatureMatcher<CommandResult, List<ConsoleLog>>(hasItems(logs), "console log", "console log") {
-            protected List<ConsoleLog> featureValueOf(CommandResult commandResult) {
-                return commandResult.logs();
+    private static Matcher<ConsoleResult> hasLogged(final ConsoleLog... logs) {
+        return new FeatureMatcher<ConsoleResult, List<ConsoleLog>>(hasItems(logs), "console log", "console log") {
+            protected List<ConsoleLog> featureValueOf(ConsoleResult consoleResult) {
+                return consoleResult.logs();
             }
         };
     }
