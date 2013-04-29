@@ -128,7 +128,7 @@ public class Main {
             private final PermissionCollection permissions = new Permissions();
 
             {
-                permissions.add(new SocketPermission("*", "connect, listen, resolve, accept"));
+                permissions.add(new SocketPermission("*", "accept"));
                 permissions.add(new RuntimePermission("accessClassInPackage.sun.misc.*"));
                 permissions.add(new RuntimePermission("accessClassInPackage.sun.misc"));
                 permissions.add(new RuntimePermission("getProtectionDomain"));
