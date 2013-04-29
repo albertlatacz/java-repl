@@ -4,7 +4,8 @@ import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
 import jline.console.completer.StringsCompleter;
 
-import static com.googlecode.totallylazy.Predicates.equalTo;
+import static com.googlecode.totallylazy.Callables.asString;
+import static com.googlecode.totallylazy.Predicates.*;
 import static javarepl.Utils.listValues;
 
 public final class ShowHelp extends Command {
@@ -18,6 +19,6 @@ public final class ShowHelp extends Command {
     }
 
     public void execute(String expression) {
-        System.out.println(listValues("Available commands", commands));
+        System.out.println(listValues("Available commands", commands.map(asString()).filter(not(nullValue()))));
     }
 }

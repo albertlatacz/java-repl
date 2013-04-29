@@ -5,11 +5,10 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
 import javarepl.console.*;
-import javarepl.console.commands.Command;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
-import jline.console.history.FileHistory;
+import jline.console.history.MemoryHistory;
 
 import java.io.*;
 import java.lang.management.ManagementPermission;
@@ -23,6 +22,7 @@ import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
@@ -45,7 +45,7 @@ public class Main {
         System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
         System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
 
-        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger), expressionTimeout(args), inactivityTimeout(args)), port(args));
+        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger, some(new File(getProperty("user.home"), ".javarepl.history"))), expressionTimeout(args), inactivityTimeout(args)), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
         if (isSandboxed(args)) {
@@ -81,7 +81,7 @@ public class Main {
         if (ignoreConsole(args))
             return new ExpressionReader(ignoreConsoleInput());
 
-        return new ExpressionReader(readFromExtendedConsole(console.commands()));
+        return new ExpressionReader(readFromExtendedConsole(console));
     }
 
     private static boolean simpleConsole(String[] args) {
@@ -147,39 +147,28 @@ public class Main {
         System.setSecurityManager(new SecurityManager());
     }
 
-    private static Function1<Sequence<String>, String> readFromExtendedConsole(final Sequence<Command> commandSequence) throws IOException {
+    private static Function1<Sequence<String>, String> readFromExtendedConsole(final Console console) throws IOException {
         return new Function1<Sequence<String>, String>() {
-            private final ConsoleReader console;
-            private final FileHistory history;
+            private final ConsoleReader consoleReader;
 
             {
-                history = new FileHistory(new File(getProperty("user.home"), ".javarepl.history"));
+                consoleReader = new ConsoleReader(System.in, System.out);
+                consoleReader.setHistoryEnabled(true);
+                consoleReader.addCompleter(new AggregateCompleter(console.commands().map(completer()).filter(notNullValue()).toList()));
+                consoleReader.setHistory(historyFromConsole());
+            }
 
-                console = new ConsoleReader(System.in, System.out);
-                console.setHistoryEnabled(true);
-                console.addCompleter(new AggregateCompleter(commandSequence.map(completer()).filter(notNullValue()).toList()));
-                console.setHistory(history);
-
-                shutdownConsoleOnExit();
+            private MemoryHistory historyFromConsole() {
+                MemoryHistory history = new MemoryHistory();
+                for (String historyItem : console.history().items()) {
+                    history.add(historyItem);
+                }
+                return history;
             }
 
             public String call(Sequence<String> lines) throws Exception {
-                console.setPrompt(lines.isEmpty() ? "java> " : "    | ");
-                return console.readLine();
-            }
-
-
-            private void shutdownConsoleOnExit() {
-                Runtime.getRuntime().addShutdownHook(new Thread() {
-                    public void run() {
-                        try {
-                            console.shutdown();
-                            history.flush();
-                        } catch (Exception e) {
-                            //ignore
-                        }
-                    }
-                });
+                consoleReader.setPrompt(lines.isEmpty() ? "java> " : "    | ");
+                return consoleReader.readLine();
             }
         };
     }
@@ -198,7 +187,7 @@ public class Main {
         return new Function1<Sequence<String>, String>() {
             public String call(Sequence<String> strings) throws Exception {
                 while (true) {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }
             }
         };

@@ -1,9 +1,11 @@
 package javarepl.console;
 
+import com.googlecode.totallylazy.Option;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 
 import static javarepl.console.ConsoleLog.Type;
@@ -161,7 +163,7 @@ public class SimpleConsoleTest {
         ConsoleLogger logger = new ConsoleLogger();
         System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
         System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
-        SimpleConsole console = new SimpleConsole(logger);
+        SimpleConsole console = new SimpleConsole(logger, Option.<File>none());
 
         ConsoleResult result = null;
         for (String item : items) {

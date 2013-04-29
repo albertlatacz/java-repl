@@ -4,8 +4,11 @@ import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
 import javarepl.console.commands.*;
 
+import java.io.File;
+
 import static com.googlecode.totallylazy.Predicates.always;
-import static javarepl.console.ConsoleHistory.emptyHistory;
+import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
 
 public final class SimpleConsole implements Console {
@@ -16,11 +19,11 @@ public final class SimpleConsole implements Console {
 
     private ConsoleHistory history;
 
-    public SimpleConsole(ConsoleLogger logger) {
+    public SimpleConsole(ConsoleLogger logger, Option<File> historyFile) {
         this.logger = logger;
 
         evaluator = new Evaluator();
-        history = emptyHistory();
+        history = historyFromFile(startsWith(":h!"), historyFile);
 
         commands = createCommands();
         evaluationRules = createEvaluationRules(commands);
@@ -29,8 +32,9 @@ public final class SimpleConsole implements Console {
     }
 
     public ConsoleResult execute(String expression) {
+        ConsoleResult result = evaluationRules.apply(expression);
         history = history.add(expression);
-        return evaluationRules.apply(expression);
+        return result;
     }
 
     public Sequence<Command> commands() {
@@ -49,6 +53,7 @@ public final class SimpleConsole implements Console {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 evaluator.clearOutputDirectory();
+                history.save();
             }
         });
     }
@@ -65,11 +70,11 @@ public final class SimpleConsole implements Console {
                 .add(new LoadSourceFile(this))
                 .add(new ListValues(this))
                 .add(new ShowLastSource(this))
-                .add(new ShowTypeOfExpression(this));
+                .add(new ShowTypeOfExpression(this))
+                .add(new ShowResult(this));
 
         return commandSequence
                 .add(new ShowHelp(commandSequence, this))
-                .add(new ShowResult(this))
                 .add(new NotAValidCommand(this))
                 .add(new EvaluateExpression(this));
     }
