@@ -4,20 +4,7 @@
 * Export evaluations to source file
 * Show the list of recent exceptions
 * Support generic typing where possible
-* Add evaluation timeout
-* Add inactivity timeout
-
-
-
-* WREPL - initial
-    - Expose consoles over UI within separate main()
-    - Sandbox rest main using java policies
-    - Push automatically to ec2
-    - Create simple service to spawn multiple consoles and redirect requests locally
-
-
-
-
+* Push automatically to ec2
 
 
 fix intellij 11

@@ -6,7 +6,7 @@ mvn:org.antlr:stringtemplate:jar:3.2.1
 mvn:cglib:cglib-nodep:jar:2.2
 mvn:org.objenesis:objenesis:jar:1.2
 
-s3://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar:1052
-s3://repo.bodar.com/com.googlecode.funclate:funclate:jar:102
-s3://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar:628
-s3://repo.bodar.com/com.googlecode.yadic:yadic:jar:153
+s3://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar:1081
+s3://repo.bodar.com/com.googlecode.funclate:funclate:jar:104
+s3://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar:630
+s3://repo.bodar.com/com.googlecode.yadic:yadic:jar:160
