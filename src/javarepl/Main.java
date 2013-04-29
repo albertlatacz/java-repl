@@ -45,7 +45,7 @@ public class Main {
         System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
         System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
 
-        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger, some(new File(getProperty("user.home"), ".javarepl.history"))), expressionTimeout(args), inactivityTimeout(args)), port(args));
+        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger, historyFile(args)), expressionTimeout(args), inactivityTimeout(args)), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
         if (isSandboxed(args)) {
@@ -72,6 +72,12 @@ public class Main {
                 System.out.println("");
             } while (true);
         }
+    }
+
+    private static Option<File> historyFile(String[] args) {
+        return isSandboxed(args)
+                ? Option.<File>none()
+                : some(new File(getProperty("user.home"), ".javarepl.history"));
     }
 
     private static ExpressionReader expressionReader(String[] args, Console console) throws IOException {
