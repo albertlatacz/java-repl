@@ -41,6 +41,7 @@ body {
 
 #console {
     height: 320px;
+    width: 700px;
     background: #2B2B2B;
     font-size: 14px;
     font-weight: bold;
@@ -142,7 +143,7 @@ table.bottom {
     cursor: pointer;
 }
 
-#changer {
+.changer {
     margin: 10px;
     padding: 0.25em 0.5em 0.25em 0.5em;
     background: #f3f3f3;
@@ -151,11 +152,11 @@ table.bottom {
     border: 1px solid #AAAAAA;
 }
 
-#changer h3 {
+.changer h3 {
     color: #555;
 }
 
-#changer p {
+.changer p {
     background: transparent;
     line-height: 1.3em;
     font-family: Arial, serif;
@@ -163,9 +164,15 @@ table.bottom {
     color: #555;
 }
 
-#changer code {
+.changer code {
     background-color: #eee;
     border: 1px solid #aaa;
+    color: #555;
+    font-family: courier, monospace;
+    padding: 0.1em 0.25em 0.1em 0.25em;
+}
+
+.changer .code_html {
     color: #555;
     font-family: courier, monospace;
     padding: 0.1em 0.25em 0.1em 0.25em;

@@ -6,7 +6,12 @@
     <meta name="Content-Type" content="text/html; charset=UTF-8">
 
     <link href="style.css" rel="stylesheet" type="text/css">
-    <link href="gh-fork-ribbon.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="jquery.console.js"></script>
     <script type="text/javascript">
@@ -44,36 +49,6 @@
     </script>
 </head>
 <body>
-<div id="wrapper">
-    <div class="github-fork-ribbon-wrapper right">
-        <div class="github-fork-ribbon"><a href="https://github.com/albertlatacz/java-repl">Fork me on GitHub</a></div>
-    </div>
-    <div id="content">
-        <div id="header">
-            <h1><span class="logo-javarepl">Java REPL</span></h1>
-        </div>
-
-        <div id="container">
-            <script type="text/javascript" src="javarepl.js"></script>
-            <div class="changer">
-                <p class="bottom">
-                    Welcome to Java REPL, a simple Read-Eval-Print-Loop for Java language. Type
-                    in expression to evaluate or <code>:help</code> for more options.<br>
-
-                </p>
-
-                <p class="bottom">To embed in your page add <br>
-                <span class="code_html">
-                    &lt;iframe src="http://www.javarepl.com/embed.html" style="width: 720px; height: 350px; border: 0px"&gt;&lt;/iframe&gt;
-                </span>
-                </p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p class="bottom">© <a href="https://github.com/albertlatacz/">Albert Latacz</a> and contributors.</p>
-        </div>
-    </div>
-</div>
+<script type="text/javascript" src="javarepl.js"></script>
 </body>
 </html>
