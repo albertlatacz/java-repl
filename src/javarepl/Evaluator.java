@@ -33,7 +33,7 @@ import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.randomOutputDirectory;
-import static javarepl.expressions.ExpressionParser.parseExpression;
+import static javarepl.parsing.ExpressionParser.parseExpression;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 

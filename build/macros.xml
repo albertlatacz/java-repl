@@ -32,10 +32,21 @@
                 <rule pattern="org.fusesource.*" result="javarepl.internal.org.fusesource.@1"/>
 
                 <rule pattern="antlr.*" result="javarepl.internal.antlr.@1"/>
+
                 <rule pattern="net.sf.cglib.*" result="javarepl.internal.net.sf.cglib.@1"/>
                 <rule pattern="org.objenesis.*" result="javarepl.internal.org.objenesis.@1"/>
                 <rule pattern="org.apache.commons.codec.*" result="javarepl.internal.org.apache.commons.codec.@1"/>
                 <rule pattern="org.antlr.stringtemplate.*" result="javarepl.internal.org.antlr.stringtemplate.@1"/>
+
+                <!-- Antlr 4 - revisit to strip down to runtime only -->
+                <rule pattern="org.antlr.*" result="javarepl.internal.org.antlr.@1"/>
+                <rule pattern="org.antlr.**.*" result="javarepl.internal.org.antlr.@1.@2"/>
+
+                <rule pattern="org.stringtemplate.v4.*" result="javarepl.internal.org.stringtemplate.v4.@1"/>
+                <rule pattern="org.stringtemplate.v4.**.*" result="javarepl.internal.org.stringtemplate.v4.@1.@2"/>
+
+                <rule pattern="org.abego.treelayout.*" result="javarepl.internal.org.abego.treelayout.@1"/>
+                <rule pattern="org.abego.treelayout.**.*" result="javarepl.internal.org.abego.treelayout.@1.@2"/>
             </jarjar>
             <delete file="${release.jar.path}"/>
             <move file="${release.no.libs.jar}" tofile="${release.jar.path}"/>

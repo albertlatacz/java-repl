@@ -1,4 +1,6 @@
-package javarepl.expressions;
+package javarepl.parsing;
+
+import javarepl.expressions.*;
 
 import static javarepl.expressions.Patterns.*;
 
