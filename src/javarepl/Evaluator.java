@@ -32,7 +32,8 @@ import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
 import static javarepl.Utils.randomIdentifier;
-import static javarepl.expressions.Patterns.*;
+import static javarepl.Utils.randomOutputDirectory;
+import static javarepl.expressions.ExpressionParser.parseExpression;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -52,7 +53,7 @@ public class Evaluator {
     }
 
     public Either<? extends Throwable, Evaluation> evaluate(String expr) {
-        Expression expression = createExpression(expr);
+        Expression expression = parseExpression(expr);
         Either<? extends Throwable, Evaluation> result = evaluate(expression);
         if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
             Either<? extends Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
@@ -122,26 +123,6 @@ public class Evaluator {
 
     public File outputDirectory() {
         return outputDirectory;
-    }
-
-    private Expression createExpression(String expr) {
-        if (isValidImport(expr))
-            return new Import(expr);
-
-        if (isValidType(expr))
-            return new Type(expr);
-
-        if (isValidMethod(expr))
-            return new Method(expr);
-
-        if (isValidAssignmentWithType(expr))
-            return new AssignmentWithType(expr);
-
-        if (isValidAssignment(expr))
-            return new Assignment(expr);
-
-
-        return new Value(expr);
     }
 
     @multimethod
@@ -244,9 +225,4 @@ public class Evaluator {
         }
     }
 
-    private static File randomOutputDirectory() {
-        File file = temporaryDirectory("JavaREPL/" + randomFilename());
-        file.deleteOnExit();
-        return file;
-    }
 }

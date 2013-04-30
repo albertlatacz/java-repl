@@ -14,6 +14,8 @@ import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import static com.googlecode.totallylazy.Callables.size;
+import static com.googlecode.totallylazy.Files.randomFilename;
+import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
@@ -115,5 +117,11 @@ public class Utils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static File randomOutputDirectory() {
+        File file = temporaryDirectory("JavaREPL/" + randomFilename());
+        file.deleteOnExit();
+        return file;
     }
 }
