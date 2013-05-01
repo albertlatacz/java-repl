@@ -1,39 +1,41 @@
 package javarepl.expressions;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Sequence;
 
-import java.util.regex.MatchResult;
-
-import static javarepl.expressions.Patterns.methodPattern;
+import static javarepl.Utils.canonicalName;
 
 public final class Method extends Expression {
-    private final String signature;
-    private final String type;
+    private final Class<?> type;
     private final String name;
+    private final Sequence<Class<?>> arguments;
 
-    public Method(String source) {
+    public Method(String source, Class<?> type, String name, Sequence<Class<?>> arguments) {
         super(source);
 
-        MatchResult methodMatch = methodPattern.match(source);
-        signature = methodMatch.group(1);
-        type = methodMatch.group(2);
-        name = methodMatch.group(3);
+        this.type = type;
+        this.name = name;
+        this.arguments = arguments;
     }
 
     public String name() {
         return name;
     }
 
-    public String type() {
+    public Class<?> type() {
         return type;
     }
 
+    public Sequence<Class<?>> arguments() {
+        return arguments;
+    }
+
     public String signature() {
-        return signature;
+        return type.getCanonicalName() + " " + name + arguments.map(canonicalName()).toString("(", ", ", ")");
     }
 
     public String key() {
-        return signature.replace(" ", "");
+        return name + arguments.map(canonicalName()).toString(", ");
     }
 
     public static enum functions {

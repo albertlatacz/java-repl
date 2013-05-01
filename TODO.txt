@@ -5,6 +5,7 @@
 * Show the list of recent exceptions
 * Support generic typing where possible
 * Push automatically to ec2
+* Move default imports from renderer to evaluator
 
 
 fix intellij 11

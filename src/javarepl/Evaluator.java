@@ -14,13 +14,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.MatchResult;
 
 import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.*;
-import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Option.*;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -35,6 +35,7 @@ import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.randomOutputDirectory;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
+import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
@@ -65,23 +66,39 @@ public class Evaluator {
         return result;
     }
 
-    public static Expression parseExpression(String expression) {
+    public Expression parseExpression(String expression) {
         if (isValidImport(expression))
             return new Import(expression);
 
         if (isValidType(expression))
-            return new Type(expression);
+            return createTypeExpression(expression);
 
-        if (isValidMethod(expression))
-            return new Method(expression);
+        if (isValidMethod(expression)) {
+            return createMethodExpression(expression);
+        }
 
         if (isValidAssignmentWithType(expression))
-            return new AssignmentWithType(expression);
+            return createAssignmentWithType(expression);
 
         if (isValidAssignment(expression))
-            return new Assignment(expression);
+            return createAssignmentExpression(expression);
 
         return new Value(expression);
+    }
+
+    private AssignmentWithType createAssignmentWithType(String expression) {
+        MatchResult match = Patterns.assignmentWithTypeNamePattern.match(expression);
+        return new AssignmentWithType(expression, match.group(1), match.group(2), match.group(3));
+    }
+
+    private Assignment createAssignmentExpression(String expression) {
+        MatchResult match = Patterns.assignmentPattern.match(expression);
+        return new Assignment(expression, match.group(1), match.group(2));
+    }
+
+    private Type createTypeExpression(String expression) {
+        MatchResult match = typePattern.match(expression);
+        return new Type(expression, option(match.group(1)), match.group(2));
     }
 
     public Option<String> lastSource() {
@@ -175,19 +192,43 @@ public class Evaluator {
         }
     }
 
+    private Method createMethodExpression(String expression) {
+        try {
+            final String className = randomIdentifier("Method");
+            final File outputJavaFile = file(outputDirectory, className + ".java");
+
+            final String sources = renderMethodSignatureDetection(context, className, expression);
+            Files.write(sources.getBytes(), outputJavaFile);
+
+            compile(outputJavaFile);
+
+            Class<?> expressionClass = classLoader.loadClass(className);
+
+            java.lang.reflect.Method declaredMethod = expressionClass.getDeclaredMethods()[0];
+
+            return new Method(expression, declaredMethod.getReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes()));
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Either<? extends Throwable, Evaluation> evaluateExpression(final Expression expression) {
         final String className = randomIdentifier("Evaluation");
 
         try {
+            EvaluationContext newContext = (expression instanceof Method) ? context.removeEvaluationWithKey(expression.key()) : context;
+
             File outputJavaFile = file(outputDirectory, className + ".java");
-            final String sources = renderExpressionClass(context, className, expression);
+            final String sources = renderExpressionClass(newContext, className, expression);
             Files.write(sources.getBytes(), outputJavaFile);
 
             compile(outputJavaFile);
 
             Class<?> expressionClass = classLoader.loadClass(className);
             Constructor<?> constructor = expressionClass.getDeclaredConstructor(EvaluationContext.class);
-            final Object expressionInstance = constructor.newInstance(context);
+
+            final Object expressionInstance = constructor.newInstance(newContext);
 
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
@@ -209,12 +250,12 @@ public class Evaluator {
 
             if (resultObject != null) {
                 Evaluation evaluation = evaluation(expression, some(Result.result(nextResultKeyFor(expression), resultObject)));
-                context = context.addEvaluations(modifiedResults.add(evaluation), some(sources));
+                context = newContext.addEvaluations(modifiedResults.add(evaluation), some(sources));
                 return right(evaluation);
             } else {
                 Evaluation evaluation = evaluation(expression, Result.noResult());
 
-                context = context.addEvaluations(modifiedResults.add(evaluation), some(sources));
+                context = newContext.addEvaluations(modifiedResults.add(evaluation), some(sources));
                 return right(evaluation);
             }
         } catch (Throwable e) {

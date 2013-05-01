@@ -1,21 +1,16 @@
 package javarepl.expressions;
 
-import java.util.regex.MatchResult;
-
-import static javarepl.expressions.Patterns.assignmentWithTypeNamePattern;
-
 public final class AssignmentWithType extends Expression {
     private final String type;
     private final String key;
     private final String value;
 
-    public AssignmentWithType(String source) {
+    public AssignmentWithType(String source, String type, String key, String value) {
         super(source);
 
-        MatchResult matches = assignmentWithTypeNamePattern.match(source);
-        type = matches.group(1).trim();
-        key = matches.group(2).trim();
-        value = matches.group(3).trim();
+        this.type = type;
+        this.key = key;
+        this.value = value;
     }
 
     public String key() {

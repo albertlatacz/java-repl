@@ -4,18 +4,15 @@ package javarepl.expressions;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 
-import static com.googlecode.totallylazy.Option.option;
-import static javarepl.expressions.Patterns.typePattern;
-
 public final class Type extends Expression {
     private final Option<String> typePackage;
     private final String type;
 
-    public Type(String source) {
+    public Type(String source, Option<String> typePackage, String type) {
         super(source);
 
-        typePackage = option(typePattern.match(source).group(1));
-        type = typePattern.match(source).group(2);
+        this.typePackage = typePackage;
+        this.type = type;
     }
 
     public String key() {

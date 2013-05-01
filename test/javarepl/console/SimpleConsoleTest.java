@@ -66,10 +66,10 @@ public class SimpleConsoleTest {
     @Test
     public void supportsListingOfMethods() {
         assertThat(
-                executing("void method1(){}", "\"test\"", "int method2(int param){return param;}", ":list methods"),
+                executing("void method1(){}", "\"test\"", "Integer method2(int p1, String p2){return p1;}", ":list methods"),
                 hasLogged(info("Methods:\n" +
                         "    void method1()\n" +
-                        "    int method2(int param)\n")));
+                        "    java.lang.Integer method2(int, java.lang.String)\n")));
     }
 
     @Test

@@ -104,6 +104,14 @@ public class Utils {
                 .unique();
     }
 
+    public static Function1<Class<?>, String> canonicalName() {
+        return new Function1<Class<?>, String>() {
+            public String call(Class<?> aClass) throws Exception {
+                return aClass.getCanonicalName();
+            }
+        };
+    }
+
     public static String listValues(String name, Iterable<?> list) {
         return format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    "));
     }

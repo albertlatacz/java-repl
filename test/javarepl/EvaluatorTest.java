@@ -48,6 +48,12 @@ public class EvaluatorTest {
     }
 
     @Test
+    public void supportsRedefiningAndOverloadingMethods() {
+        assertThat(evaluating("int method(){return 21;}", "int method(){return 42;}", "method()"), hasResult(42));
+        assertThat(evaluating("int method(){return 21;}", "int method(int i){return i;}", "method() + method(21)"), hasResult(42));
+    }
+
+    @Test
     public void shouldReturnTypeOfExpression() {
         assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<Class>some(String.class)));
         assertThat(new Evaluator().typeOfExpression("12"), is(Option.<Class>some(Integer.class)));

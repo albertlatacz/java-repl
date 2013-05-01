@@ -15,6 +15,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.String.format;
 import static javarepl.Utils.extractType;
 import static javarepl.expressions.Expression.functions.source;
+import static javarepl.expressions.Patterns.methodPattern;
 import static javarepl.rendering.ExpressionRenderer.renderExpression;
 import static javarepl.rendering.MethodNameRenderer.renderMethodName;
 
@@ -96,6 +97,29 @@ public class EvaluationClassRenderer {
         writer.println(expression.source());
 
         return outputStream.toString();
+    }
+
+    public static String renderMethodSignatureDetection(EvaluationContext context, String className, String expression) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream writer = new PrintStream(outputStream);
+
+        writer.println(renderDefaultImports());
+        writer.println(renderUserImports(context));
+        writer.println(renderInterfaceName(className));
+        writer.println(renderInterfaceMethod(expression));
+        writer.println(renderEndOfFile());
+
+        return outputStream.toString();
+    }
+
+    private static String renderInterfaceName(String className) {
+        return format("public interface %s {", className);
+    }
+
+    private static String renderInterfaceMethod(String expression) {
+        String signature = methodPattern.match(expression).group(1);
+        String type = methodPattern.match(expression).group(2);
+        return format("  %s;", signature.substring(signature.indexOf(type)));
     }
 
 
