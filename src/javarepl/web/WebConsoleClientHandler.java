@@ -1,5 +1,7 @@
 package javarepl.web;
 
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -9,6 +11,8 @@ import javarepl.Main;
 import java.io.File;
 import java.util.UUID;
 
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.Responses.response;
 import static com.googlecode.utterlyidle.Status.GATEWAY_TIMEOUT;
@@ -20,34 +24,30 @@ import static javarepl.Utils.randomServerPort;
 import static javarepl.console.TimingOutConsole.EXPRESSION_TIMEOUT;
 import static javarepl.console.TimingOutConsole.INACTIVITY_TIMEOUT;
 
-public class WebConsoleClientHandler {
-    private final String id;
+public final class WebConsoleClientHandler {
+    private final String id = UUID.randomUUID().toString();
+    private Option<Integer> port = none();
+    private Option<Process> process = none();
 
-    private int port;
-    private Process process;
-
-    public WebConsoleClientHandler() {
-        this.id = UUID.randomUUID().toString();
-    }
 
     public String id() {
         return id;
     }
 
-    public int port() {
+    public Option<Integer> port() {
         return port;
     }
 
     private void createProcess() {
-        if (process == null) {
+        if (port.isEmpty()) {
             try {
                 File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
                 String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
-                port = randomServerPort();
+                port = some(randomServerPort());
                 ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Main.class.getCanonicalName(),
-                        "--sandboxed", "--ignoreConsole", "--port=" + port, "--expressionTimeout=5", "--inactivityTimeout=300");
+                        "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
-                process = builder.start();
+                process = some(builder.start());
 
                 sleep(1000);
 
@@ -58,9 +58,9 @@ public class WebConsoleClientHandler {
     }
 
     public void shutdown() {
-        if (process != null) {
-            process.destroy();
-            process = null;
+        if (!process.isEmpty()) {
+            process.get().destroy();
+            process = none();
         }
     }
 
@@ -68,34 +68,41 @@ public class WebConsoleClientHandler {
         createProcess();
 
         try {
-            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port + "/" + "execute").form("expression", expression).build()));
+            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port.get() + "/" + "execute").form("expression", expression).build()));
         } catch (Exception e) {
+            e.printStackTrace();
             return response(INTERNAL_SERVER_ERROR);
         }
     }
 
-    private Response reportProcessError(Response response) {
+    private Response reportProcessError(final Response response) {
         if (response.status() == Status.OK)
             return response;
 
-        int exitCode = processExitCode();
-        switch (exitCode) {
-            case EXPRESSION_TIMEOUT:
-            case INACTIVITY_TIMEOUT: {
-                shutdown();
-                return response(GATEWAY_TIMEOUT);
+        return exitCode().map(new Function1<Integer, Response>() {
+            public Response call(Integer code) throws Exception {
+                switch (code) {
+                    case EXPRESSION_TIMEOUT:
+                    case INACTIVITY_TIMEOUT: {
+                        shutdown();
+                        return response(GATEWAY_TIMEOUT);
+                    }
+                    default:
+                        return response;
+                }
             }
-            default:
-                return response;
-        }
+        }).getOrElse(response);
     }
 
-    private int processExitCode() {
+    public Option<Integer> exitCode() {
+        if (process.isEmpty())
+            return none();
+
         try {
             Thread.sleep(100);
-            return process.exitValue();
+            return some(process.get().exitValue());
         } catch (Exception e) {
-            return -1;
+            return none();
         }
     }
 }

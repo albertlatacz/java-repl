@@ -81,7 +81,7 @@ public class WebConsoleResource {
             public Model call(WebConsoleClientHandler webConsoleClientHandler) throws Exception {
                 return model()
                         .add("id", webConsoleClientHandler.id())
-                        .add("port", webConsoleClientHandler.port());
+                        .add("port", webConsoleClientHandler.port().getOrElse(-1));
             }
         };
     }

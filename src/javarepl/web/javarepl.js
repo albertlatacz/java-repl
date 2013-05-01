@@ -1,14 +1,14 @@
 document.write('<div id="console" class="console"></div>')
 
+function removeClient(clientId) {
+    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
+}
+
 var requesting = false;
 var clientId = null;
 
 $(window).bind('beforeunload', function () {
-    $.ajax({
-        type: 'POST',
-        async: false,
-        url: '/remove',
-        data: 'id=' + clientId});
+    removeClient(clientId);
 });
 
 $(document).ready(function () {
@@ -51,19 +51,14 @@ $(document).ready(function () {
                     requesting = false;
                 })
                 .fail(function (xhr, textStatus, errorThrown) {
-                    if (xhr.status === 504) {
-                        report([
-                            {msg: "Session timeout. Starting new session...", className: "jquery-console-message-error"}
-                        ]);
-                    } else {
-                        report([
-                            {msg: errorThrown + ". Starting new session...", className: "jquery-console-message-error"}
-                        ]);
-                    }
+                    report([
+                        {msg: "Service timeout. Starting new session...", className: "jquery-console-message-service-error"}
+                    ]);
 
-                    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
+                    removeClient(clientId);
                     $.post('/create', function (data) {
                         clientId = data.id;
+                        requesting = false;
                     });
                 });
 
