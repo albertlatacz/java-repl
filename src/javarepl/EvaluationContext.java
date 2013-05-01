@@ -5,52 +5,44 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
 
-import static com.googlecode.totallylazy.Option.functions.get;
+import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.*;
-import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.Evaluation.functions.expression;
 import static javarepl.Result.functions.key;
-import static javarepl.Result.noResult;
 
 public class EvaluationContext {
-    private final Sequence<Evaluation> evaluations;
+    private final Sequence<Expression> expressions;
+    private final Sequence<Result> results;
     private final Option<String> lastSource;
 
-    private EvaluationContext(Sequence<Evaluation> evaluations, Option<String> lastSource) {
-        this.evaluations = sequence(evaluations);
+    private EvaluationContext(Sequence<Expression> expressions, Sequence<Result> results, Option<String> lastSource) {
+        this.expressions = expressions;
+        this.results = results;
         this.lastSource = lastSource;
     }
 
     public static EvaluationContext evaluationContext() {
-        return new EvaluationContext(Sequences.<Evaluation>empty(), Option.<String>none());
+        return new EvaluationContext(Sequences.<Expression>empty(), Sequences.<Result>empty(), Option.<String>none());
     }
 
     public Option<String> lastSource() {
         return lastSource;
     }
 
-    public Sequence<Evaluation> evaluations() {
-        return evaluations;
-    }
-
-    public <T extends Expression> Sequence<T> expressionsOfType(Class<T> type) {
-        return evaluations()
-                .filter(where(expression(), instanceOf(type)))
-                .map(expression())
-                .safeCast(type)
-                .reverse()
-                .unique(Expression.functions.key())
-                .reverse();
-    }
-
     public Sequence<Result> results() {
-        return evaluations()
-                .map(Evaluation.functions.result())
-                .filter(is(not(noResult())))
-                .map(get(Result.class))
+        return results
                 .reverse()
                 .unique(key())
                 .reverse();
+    }
+
+    public Sequence<Expression> expressions() {
+        return expressions;
+    }
+
+    public <T extends Expression> Sequence<T> expressionsOfType(Class<T> type) {
+        return expressions
+                .filter(instanceOf(type))
+                .safeCast(type);
     }
 
     public Option<Result> result(final String key) {
@@ -61,17 +53,23 @@ public class EvaluationContext {
         return "res" + results().size();
     }
 
-    public EvaluationContext addEvaluation(Evaluation evaluationIn, Option<String> lastSource) {
-        return addEvaluations(sequence(evaluationIn), lastSource);
+    public EvaluationContext lastSource(String lastSource) {
+        return new EvaluationContext(expressions, results, option(lastSource));
     }
 
-    public EvaluationContext addEvaluations(Iterable<Evaluation> evaluationIn, Option<String> lastSource) {
-        return new EvaluationContext(evaluations().join(sequence(evaluationIn)), lastSource);
+    public EvaluationContext addResult(Result result) {
+        return new EvaluationContext(expressions, results.add(result), lastSource);
     }
 
-    public EvaluationContext removeEvaluationWithKey(String key) {
-        return new EvaluationContext(evaluations().filter(where(expression().then(Expression.functions.key()), not(equalTo(key)))), lastSource);
+    public EvaluationContext addResults(Sequence<Result> result) {
+        return new EvaluationContext(expressions, results.join(result), lastSource);
     }
 
+    public EvaluationContext addExpression(Expression expression) {
+        return new EvaluationContext(expressions.add(expression), results, lastSource);
+    }
 
+    public EvaluationContext removeExpressionWithKey(String key) {
+        return new EvaluationContext(expressions.filter(where(Expression.functions.key(), not(key))), results, lastSource);
+    }
 }

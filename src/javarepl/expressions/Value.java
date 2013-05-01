@@ -1,12 +1,13 @@
 package javarepl.expressions;
 
+import static java.util.UUID.randomUUID;
+
 public final class Value extends Expression {
     public Value(String source) {
         super(source);
     }
 
-    @Override
     public String key() {
-        return source();
+        return randomUUID().toString();
     }
 }

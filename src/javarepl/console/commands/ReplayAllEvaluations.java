@@ -1,8 +1,8 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.Evaluation;
 import javarepl.console.Console;
+import javarepl.expressions.Expression;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
@@ -15,13 +15,13 @@ public final class ReplayAllEvaluations extends Command {
         super(console, COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
+    public void execute(String line) {
         System.out.println("Replaying all evaluations:");
-        Sequence<Evaluation> evaluations = evaluator().evaluations();
+        Sequence<Expression> expressions = evaluator().expressions();
         evaluator().reset();
 
-        for (Evaluation evaluation : evaluations) {
-            evaluate(evaluator(), evaluation.expression().source());
+        for (Expression expression : expressions) {
+            evaluate(evaluator(), expression.source());
         }
     }
 }

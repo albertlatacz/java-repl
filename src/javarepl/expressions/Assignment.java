@@ -7,9 +7,7 @@ public final class Assignment extends Expression {
     public Assignment(String source, String key, String value) {
         super(source);
         this.key = key;
-        ;
         this.value = value;
-        ;
     }
 
     public String key() {

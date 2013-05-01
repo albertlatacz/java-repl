@@ -31,6 +31,7 @@ import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
+import static javarepl.Result.noResult;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.randomOutputDirectory;
 import static javarepl.expressions.Patterns.*;
@@ -117,8 +118,8 @@ public class Evaluator {
         return context.expressionsOfType(type);
     }
 
-    public Sequence<Evaluation> evaluations() {
-        return context.evaluations();
+    public Sequence<Expression> expressions() {
+        return context.expressions();
     }
 
     public void reset() {
@@ -183,10 +184,9 @@ public class Evaluator {
 
             classLoader.loadClass(expression.canonicalName());
 
-            Evaluation evaluation = evaluation(expression, Result.noResult());
-            context = context.addEvaluation(evaluation, some(sources));
+            context = context.addExpression(expression).lastSource(sources);
 
-            return right(evaluation);
+            return right(evaluation(expression, noResult()));
         } catch (Exception e) {
             return left(Utils.unwrapException(e));
         }
@@ -217,7 +217,7 @@ public class Evaluator {
         final String className = randomIdentifier("Evaluation");
 
         try {
-            EvaluationContext newContext = (expression instanceof Method) ? context.removeEvaluationWithKey(expression.key()) : context;
+            EvaluationContext newContext = context.removeExpressionWithKey(expression.key());
 
             File outputJavaFile = file(outputDirectory, className + ".java");
             final String sources = renderExpressionClass(newContext, className, expression);
@@ -232,31 +232,27 @@ public class Evaluator {
 
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
-            Sequence<Evaluation> modifiedResults = sequence(expressionInstance.getClass().getDeclaredFields())
-                    .foldLeft(Sequences.<Evaluation>empty(), new Function2<Sequence<Evaluation>, Field, Sequence<Evaluation>>() {
-                        public Sequence<Evaluation> call(Sequence<Evaluation> evaluations, Field field) throws Exception {
+            Sequence<Result> modifiedResults = sequence(expressionInstance.getClass().getDeclaredFields())
+                    .foldLeft(Sequences.<Result>empty(), new Function2<Sequence<Result>, Field, Sequence<Result>>() {
+                        public Sequence<Result> call(Sequence<Result> results, Field field) throws Exception {
                             Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
 
                             if (result.isEmpty())
-                                return evaluations;
+                                return results;
 
-                            return evaluations.add(evaluation(
-                                    new ExternalAssignment(expression.source(), field.getName(), result.value(), field.get(expressionInstance)),
-                                    some(Result.result(field.getName(), field.get(expressionInstance)))));
+                            return results.add(Result.result(field.getName(), field.get(expressionInstance)));
 
                         }
                     });
 
 
             if (resultObject != null) {
-                Evaluation evaluation = evaluation(expression, some(Result.result(nextResultKeyFor(expression), resultObject)));
-                context = newContext.addEvaluations(modifiedResults.add(evaluation), some(sources));
-                return right(evaluation);
+                Result result = Result.result(nextResultKeyFor(expression), resultObject);
+                context = newContext.addExpression(expression).addResults(modifiedResults.add(result)).lastSource(sources);
+                return right(evaluation(expression, some(result)));
             } else {
-                Evaluation evaluation = evaluation(expression, Result.noResult());
-
-                context = newContext.addEvaluations(modifiedResults.add(evaluation), some(sources));
-                return right(evaluation);
+                context = newContext.addExpression(expression).addResults(modifiedResults).lastSource(sources);
+                return right(evaluation(expression, noResult()));
             }
         } catch (Throwable e) {
             return left(Utils.unwrapException(e));
