@@ -7,6 +7,7 @@ import javarepl.console.commands.*;
 import java.io.File;
 
 import static com.googlecode.totallylazy.Predicates.always;
+import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
@@ -23,7 +24,7 @@ public final class SimpleConsole implements Console {
         this.logger = logger;
 
         evaluator = new Evaluator();
-        history = historyFromFile(startsWith(":h!"), historyFile);
+        history = historyFromFile(startsWith(":h!").or(blank()), historyFile);
 
         commands = createCommands();
         evaluationRules = createEvaluationRules(commands);

@@ -4,6 +4,8 @@ import com.googlecode.totallylazy.*;
 
 import java.io.File;
 
+import static com.googlecode.totallylazy.predicates.Not.not;
+
 
 public final class ConsoleHistory {
 
@@ -13,7 +15,7 @@ public final class ConsoleHistory {
 
     public ConsoleHistory(Sequence<String> history, Predicate<String> ignored, Option<File> file) {
         this.ignored = ignored;
-        this.history = history.reverse().take(300).reverse();
+        this.history = history.filter(not(ignored)).reverse().take(300).reverse();
         this.file = file;
     }
 

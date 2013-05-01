@@ -160,6 +160,7 @@ public class Main {
             {
                 consoleReader = new ConsoleReader(System.in, System.out);
                 consoleReader.setHistoryEnabled(true);
+                consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(new AggregateCompleter(console.commands().map(completer()).filter(notNullValue()).toList()));
                 consoleReader.setHistory(historyFromConsole());
             }
