@@ -69,7 +69,7 @@ public class SimpleConsoleTest {
                 executing("void method1(){}", "\"test\"", "int method2(int param){return param;}", ":list methods"),
                 hasLogged(info("Methods:\n" +
                         "    void method1()\n" +
-                        "    int method2()\n")));
+                        "    int method2(int param)\n")));
     }
 
     @Test
@@ -109,7 +109,6 @@ public class SimpleConsoleTest {
 
     @Test
     public void supportsSearchingHistory() {
-
         assertThat(
                 executing("42", "\"test 1\"", "\"test 2\"", ":h?"),
                 hasLogged(info("History search for '':\n" +

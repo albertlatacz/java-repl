@@ -1,6 +1,6 @@
 package javarepl.expressions;
 
-public final class ExternalAssignment extends Expression implements WithKey {
+public final class ExternalAssignment extends Expression {
     private final String key;
     private final Object oldValue;
     private final Object newValue;

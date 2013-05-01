@@ -37,7 +37,10 @@ public class EvaluationContext {
         return evaluations()
                 .filter(where(expression(), instanceOf(type)))
                 .map(expression())
-                .safeCast(type);
+                .safeCast(type)
+                .reverse()
+                .unique(Expression.functions.key())
+                .reverse();
     }
 
     public Sequence<Result> results() {
@@ -64,6 +67,10 @@ public class EvaluationContext {
 
     public EvaluationContext addEvaluations(Iterable<Evaluation> evaluationIn, Option<String> lastSource) {
         return new EvaluationContext(evaluations().join(sequence(evaluationIn)), lastSource);
+    }
+
+    public EvaluationContext removeEvaluationWithKey(String key) {
+        return new EvaluationContext(evaluations().filter(where(expression().then(Expression.functions.key()), not(equalTo(key)))), lastSource);
     }
 
 

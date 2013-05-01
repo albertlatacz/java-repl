@@ -4,7 +4,6 @@ import javarepl.console.Console;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
-import javarepl.expressions.WithKey;
 import jline.console.completer.ArgumentCompleter;
 import jline.console.completer.StringsCompleter;
 
@@ -12,7 +11,8 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.Utils.listValues;
 import static javarepl.expressions.Expression.functions.source;
-import static javarepl.expressions.WithKey.functions.key;
+import static javarepl.expressions.Method.functions.signature;
+import static javarepl.expressions.Type.functions.type;
 
 public final class ListValues extends Command {
     private static final String COMMAND = ":list";
@@ -50,7 +50,7 @@ public final class ListValues extends Command {
     }
 
     private void listMethods() {
-        System.out.println(listValues("Methods", sequence(evaluator().expressionsOfType(Method.class)).safeCast(WithKey.class).map(key())));
+        System.out.println(listValues("Methods", sequence(evaluator().expressionsOfType(Method.class)).map(signature())));
     }
 
     private void listImports() {
@@ -58,7 +58,7 @@ public final class ListValues extends Command {
     }
 
     private void listTypes() {
-        System.out.println(listValues("Types", sequence(evaluator().expressionsOfType(Type.class)).safeCast(WithKey.class).map(key())));
+        System.out.println(listValues("Types", sequence(evaluator().expressionsOfType(Type.class)).map(type())));
     }
 
     private void listResults() {

@@ -9,6 +9,8 @@ public abstract class Expression {
         this.source = source;
     }
 
+    public abstract String key();
+
     public String source() {
         return source;
     }
@@ -30,7 +32,9 @@ public abstract class Expression {
                 (source != null && source.equals(((Expression) other).source));
     }
 
-    public static enum functions{;
+    public static enum functions {
+        ;
+
         public static Function1<Expression, String> source() {
             return new Function1<Expression, String>() {
                 public String call(Expression value) throws Exception {
@@ -38,8 +42,15 @@ public abstract class Expression {
                 }
             };
         }
-    }
 
+        public static Function1<Expression, String> key() {
+            return new Function1<Expression, String>() {
+                public String call(Expression value) throws Exception {
+                    return value.key();
+                }
+            };
+        }
+    }
 
 
 }

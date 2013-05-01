@@ -107,8 +107,8 @@ public class PatternsTest {
         assertFalse(isValidMethod("SomeMethod(){"));
 
         MatchResult result = methodPattern.match("public final java.lang.String SomeMethod () { ");
-        assertThat(result.group(1), is("java.lang.String"));
-        assertThat(result.group(2), is("SomeMethod"));
+        assertThat(result.group(2), is("java.lang.String"));
+        assertThat(result.group(3), is("SomeMethod"));
     }
 
 }

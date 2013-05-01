@@ -33,7 +33,7 @@ import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.randomOutputDirectory;
-import static javarepl.parsing.ExpressionParser.parseExpression;
+import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -63,6 +63,25 @@ public class Evaluator {
         }
 
         return result;
+    }
+
+    public static Expression parseExpression(String expression) {
+        if (isValidImport(expression))
+            return new Import(expression);
+
+        if (isValidType(expression))
+            return new Type(expression);
+
+        if (isValidMethod(expression))
+            return new Method(expression);
+
+        if (isValidAssignmentWithType(expression))
+            return new AssignmentWithType(expression);
+
+        if (isValidAssignment(expression))
+            return new Assignment(expression);
+
+        return new Value(expression);
     }
 
     public Option<String> lastSource() {
@@ -204,9 +223,9 @@ public class Evaluator {
     }
 
     private String nextResultKeyFor(Expression expression) {
-        return (expression instanceof WithKey)
-                ? ((WithKey) expression).key()
-                : context.nextResultKey();
+        return (expression instanceof Value)
+                ? context.nextResultKey()
+                : expression.key();
     }
 
     private void compile(File file) throws Exception {

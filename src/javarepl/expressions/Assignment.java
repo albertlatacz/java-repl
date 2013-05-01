@@ -2,7 +2,7 @@ package javarepl.expressions;
 
 import java.util.regex.MatchResult;
 
-public final class Assignment extends Expression implements WithKey {
+public final class Assignment extends Expression {
     private final String key;
     private final String value;
 
