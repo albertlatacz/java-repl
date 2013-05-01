@@ -12,6 +12,9 @@ import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.utterlyidle.Responses.response;
 import static com.googlecode.utterlyidle.Status.BAD_REQUEST;
 import static com.googlecode.utterlyidle.Status.OK;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static javarepl.Utils.applicationVersion;
 
 @Hidden
 public class WebConsoleResource {
@@ -28,7 +31,8 @@ public class WebConsoleResource {
     public Model create() {
         Option<WebConsoleClientHandler> clientHandler = agent.createClient();
 
-        return clientHandler.map(clientHandlerToModel()).get();
+        return clientHandler.map(clientHandlerToModel()).get()
+                .add("welcomeMessage", welcomeMessage() + "\n\n");
     }
 
     @POST
@@ -61,7 +65,6 @@ public class WebConsoleResource {
         }
     }
 
-
     @GET
     @Hidden
     @Path("list")
@@ -69,6 +72,7 @@ public class WebConsoleResource {
     public Model list() {
         return model().add("clients", agent.clients().map(clientHandlerToModel()));
     }
+
 
     @GET
     @Path("")
@@ -84,5 +88,14 @@ public class WebConsoleResource {
                         .add("port", webConsoleClientHandler.port().getOrElse(-1));
             }
         };
+    }
+
+    private String welcomeMessage() {
+        return format("%s, Java %s on %s %s\nWelcome to JavaREPL Web Console version %s",
+                getProperty("java.vm.name"),
+                getProperty("java.version"),
+                getProperty("os.name"),
+                getProperty("os.version"),
+                applicationVersion());
     }
 }

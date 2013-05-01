@@ -6,6 +6,7 @@ function removeClient(clientId) {
 
 var requesting = false;
 var clientId = null;
+var welcomeMessage = null;
 
 $(window).bind('beforeunload', function () {
     removeClient(clientId);
@@ -15,9 +16,11 @@ $(document).ready(function () {
     var console = $('<div>');
     $('#console').append(console);
 
-    $.post('/create', function (data) {
-        clientId = data.id;
-    });
+    $.ajax({type: 'POST', async: false, url: '/create'})
+        .done(function (data) {
+            clientId = data.id;
+            welcomeMessage = data.welcomeMessage
+        });
 
     var controller = console.console({
         promptLabel: 'java> ',
@@ -65,7 +68,7 @@ $(document).ready(function () {
             return [];
 
         },
-        welcomeMessage: "Welcome to Java REPL",
+        welcomeMessage: welcomeMessage,
         autofocus: true,
         animateScroll: true,
         promptHistory: true,
