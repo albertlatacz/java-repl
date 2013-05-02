@@ -162,6 +162,7 @@ public class ConsoleLogOutputStream extends PrintStream {
 
     @Override
     public void println(Object x) {
+        logMessage(String.valueOf(x));
         printStream.println(x);
     }
 
