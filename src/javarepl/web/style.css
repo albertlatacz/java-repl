@@ -20,7 +20,7 @@ body {
 #header h1 {
     height: 72px;
     line-height: 72px;
-    background: url(/javarepl-logo.png) no-repeat;
+    background: url(javarepl-icon.png) no-repeat;
     margin: 0;
     padding: 0;
     padding-left: 75px;
