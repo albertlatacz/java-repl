@@ -12,7 +12,6 @@ import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 
 import static com.googlecode.funclate.Model.persistent.model;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.ConsoleResult.emptyResult;
 
 public class RestConsoleResource {
@@ -35,7 +34,7 @@ public class RestConsoleResource {
     public static Model resultToModel(ConsoleResult result) {
         return model()
                 .add("expression", result.expression())
-                .add("logs", sequence(result.logs()).map(commandResultToModel()));
+                .add("logs", result.logs().map(commandResultToModel()));
     }
 
     private static Function1<ConsoleLog, Model> commandResultToModel() {

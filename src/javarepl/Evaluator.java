@@ -13,7 +13,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.List;
 import java.util.regex.MatchResult;
 
 import static com.googlecode.totallylazy.Callables.toString;
@@ -26,7 +25,6 @@ import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.predicates.Not.not;
 import static java.io.File.pathSeparator;
-import static java.util.Arrays.asList;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
@@ -38,6 +36,8 @@ import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
+
+//import static java.util.Arrays.asList;
 
 public class Evaluator {
 
@@ -109,8 +109,8 @@ public class Evaluator {
         return context.lastSource();
     }
 
-    public List<Result> results() {
-        return context.results().toList();
+    public Sequence<Result> results() {
+        return context.results();
     }
 
     public Option<Result> result(String name) {
@@ -273,8 +273,8 @@ public class Evaluator {
         JavaCompiler compiler = getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(asList(file));
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, asList("-cp", classpath), null, compilationUnits);
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(sequence(file));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, sequence("-cp", classpath), null, compilationUnits);
 
         try {
             if (!task.call())

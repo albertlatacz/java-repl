@@ -112,8 +112,8 @@ public class Utils {
         };
     }
 
-    public static String listValues(String name, Iterable<?> list) {
-        return format(name + ":\n    %s\n", sequence(list).toString("\n").replaceAll("\n", "\n    "));
+    public static String listValues(String name, Sequence<?> list) {
+        return format(name + ":\n    %s\n", list.toString("\n").replaceAll("\n", "\n    "));
     }
 
     public static int randomServerPort() {

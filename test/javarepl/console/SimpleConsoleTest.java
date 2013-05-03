@@ -2,12 +2,12 @@ package javarepl.console;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
 
 import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
@@ -190,8 +190,8 @@ public class SimpleConsoleTest {
     }
 
     private static Matcher<ConsoleResult> hasLogged(final ConsoleLog... logs) {
-        return new FeatureMatcher<ConsoleResult, List<ConsoleLog>>(hasItems(logs), "console log", "console log") {
-            protected List<ConsoleLog> featureValueOf(ConsoleResult consoleResult) {
+        return new FeatureMatcher<ConsoleResult, Sequence<ConsoleLog>>(hasItems(logs), "console log", "console log") {
+            protected Sequence<ConsoleLog> featureValueOf(ConsoleResult consoleResult) {
                 return consoleResult.logs();
             }
         };

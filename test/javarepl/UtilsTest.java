@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
+import static java.util.Arrays.asList;
 import static javarepl.Utils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -18,7 +18,7 @@ public class UtilsTest {
     @Test
     public void extractsTypeFromClass() {
         assertThat(extractType("".getClass()), equalToClass(String.class));
-        assertThat(extractType(Arrays.asList(1, 2, 3).getClass()), equalToClass(AbstractList.class));
+        assertThat(extractType(asList(1, 2, 3).getClass()), equalToClass(AbstractList.class));
         assertThat(extractType(anonymousInnerRunnable().getClass()), equalToClass(Runnable.class));
         assertThat(extractType(anonymousInnerArrayList().getClass()), equalToClass(ArrayList.class));
     }
