@@ -69,14 +69,13 @@ public class Evaluator {
 
     public Expression parseExpression(String expression) {
         if (isValidImport(expression))
-            return new Import(expression, importPattern.match(expression).group(1));
+            return createImport(expression);
 
         if (isValidType(expression))
             return createTypeExpression(expression);
 
-        if (isValidMethod(expression)) {
+        if (isValidMethod(expression))
             return createMethodExpression(expression);
-        }
 
         if (isValidAssignmentWithType(expression))
             return createAssignmentWithType(expression);
@@ -85,6 +84,10 @@ public class Evaluator {
             return createAssignmentExpression(expression);
 
         return new Value(expression);
+    }
+
+    private Import createImport(String expression) {
+        return new Import(expression, importPattern.match(expression).group(1));
     }
 
     private AssignmentWithType createAssignmentWithType(String expression) {
