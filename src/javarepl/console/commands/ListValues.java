@@ -10,7 +10,7 @@ import jline.console.completer.StringsCompleter;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.Utils.listValues;
-import static javarepl.expressions.Expression.functions.source;
+import static javarepl.expressions.Import.functions.typePackage;
 import static javarepl.expressions.Method.functions.signature;
 import static javarepl.expressions.Type.functions.type;
 
@@ -54,7 +54,7 @@ public final class ListValues extends Command {
     }
 
     private void listImports() {
-        System.out.println(listValues("Imports", sequence(evaluator().expressionsOfType(Import.class)).map(source())));
+        System.out.println(listValues("Imports", sequence(evaluator().expressionsOfType(Import.class)).map(typePackage())));
     }
 
     private void listTypes() {

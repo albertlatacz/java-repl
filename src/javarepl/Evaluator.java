@@ -69,7 +69,7 @@ public class Evaluator {
 
     public Expression parseExpression(String expression) {
         if (isValidImport(expression))
-            return new Import(expression);
+            return new Import(expression, importPattern.match(expression).group(1));
 
         if (isValidType(expression))
             return createTypeExpression(expression);

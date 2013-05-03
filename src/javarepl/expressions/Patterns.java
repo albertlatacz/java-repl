@@ -13,7 +13,7 @@ public class Patterns {
     public static final Regex assignmentPattern = join(identifierPattern, " *=(.*)$");
     public static final Regex typeNamePattern = captureGroup("[a-zA-Z\\$_][a-zA-Z0-9\\.\\$_\\[\\]<>,?& ]*");
     public static final Regex assignmentWithTypeNamePattern = join(typeNamePattern, " +", assignmentPattern);
-    public static final Regex importPattern = regex("import .*");
+    public static final Regex importPattern = join("import  *", captureGroup("[^;^ ]*"), " *", optional(";"), ".*");
 
     public static final Regex visibilityModifiersPattern = oneOf("private +", "public +", "protected +");
     public static final Regex staticModifierPattern = oneOf("static +");

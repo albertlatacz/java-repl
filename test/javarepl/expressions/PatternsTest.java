@@ -58,6 +58,9 @@ public class PatternsTest {
         assertTrue(isValidImport("  import     xx.yy.zz"));
         assertFalse(isValidImport("Import     xx.yy.zz"));
         assertFalse(isValidImport("importxx.yy.zz"));
+
+        MatchResult result = importPattern.match("\"  import     xx.yy.zz    ;");
+        assertThat(result.group(1), is("xx.yy.zz"));
     }
 
     @Test

@@ -5,11 +5,13 @@ import com.googlecode.totallylazy.multi;
 import javarepl.expressions.*;
 
 import static java.lang.String.format;
+import static javarepl.Utils.randomIdentifier;
 
 public class ExpressionRenderer {
     @multimethod
     public static String renderExpression(Expression expression) {
-        return new multi() {}.<String>methodOption(expression)
+        return new multi() {
+        }.<String>methodOption(expression)
                 .getOrThrow(new IllegalArgumentException(expression + " not mapped"));
     }
 
@@ -25,7 +27,7 @@ public class ExpressionRenderer {
 
     @multimethod
     private static String renderExpression(AssignmentWithType expression) {
-        return expressionWithValue(expression.value());
+        return expressionWithValue(expression.value(), expression.type());
     }
 
     @multimethod
@@ -34,6 +36,11 @@ public class ExpressionRenderer {
     }
 
     private static String expressionWithValue(String value) {
-        return format("    return\n    %s;", value);
+        return expressionWithValue(value, "Object");
+    }
+
+    private static String expressionWithValue(String value, String returnType) {
+        String identifier = randomIdentifier("expr");
+        return format("    %s %s =\n\n   %s;\n\n    return %s;", returnType, identifier, value, identifier);
     }
 }

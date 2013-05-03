@@ -24,6 +24,14 @@ public class SimpleConsoleTest {
     }
 
     @Test
+    public void providesFeedbackAfterEvaluation() {
+        assertThat(executing("import java.net.*;"), hasLogged(info("Imported java.net.*")));
+        assertThat(executing("int method(Integer i){return i;}"), hasLogged(info("Created method int method(java.lang.Integer)")));
+        assertThat(executing("class SomeClass{}"), hasLogged(info("Created type SomeClass")));
+        assertThat(executing("int i = 42"), hasLogged(info("Integer i = 42")));
+    }
+
+    @Test
     public void supportsDisplayingSingleResult() {
         assertThat(
                 executing("42", "\"test\"", "res1"),
@@ -49,10 +57,10 @@ public class SimpleConsoleTest {
     @Test
     public void supportsListingOfImports() {
         assertThat(
-                executing("import java.io.*", "\"test\"", "import java.net.*", ":list imports"),
+                executing("import java.io.*;", "\"test\"", "import java.net.*", ":list imports"),
                 hasLogged(info("Imports:\n" +
-                        "    import java.io.*\n" +
-                        "    import java.net.*\n")));
+                        "    java.io.*\n" +
+                        "    java.net.*\n")));
     }
 
     @Test
@@ -83,7 +91,7 @@ public class SimpleConsoleTest {
                         info("Types:\n" +
                                 "    AClass\n"),
                         info("Imports:\n" +
-                                "    import java.net.*\n"),
+                                "    java.net.*\n"),
                         info("Methods:\n" +
                                 "    void method1()\n")));
     }
