@@ -1,15 +1,17 @@
 package javarepl.console;
 
+import com.googlecode.totallylazy.Predicate;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
 import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Strings.startsWith;
 
 public class ConsoleLogOutputStream extends PrintStream {
     private final ConsoleLog.Type type;
+    private final Predicate<String> ignore;
     private final ConsoleLogger logger;
     private final PrintStream printStream;
 
@@ -18,12 +20,13 @@ public class ConsoleLogOutputStream extends PrintStream {
         printStream.flush();
     }
 
-    public ConsoleLogOutputStream(ConsoleLog.Type type, ConsoleLogger logger, PrintStream printStream) {
+    public ConsoleLogOutputStream(ConsoleLog.Type type, Predicate<String> ignore, ConsoleLogger logger, PrintStream printStream) {
         super(new OutputStream() {
             public void write(int b) throws IOException {
             }
         });
         this.type = type;
+        this.ignore = ignore;
         this.logger = logger;
         this.printStream = printStream;
     }
@@ -36,14 +39,6 @@ public class ConsoleLogOutputStream extends PrintStream {
     @Override
     public boolean checkError() {
         return printStream.checkError();
-    }
-
-    private void logMessage(String message) {
-        if (not(startsWith("POST /")
-                .or(startsWith("GET /"))
-                .or(startsWith("Listening on http://")))
-                .matches(message))
-            logger.log(new ConsoleLog(type, message));
     }
 
     @Override
@@ -169,46 +164,59 @@ public class ConsoleLogOutputStream extends PrintStream {
     @Override
     public PrintStream printf(String format, Object... args) {
         logMessage(String.format(format, args));
-        return printStream.printf(format, args);
+        printStream.printf(format, args);
+        return this;
     }
 
     @Override
     public PrintStream printf(Locale l, String format, Object... args) {
         logMessage(String.format(l, format, args));
-        return printStream.printf(l, format, args);
+        printStream.printf(l, format, args);
+        return this;
     }
 
     @Override
     public PrintStream format(String format, Object... args) {
         logMessage(String.format(format, args));
-        return printStream.format(format, args);
+        printStream.format(format, args);
+        return this;
     }
 
     @Override
     public PrintStream format(Locale l, String format, Object... args) {
         logMessage(String.format(l, format, args));
-        return printStream.format(l, format, args);
+        printStream.format(l, format, args);
+        return this;
     }
 
     @Override
     public PrintStream append(CharSequence csq) {
         logMessage(String.valueOf(csq));
-        return printStream.append(csq);
+        printStream.append(csq);
+        return this;
     }
 
     @Override
     public PrintStream append(CharSequence csq, int start, int end) {
-//            logMessage(String.valueOf(csq., start, end));
-        return printStream.append(csq, start, end);
+        logMessage(String.valueOf(csq).substring(start, end));
+        printStream.append(csq, start, end);
+        return this;
     }
 
     @Override
     public PrintStream append(char c) {
-        return printStream.append(c);
+        logMessage(String.valueOf(c));
+        printStream.append(c);
+        return this;
     }
 
     @Override
     public void write(int b) {
         printStream.write(b);
+    }
+
+    private void logMessage(String message) {
+        if (not(ignore).matches(message))
+            logger.log(new ConsoleLog(type, message));
     }
 }

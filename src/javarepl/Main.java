@@ -2,6 +2,7 @@ package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicate;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
 import javarepl.console.*;
@@ -40,12 +41,8 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
     public static void main(String... args) throws Exception {
-        ConsoleLogger logger = new ConsoleLogger();
 
-        System.setOut(new ConsoleLogOutputStream(INFO, logger, System.out));
-        System.setErr(new ConsoleLogOutputStream(ERROR, logger, System.err));
-
-        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(logger, historyFile(args)), expressionTimeout(args), inactivityTimeout(args)), port(args));
+        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(systemStreamsLogger(), historyFile(args)), expressionTimeout(args), inactivityTimeout(args)), port(args));
         ExpressionReader expressionReader = expressionReader(args, console);
 
         if (isSandboxed(args)) {
@@ -72,6 +69,19 @@ public class Main {
                 System.out.println("");
             } while (true);
         }
+    }
+
+    private static ConsoleLogger systemStreamsLogger() {
+        ConsoleLogger logger = new ConsoleLogger();
+
+        Predicate<String> ignoredLogs = startsWith("POST /")
+                .or(startsWith("GET /"))
+                .or(startsWith("Listening on http://"));
+
+        System.setOut(new ConsoleLogOutputStream(INFO, ignoredLogs, logger, System.out));
+        System.setErr(new ConsoleLogOutputStream(ERROR, ignoredLogs, logger, System.err));
+
+        return logger;
     }
 
     private static Option<File> historyFile(String[] args) {
