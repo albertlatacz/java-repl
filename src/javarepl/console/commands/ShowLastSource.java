@@ -8,11 +8,11 @@ import static com.googlecode.totallylazy.Predicates.equalTo;
 public final class ShowLastSource extends Command {
     private static final String COMMAND = ":src";
 
-    public ShowLastSource(Console console) {
-        super(console, COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ShowLastSource() {
+        super(COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
-        System.out.println(evaluator().lastSource().getOrElse("No source"));
+    public void execute(Console console, String expression) {
+        System.out.println(console.evaluator().lastSource().getOrElse("No source"));
     }
 }

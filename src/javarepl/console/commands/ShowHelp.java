@@ -13,12 +13,12 @@ public final class ShowHelp extends Command {
 
     private final Sequence<Command> commands;
 
-    public ShowHelp(Sequence<Command> commands, Console console) {
-        super(console, COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ShowHelp(Sequence<Command> commands) {
+        super(COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
         this.commands = commands.cons(this);
     }
 
-    public void execute(String expression) {
+    public void execute(Console console, String expression) {
         System.out.println(listValues("Available commands", commands.map(asString()).filter(not(nullValue()))));
     }
 }

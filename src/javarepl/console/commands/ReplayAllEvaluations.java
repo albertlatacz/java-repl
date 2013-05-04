@@ -11,17 +11,17 @@ import static javarepl.console.commands.EvaluateExpression.evaluate;
 public final class ReplayAllEvaluations extends Command {
     private static final String COMMAND = ":replay";
 
-    public ReplayAllEvaluations(Console console) {
-        super(console, COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ReplayAllEvaluations() {
+        super(COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String line) {
+    public void execute(Console console, String line) {
         System.out.println("Replaying all evaluations:");
-        Sequence<Expression> expressions = evaluator().expressions();
-        evaluator().reset();
+        Sequence<Expression> expressions = console.evaluator().expressions();
+        console.evaluator().reset();
 
         for (Expression expression : expressions) {
-            evaluate(evaluator(), expression.source());
+            evaluate(console, expression.source());
         }
     }
 }

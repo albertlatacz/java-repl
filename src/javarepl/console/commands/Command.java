@@ -1,9 +1,7 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
-import javarepl.Evaluator;
 import javarepl.console.Console;
-import javarepl.console.ConsoleHistory;
 import jline.console.completer.Completer;
 
 import static com.googlecode.totallylazy.Option.none;
@@ -12,44 +10,29 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static java.lang.Integer.parseInt;
 
 public abstract class Command {
-
     public static final String COMMAND_SEPARATOR = " ";
 
-    private final Console console;
     private final String description;
     private final Predicate<String> predicate;
     private final Completer completer;
 
-    protected Command(Console console, String description, Predicate<String> predicate, Completer completer) {
-        this.console = console;
+    protected Command(String description, Predicate<String> predicate, Completer completer) {
         this.description = description;
         this.predicate = predicate;
         this.completer = completer;
     }
 
-    public abstract void execute(String expression);
+    public abstract void execute(Console console, String expression);
 
-    public final Evaluator evaluator() {
-        return console.evaluator();
-    }
-
-    public final Console console() {
-        return console;
-    }
-
-    public final ConsoleHistory history() {
-        return console.history();
-    }
-
-    public final String description() {
+    public String description() {
         return description;
     }
 
-    public final Predicate<String> predicate() {
+    public Predicate<String> predicate(Console console) {
         return predicate;
     }
 
-    public final Completer completer() {
+    public Completer completer() {
         return completer;
     }
 

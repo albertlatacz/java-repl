@@ -1,17 +1,16 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import java.io.File;
-
 import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.SimpleConsole.defaultCommands;
+import static javarepl.console.SimpleConsoleConfig.consoleConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -168,10 +167,9 @@ public class SimpleConsoleTest {
 
 
     private static ConsoleResult executing(String... items) {
-        ConsoleLogger logger = new ConsoleLogger();
-        System.setOut(new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out));
-        System.setErr(new ConsoleLogOutputStream(ERROR, Predicates.<String>never(), logger, System.err));
-        SimpleConsole console = new SimpleConsole(logger, Option.<File>none());
+        SimpleConsole console = new SimpleConsole(consoleConfig().commands(defaultCommands()));
+        System.setOut(new ConsoleLogOutputStream(INFO, Predicates.<String>never(), console.logger(), System.out));
+        System.setErr(new ConsoleLogOutputStream(ERROR, Predicates.<String>never(), console.logger(), System.err));
 
         ConsoleResult result = null;
         for (String item : items) {

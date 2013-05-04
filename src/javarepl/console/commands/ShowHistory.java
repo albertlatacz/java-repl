@@ -15,14 +15,14 @@ import static javarepl.Utils.listValues;
 public final class ShowHistory extends Command {
     private static final String COMMAND = ":hist";
 
-    public ShowHistory(Console console) {
-        super(console, COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
+    public ShowHistory() {
+        super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
                 startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
-        Integer limit = parseNumericCommand(expression).second().getOrElse(history().items().size());
-        Sequence<String> numberedHistory = numberedHistory(history()).reverse().take(limit).reverse();
+    public void execute(Console console, String expression) {
+        Integer limit = parseNumericCommand(expression).second().getOrElse(console.history().items().size());
+        Sequence<String> numberedHistory = numberedHistory(console.history()).reverse().take(limit).reverse();
 
         if (!numberedHistory.isEmpty()) {
             System.out.println(listValues("History", numberedHistory));

@@ -6,7 +6,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.pattern;
 import javarepl.Evaluation;
-import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
 import javarepl.Result;
 import javarepl.console.Console;
@@ -19,16 +18,16 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
 public final class EvaluateExpression extends Command {
-    public EvaluateExpression(Console console) {
-        super(console, null, Predicates.<String>not(blank()), null);
+    public EvaluateExpression() {
+        super(null, Predicates.<String>not(blank()), null);
     }
 
-    public void execute(String expression) {
-        evaluate(evaluator(), expression);
+    public void execute(Console console, String expression) {
+        evaluate(console, expression);
     }
 
-    public static void evaluate(Evaluator evaluator, String expression) {
-        Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
+    public static void evaluate(Console console, String expression) {
+        Either<? extends Throwable, Evaluation> evaluation = console.evaluator().evaluate(expression);
 
         if (evaluation.isRight()) {
             System.out.println(new pattern(evaluation.right().expression(), evaluation.right().result()) {

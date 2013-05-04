@@ -8,12 +8,12 @@ import static com.googlecode.totallylazy.Predicates.equalTo;
 public final class ResetAllEvaluations extends Command {
     private static final String COMMAND = ":reset";
 
-    public ResetAllEvaluations(Console console) {
-        super(console, COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
+    public ResetAllEvaluations() {
+        super(COMMAND + " - resets environment to initial state", equalTo(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
-        evaluator().reset();
+    public void execute(Console console, String expression) {
+        console.evaluator().reset();
         System.out.println("All variables has been cleared");
     }
 }

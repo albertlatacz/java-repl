@@ -15,12 +15,11 @@ import static javarepl.Utils.*;
 public final class AddToClasspath extends Command {
     private static final String COMMAND = ":cp";
 
-    public AddToClasspath(Console console) {
-        super(console, COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public AddToClasspath() {
+        super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-
-    public void execute(String expression) {
+    public void execute(Console console, String expression) {
         String path = parseStringCommand(expression).second().getOrNull();
         try {
             URL url = resolveClasspath(path);
@@ -28,12 +27,12 @@ public final class AddToClasspath extends Command {
             if (isWebUrl(url)) {
                 System.out.println(format("Downloading %s...", path));
 
-                File outputFile = new File(evaluator().outputDirectory(), randomIdentifier("external"));
+                File outputFile = new File(console.evaluator().outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
 
-                evaluator().addClasspathUrl(outputFile.toURI().toURL());
+                console.evaluator().addClasspathUrl(outputFile.toURI().toURL());
             } else {
-                evaluator().addClasspathUrl(url);
+                console.evaluator().addClasspathUrl(url);
             }
 
             System.out.println(format("Added %s to classpath.", path));

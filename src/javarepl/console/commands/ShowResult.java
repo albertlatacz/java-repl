@@ -5,12 +5,17 @@ import javarepl.Evaluator;
 import javarepl.console.Console;
 
 public final class ShowResult extends Command {
-    public ShowResult(Console console) {
-        super(console, null, containsResult(console.evaluator()), null);
+    public ShowResult() {
+        super(null, null, null);
     }
 
-    public void execute(String expression) {
-        System.out.println(evaluator().result(expression).get().toString(true));
+    @Override
+    public Predicate<String> predicate(Console console) {
+        return containsResult(console.evaluator());
+    }
+
+    public void execute(Console console, String expression) {
+        System.out.println(console.evaluator().result(expression).get().toString(true));
     }
 
     private static Predicate<String> containsResult(final Evaluator evaluator) {

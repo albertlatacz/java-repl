@@ -9,17 +9,16 @@ import static com.googlecode.totallylazy.Strings.startsWith;
 public final class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
 
-    public EvaluateFromHistory(Console console) {
-        super(console, COMMAND + " num - evaluate expression from history)",
-                startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public EvaluateFromHistory() {
+        super(COMMAND + " num - evaluate expression from history)", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
-        Integer historyItem = parseNumericCommand(expression).second().getOrElse(history().items().size());
-        Option<String> fromHistory = history().items().drop(historyItem - 1).headOption();
+    public void execute(Console console, String expression) {
+        Integer historyItem = parseNumericCommand(expression).second().getOrElse(console.history().items().size());
+        Option<String> fromHistory = console.history().items().drop(historyItem - 1).headOption();
 
         if (!fromHistory.isEmpty()) {
-            console().execute(fromHistory.get());
+            console.execute(fromHistory.get());
         } else {
             System.err.println("Expression not found.\n");
         }

@@ -6,6 +6,7 @@ import com.googlecode.utterlyidle.httpserver.RestServer;
 import javarepl.Evaluator;
 import javarepl.console.Console;
 import javarepl.console.ConsoleHistory;
+import javarepl.console.ConsoleLogger;
 import javarepl.console.ConsoleResult;
 import javarepl.console.commands.Command;
 
@@ -36,7 +37,12 @@ public class RestConsole implements Console {
         return console.history();
     }
 
+    public ConsoleLogger logger() {
+        return console.logger();
+    }
+
     public Evaluator evaluator() {
         return console.evaluator();
     }
+
 }

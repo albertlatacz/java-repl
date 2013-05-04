@@ -36,13 +36,21 @@ import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.SimpleConsole.defaultCommands;
+import static javarepl.console.SimpleConsoleConfig.consoleConfig;
 import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
     public static void main(String... args) throws Exception {
 
-        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(systemStreamsLogger(), historyFile(args)), expressionTimeout(args), inactivityTimeout(args)), port(args));
+        SimpleConsoleConfig consoleConfig = consoleConfig()
+                .historyFile(historyFile(args))
+                .commands(defaultCommands())
+                .logger(systemStreamsLogger());
+
+        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
+
         ExpressionReader expressionReader = expressionReader(args, console);
 
         if (isSandboxed(args)) {

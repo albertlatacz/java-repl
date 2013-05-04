@@ -73,6 +73,10 @@ public class TimingOutConsole implements Console {
         return console.history();
     }
 
+    public ConsoleLogger logger() {
+        return console.logger();
+    }
+
     public Evaluator evaluator() {
         return console.evaluator();
     }

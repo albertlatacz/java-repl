@@ -11,12 +11,12 @@ import static javarepl.console.commands.ShowHistory.numberedHistory;
 public final class SearchHistory extends Command {
     private static final String COMMAND = ":h?";
 
-    public SearchHistory(Console console) {
-        super(console, COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND));
+    public SearchHistory() {
+        super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND));
     }
 
-    public void execute(String expression) {
+    public void execute(Console console, String expression) {
         String searchTerm = parseStringCommand(expression).second().getOrElse("");
-        System.out.println(listValues("History search for '" + searchTerm + "'", numberedHistory(history()).filter(contains(searchTerm))));
+        System.out.println(listValues("History search for '" + searchTerm + "'", numberedHistory(console.history()).filter(contains(searchTerm))));
     }
 }

@@ -12,4 +12,6 @@ public interface Console {
     Evaluator evaluator();
 
     ConsoleHistory history();
+
+    ConsoleLogger logger();
 }
