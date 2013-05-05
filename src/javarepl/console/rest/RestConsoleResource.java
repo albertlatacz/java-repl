@@ -4,10 +4,9 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.annotations.FormParam;
-import com.googlecode.utterlyidle.annotations.POST;
-import com.googlecode.utterlyidle.annotations.Path;
-import com.googlecode.utterlyidle.annotations.Produces;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.Responses;
+import com.googlecode.utterlyidle.annotations.*;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 
@@ -29,6 +28,12 @@ public class RestConsoleResource {
     public Model execute(@FormParam("expression") String expr) {
         Option<String> expression = expressionReader.readExpression(expr);
         return resultToModel(expression.isEmpty() ? emptyResult() : console.execute(expression.get()));
+    }
+
+    @GET
+    @Path("")
+    public Response main() {
+        return Responses.seeOther("console.html");
     }
 
     public static Model resultToModel(ConsoleResult result) {
