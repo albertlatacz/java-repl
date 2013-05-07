@@ -2,9 +2,17 @@ package javarepl.examples;
 
 import javarepl.console.SimpleConsole;
 import javarepl.console.SimpleConsoleConfig;
+import javarepl.console.commands.EvaluateFromHistory;
+import javarepl.console.commands.ListValues;
 import javarepl.console.commands.SearchHistory;
+import javarepl.console.commands.ShowHistory;
 import javarepl.console.rest.RestConsole;
 
+import java.io.File;
+import java.util.Date;
+
+import static java.lang.System.getProperty;
+import static javarepl.Result.result;
 import static javarepl.console.SimpleConsoleConfig.consoleConfig;
 
 /**
@@ -13,7 +21,16 @@ import static javarepl.console.SimpleConsoleConfig.consoleConfig;
  */
 public class EmbedInApplication {
     public static void main(String... args) throws Exception {
-        SimpleConsoleConfig config = consoleConfig().commands(new SearchHistory());
+        SimpleConsoleConfig config = consoleConfig()
+                .historyFile(new File(getProperty("user.home"), ".javarepl-embedded.history"))
+                .commands(
+                        new ListValues(),
+                        new ShowHistory(),
+                        new EvaluateFromHistory(),
+                        new SearchHistory())
+                .results(
+                        result("date", new Date()),
+                        result("num", 42));
 
         new RestConsole(new SimpleConsole(config), 8001);
     }

@@ -86,6 +86,10 @@ public class Evaluator {
         return new Value(expression);
     }
 
+    public void addResults(Sequence<Result> result) {
+        context = context.addResults(result);
+    }
+
     private Import createImport(String expression) {
         return new Import(expression, importPattern.match(expression).group(1));
     }

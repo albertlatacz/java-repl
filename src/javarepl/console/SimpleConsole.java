@@ -21,6 +21,8 @@ public final class SimpleConsole implements Console {
     public SimpleConsole(SimpleConsoleConfig config) {
         logger = config.logger.getOrElse(new ConsoleLogger());
 
+        evaluator.addResults(config.results);
+
         commands = config.commands
                 .add(new ShowHelp(config.commands))
                 .add(new NotAValidCommand())
