@@ -1,9 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicate;
-import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.*;
 import javarepl.console.Console;
 import javarepl.console.*;
 import javarepl.console.rest.RestConsole;
@@ -42,6 +39,9 @@ import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
+    private static PrintStream outStream = System.out;
+    private static PrintStream errStream = System.err;
+
     public static void main(String... args) throws Exception {
 
         SimpleConsoleConfig consoleConfig = consoleConfig()
@@ -80,16 +80,14 @@ public class Main {
     }
 
     private static ConsoleLogger systemStreamsLogger(String[] args) {
-        ConsoleLogger logger = new ConsoleLogger(System.out, System.err);
+        ConsoleLogger logger = new ConsoleLogger(outStream, errStream);
 
-        if (ignoreConsole(args)) {
-            Predicate<String> ignoredLogs = startsWith("POST /")
-                    .or(startsWith("GET /"))
-                    .or(startsWith("Listening on http://"));
+        Predicate<String> ignoredLogs = ignoreConsole(args)
+                ? startsWith("POST /").or(startsWith("GET /")).or(startsWith("Listening on http://"))
+                : Predicates.<String>never();
 
-            System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
-            System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
-        }
+        System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
 
         return logger;
     }
@@ -178,7 +176,7 @@ public class Main {
             private final ConsoleReader consoleReader;
 
             {
-                consoleReader = new ConsoleReader(System.in, System.out);
+                consoleReader = new ConsoleReader(System.in, outStream);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(new AggregateCompleter(console.commands().map(completer()).filter(notNullValue()).toList()));
