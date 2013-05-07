@@ -25,9 +25,9 @@ public final class ShowHistory extends Command {
         Sequence<String> numberedHistory = numberedHistory(console.history()).reverse().take(limit).reverse();
 
         if (!numberedHistory.isEmpty()) {
-            System.out.println(listValues("History", numberedHistory));
+            console.logger().info(listValues("History", numberedHistory));
         } else {
-            System.out.println("No history.");
+            console.logger().info("No history.");
         }
     }
 

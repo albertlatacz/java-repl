@@ -24,6 +24,7 @@ public final class SimpleConsole implements Console {
         commands = config.commands
                 .add(new ShowHelp(config.commands))
                 .add(new NotAValidCommand())
+                .add(new ShowResult())
                 .add(new EvaluateExpression());
 
         history = historyFromFile(startsWith(":h!").or(blank()), config.historyFile);
@@ -75,7 +76,6 @@ public final class SimpleConsole implements Console {
                 .add(new ListValues())
                 .add(new ShowLastSource())
                 .add(new ShowTypeOfExpression())
-                .add(new ShowResult())
                 .toArray(Command.class);
     }
 

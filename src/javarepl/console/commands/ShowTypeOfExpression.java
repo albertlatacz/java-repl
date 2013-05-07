@@ -17,9 +17,9 @@ public final class ShowTypeOfExpression extends Command {
         Option<Class> expressionType = console.evaluator().typeOfExpression(parseStringCommand(expression).second().getOrElse(""));
 
         if (!expressionType.isEmpty()) {
-            System.out.println(expressionType.get().getCanonicalName());
+            console.logger().info(expressionType.get().getCanonicalName());
         } else {
-            System.err.println("Cannot determine the type of this expression.");
+            console.logger().error("Cannot determine the type of this expression.");
         }
     }
 

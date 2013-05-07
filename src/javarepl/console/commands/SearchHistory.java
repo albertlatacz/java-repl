@@ -17,6 +17,6 @@ public final class SearchHistory extends Command {
 
     public void execute(Console console, String expression) {
         String searchTerm = parseStringCommand(expression).second().getOrElse("");
-        System.out.println(listValues("History search for '" + searchTerm + "'", numberedHistory(console.history()).filter(contains(searchTerm))));
+        console.logger().info(listValues("History search for '" + searchTerm + "'", numberedHistory(console.history()).filter(contains(searchTerm))));
     }
 }

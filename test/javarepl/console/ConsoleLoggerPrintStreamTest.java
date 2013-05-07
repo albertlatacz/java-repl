@@ -10,11 +10,11 @@ import static javarepl.console.ConsoleLog.Type.INFO;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 
-public class ConsoleLogOutputStreamTest {
+public class ConsoleLoggerPrintStreamTest {
     @Test
     public void printLogsAllTypesOfMessage() {
         ConsoleLogger logger = new ConsoleLogger();
-        ConsoleLogOutputStream stream = new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out);
+        ConsoleLoggerPrintStream stream = new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), logger);
 
         stream.print(true);
         assertThat(logger.logs(), hasItem(new ConsoleLog(INFO, "true")));
@@ -47,7 +47,7 @@ public class ConsoleLogOutputStreamTest {
     @Test
     public void printlnLogsAllTypesOfMessage() {
         ConsoleLogger logger = new ConsoleLogger();
-        ConsoleLogOutputStream stream = new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out);
+        ConsoleLoggerPrintStream stream = new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), logger);
 
         stream.println(true);
         assertThat(logger.logs(), hasItem(new ConsoleLog(INFO, "true")));
@@ -81,7 +81,7 @@ public class ConsoleLogOutputStreamTest {
     @Test
     public void appendLogsAllTypesOfMessage() {
         ConsoleLogger logger = new ConsoleLogger();
-        ConsoleLogOutputStream stream = new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out);
+        ConsoleLoggerPrintStream stream = new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), logger);
 
         stream.append('h').append("ello").append("big world", 3, 9);
 
@@ -93,7 +93,7 @@ public class ConsoleLogOutputStreamTest {
     @Test
     public void printfLogsAllTypesOfMessage() {
         ConsoleLogger logger = new ConsoleLogger();
-        ConsoleLogOutputStream stream = new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out);
+        ConsoleLoggerPrintStream stream = new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), logger);
 
         stream.printf("%s is %d.", "universe", 42).printf(Locale.UK, "%s %d..", "hello", 42);
 
@@ -105,7 +105,7 @@ public class ConsoleLogOutputStreamTest {
     @Test
     public void formatLogsAllTypesOfMessage() {
         ConsoleLogger logger = new ConsoleLogger();
-        ConsoleLogOutputStream stream = new ConsoleLogOutputStream(INFO, Predicates.<String>never(), logger, System.out);
+        ConsoleLoggerPrintStream stream = new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), logger);
 
         stream.format("%s is %d.", "universe", 42).format(Locale.UK, "%s %d..", "hello", 42);
 

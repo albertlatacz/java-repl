@@ -80,14 +80,14 @@ public class Main {
     }
 
     private static ConsoleLogger systemStreamsLogger() {
-        ConsoleLogger logger = new ConsoleLogger();
+        ConsoleLogger logger = new ConsoleLogger(System.out, System.err);
 
         Predicate<String> ignoredLogs = startsWith("POST /")
                 .or(startsWith("GET /"))
                 .or(startsWith("Listening on http://"));
 
-        System.setOut(new ConsoleLogOutputStream(INFO, ignoredLogs, logger, System.out));
-        System.setErr(new ConsoleLogOutputStream(ERROR, ignoredLogs, logger, System.err));
+        System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
 
         return logger;
     }

@@ -20,7 +20,7 @@ public final class EvaluateFromHistory extends Command {
         if (!fromHistory.isEmpty()) {
             console.execute(fromHistory.get());
         } else {
-            System.err.println("Expression not found.\n");
+            console.logger().error("Expression not found.\n");
         }
     }
 }

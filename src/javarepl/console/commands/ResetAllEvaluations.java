@@ -14,6 +14,6 @@ public final class ResetAllEvaluations extends Command {
 
     public void execute(Console console, String expression) {
         console.evaluator().reset();
-        System.out.println("All variables has been cleared");
+        console.logger().info("All variables has been cleared");
     }
 }

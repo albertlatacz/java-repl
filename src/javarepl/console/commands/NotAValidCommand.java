@@ -10,6 +10,6 @@ public final class NotAValidCommand extends Command {
     }
 
     public void execute(Console console, String expression) {
-        System.err.println(expression + " is not a valid command");
+        console.logger().error(expression + " is not a valid command");
     }
 }

@@ -25,7 +25,7 @@ public final class AddToClasspath extends Command {
             URL url = resolveClasspath(path);
 
             if (isWebUrl(url)) {
-                System.out.println(format("Downloading %s...", path));
+                console.logger().info(format("Downloading %s...", path));
 
                 File outputFile = new File(console.evaluator().outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
@@ -35,9 +35,9 @@ public final class AddToClasspath extends Command {
                 console.evaluator().addClasspathUrl(url);
             }
 
-            System.out.println(format("Added %s to classpath.", path));
+            console.logger().info(format("Added %s to classpath.", path));
         } catch (Exception e) {
-            System.err.println(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
+            console.logger().error(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
         }
     }
 }

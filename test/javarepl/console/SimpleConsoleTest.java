@@ -168,8 +168,8 @@ public class SimpleConsoleTest {
 
     private static ConsoleResult executing(String... items) {
         SimpleConsole console = new SimpleConsole(consoleConfig().commands(defaultCommands()));
-        System.setOut(new ConsoleLogOutputStream(INFO, Predicates.<String>never(), console.logger(), System.out));
-        System.setErr(new ConsoleLogOutputStream(ERROR, Predicates.<String>never(), console.logger(), System.err));
+        System.setOut(new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), console.logger()));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, Predicates.<String>never(), console.logger()));
 
         ConsoleResult result = null;
         for (String item : items) {

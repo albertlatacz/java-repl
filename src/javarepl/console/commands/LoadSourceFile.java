@@ -22,12 +22,12 @@ public final class LoadSourceFile extends Command {
         if (!path.isEmpty()) {
             try {
                 console.evaluator().evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
-                System.out.println(format("Loaded source file from %s", path.get()));
+                console.logger().info(format("Loaded source file from %s", path.get()));
             } catch (Exception e) {
-                System.err.println(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
+                console.logger().error(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
             }
         } else {
-            System.err.println(format("Path not specified"));
+            console.logger().error(format("Path not specified"));
         }
     }
 

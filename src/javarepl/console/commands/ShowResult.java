@@ -15,7 +15,7 @@ public final class ShowResult extends Command {
     }
 
     public void execute(Console console, String expression) {
-        System.out.println(console.evaluator().result(expression).get().toString(true));
+        console.logger().info(console.evaluator().result(expression).get().toString(true));
     }
 
     private static Predicate<String> containsResult(final Evaluator evaluator) {

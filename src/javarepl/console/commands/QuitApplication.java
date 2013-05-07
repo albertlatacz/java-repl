@@ -13,7 +13,7 @@ public final class QuitApplication extends Command {
     }
 
     public void execute(Console console, String expression) {
-        System.out.println("Terminating...");
+        console.logger().info("Terminating...");
         console.evaluator().clearOutputDirectory();
         System.exit(0);
     }

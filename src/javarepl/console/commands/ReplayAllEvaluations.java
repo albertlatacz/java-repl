@@ -16,7 +16,7 @@ public final class ReplayAllEvaluations extends Command {
     }
 
     public void execute(Console console, String line) {
-        System.out.println("Replaying all evaluations:");
+        console.logger().info("Replaying all evaluations:");
         Sequence<Expression> expressions = console.evaluator().expressions();
         console.evaluator().reset();
 

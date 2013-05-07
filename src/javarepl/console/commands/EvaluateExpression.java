@@ -30,7 +30,7 @@ public final class EvaluateExpression extends Command {
         Either<? extends Throwable, Evaluation> evaluation = console.evaluator().evaluate(expression);
 
         if (evaluation.isRight()) {
-            System.out.println(new pattern(evaluation.right().expression(), evaluation.right().result()) {
+            console.logger().info(new pattern(evaluation.right().expression(), evaluation.right().result()) {
                 String match(Method expr, Option<Result> result) {
                     return "Created method " + expr.signature();
                 }
@@ -46,12 +46,12 @@ public final class EvaluateExpression extends Command {
                 String match(Expression expr, Option<Result> result) {
                     return result.map(asString()).getOrElse("");
                 }
-            }.match());
+            }.<String>match());
         } else {
             if (evaluation.left() instanceof ExpressionCompilationException) {
-                System.err.println(evaluation.left().getMessage());
+                console.logger().error(evaluation.left().getMessage());
             } else {
-                System.err.println(evaluation.left().toString());
+                console.logger().error(evaluation.left().toString());
             }
         }
 

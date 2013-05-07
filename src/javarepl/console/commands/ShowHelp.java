@@ -2,6 +2,7 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
+import javarepl.console.ConsoleLog;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Callables.asString;
@@ -19,6 +20,6 @@ public final class ShowHelp extends Command {
     }
 
     public void execute(Console console, String expression) {
-        System.out.println(listValues("Available commands", commands.map(asString()).filter(not(nullValue()))));
+        console.logger().log(new ConsoleLog(ConsoleLog.Type.INFO, listValues("Available commands", commands.map(asString()).filter(not(nullValue())))));
     }
 }

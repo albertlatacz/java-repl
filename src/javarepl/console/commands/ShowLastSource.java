@@ -13,6 +13,6 @@ public final class ShowLastSource extends Command {
     }
 
     public void execute(Console console, String expression) {
-        System.out.println(console.evaluator().lastSource().getOrElse("No source"));
+        console.logger().info(console.evaluator().lastSource().getOrElse("No source"));
     }
 }
