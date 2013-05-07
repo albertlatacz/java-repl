@@ -6,11 +6,11 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
-import static javarepl.console.SimpleConsole.defaultCommands;
-import static javarepl.console.SimpleConsoleConfig.consoleConfig;
+import static javarepl.console.commands.Commands.defaultCommands;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -167,7 +167,7 @@ public class SimpleConsoleTest {
 
 
     private static ConsoleResult executing(String... items) {
-        SimpleConsoleConfig config = consoleConfig().commands(defaultCommands());
+        ConsoleConfig config = consoleConfig().commands(defaultCommands());
         SimpleConsole console = new SimpleConsole(config);
 
         System.setOut(new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), config.logger));

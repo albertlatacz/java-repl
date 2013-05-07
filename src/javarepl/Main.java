@@ -3,6 +3,7 @@ package javarepl;
 import com.googlecode.totallylazy.*;
 import javarepl.console.Console;
 import javarepl.console.*;
+import javarepl.console.commands.Commands;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
@@ -31,11 +32,11 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
+import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
-import static javarepl.console.SimpleConsole.defaultCommands;
-import static javarepl.console.SimpleConsoleConfig.consoleConfig;
 import static javarepl.console.commands.Command.functions.completer;
+import static javarepl.console.commands.Commands.defaultCommands;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -44,7 +45,7 @@ public class Main {
 
     public static void main(String... args) throws Exception {
 
-        SimpleConsoleConfig consoleConfig = consoleConfig()
+        ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
                 .commands(defaultCommands())
                 .logger(systemStreamsLogger(args));
@@ -179,13 +180,13 @@ public class Main {
                 consoleReader = new ConsoleReader(System.in, outStream);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
-                consoleReader.addCompleter(new AggregateCompleter(console.commands().map(completer()).filter(notNullValue()).toList()));
+                consoleReader.addCompleter(new AggregateCompleter(console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue()).toList()));
                 consoleReader.setHistory(historyFromConsole());
             }
 
             private MemoryHistory historyFromConsole() {
                 MemoryHistory history = new MemoryHistory();
-                for (String historyItem : console.history().items()) {
+                for (String historyItem : console.context().get(ConsoleHistory.class).items()) {
                     history.add(historyItem);
                 }
                 return history;

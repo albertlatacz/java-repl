@@ -1,7 +1,6 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
-import javarepl.console.Console;
 import jline.console.completer.Completer;
 
 import static com.googlecode.totallylazy.Option.none;
@@ -28,7 +27,7 @@ public abstract class Command {
         return description;
     }
 
-    public Predicate<String> predicate(Console console) {
+    public Predicate<String> predicate() {
         return predicate;
     }
 

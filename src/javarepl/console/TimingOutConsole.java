@@ -34,7 +34,7 @@ public class TimingOutConsole extends DelegatingConsole {
             timedOut = scheduler.schedule(exitWithCode(EXPRESSION_TIMEOUT), expressionTimeout.get(), SECONDS);
         }
 
-        ConsoleResult result = delegate().execute(expression);
+        ConsoleResult result = super.execute(expression);
 
         if (!expressionTimeout.isEmpty()) {
             timedOut.cancel(true);

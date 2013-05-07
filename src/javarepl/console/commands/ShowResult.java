@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Predicate;
 import javarepl.Evaluator;
-import javarepl.console.Console;
 import javarepl.console.ConsoleLogger;
 
 public final class ShowResult extends Command {
@@ -10,14 +9,9 @@ public final class ShowResult extends Command {
     private final ConsoleLogger logger;
 
     public ShowResult(Evaluator evaluator, ConsoleLogger logger) {
-        super(null, null, null);
+        super(null, containsResult(evaluator), null);
         this.evaluator = evaluator;
         this.logger = logger;
-    }
-
-    @Override
-    public Predicate<String> predicate(Console console) {
-        return containsResult(console.evaluator());
     }
 
     public void execute(String expression) {

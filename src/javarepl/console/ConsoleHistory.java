@@ -4,18 +4,19 @@ import com.googlecode.totallylazy.*;
 
 import java.io.File;
 
+import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.predicates.Not.not;
 
 
 public final class ConsoleHistory {
-
-    private final Sequence<String> history;
     private final Option<File> file;
     private final Predicate<String> ignored;
 
-    public ConsoleHistory(Sequence<String> history, Predicate<String> ignored, Option<File> file) {
+    private Sequence<String> history = Sequences.empty();
+
+    private ConsoleHistory(Sequence<String> history, Predicate<String> ignored, Option<File> file) {
         this.ignored = ignored;
-        this.history = history.filter(not(ignored)).reverse().take(300).reverse();
+        this.history = addToHistory(history);
         this.file = file;
     }
 
@@ -46,15 +47,16 @@ public final class ConsoleHistory {
         }
     }
 
-    public ConsoleHistory add(String expression) {
-        if (expression != null && !ignored.matches(expression))
-            return new ConsoleHistory(history.add(expression), ignored, file);
-        else
-            return this;
+    public void add(String expression) {
+        history = addToHistory(one(expression));
     }
 
     public Sequence<String> items() {
         return history;
+    }
+
+    private Sequence<String> addToHistory(Sequence<String> historyToAdd) {
+        return history.join(historyToAdd).filter(not(ignored)).reverse().take(300).reverse();
     }
 
 }

@@ -1,7 +1,7 @@
 package javarepl.examples;
 
+import javarepl.console.ConsoleConfig;
 import javarepl.console.SimpleConsole;
-import javarepl.console.SimpleConsoleConfig;
 import javarepl.console.commands.EvaluateFromHistory;
 import javarepl.console.commands.ListValues;
 import javarepl.console.commands.SearchHistory;
@@ -13,7 +13,7 @@ import java.util.Date;
 
 import static java.lang.System.getProperty;
 import static javarepl.Result.result;
-import static javarepl.console.SimpleConsoleConfig.consoleConfig;
+import static javarepl.console.ConsoleConfig.consoleConfig;
 
 /**
  * Example shows how to embed JavaREPL inside your application. Note that your application needs to be running via JDK
@@ -21,7 +21,7 @@ import static javarepl.console.SimpleConsoleConfig.consoleConfig;
  */
 public class EmbedInApplication {
     public static void main(String... args) throws Exception {
-        SimpleConsoleConfig config = consoleConfig()
+        ConsoleConfig config = consoleConfig()
                 .historyFile(new File(getProperty("user.home"), ".javarepl-embedded.history"))
                 .commands(
                         ListValues.class,
