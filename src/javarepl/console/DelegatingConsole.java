@@ -16,4 +16,8 @@ public abstract class DelegatingConsole implements Console {
     public Container context() {
         return delegate.context();
     }
+
+    public void shutdown() {
+        delegate.shutdown();
+    }
 }

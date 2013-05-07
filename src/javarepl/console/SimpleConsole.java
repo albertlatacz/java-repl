@@ -51,10 +51,14 @@ public final class SimpleConsole implements Console {
     private void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                context.get(Evaluator.class).clearOutputDirectory();
-                context.get(ConsoleHistory.class).save();
+                shutdown();
             }
         });
+    }
+
+    public void shutdown() {
+        context.get(ConsoleHistory.class).save();
+        context.get(Evaluator.class).clearOutputDirectory();
     }
 
     private Rules<String, ConsoleResult> evaluationRules() {
@@ -67,7 +71,6 @@ public final class SimpleConsole implements Console {
 
     private Function1<String, ConsoleResult> asFunction(final Command command) {
         return new Function1<String, ConsoleResult>() {
-            @Override
             public ConsoleResult call(String expression) throws Exception {
                 context.get(ConsoleLogger.class).reset();
                 command.execute(expression);

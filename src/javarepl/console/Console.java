@@ -6,4 +6,6 @@ public interface Console {
     ConsoleResult execute(String expression);
 
     Container context();
+
+    void shutdown();
 }
