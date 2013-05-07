@@ -47,7 +47,7 @@ public class Main {
         SimpleConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
                 .commands(defaultCommands())
-                .logger(systemStreamsLogger());
+                .logger(systemStreamsLogger(args));
 
         Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
 
@@ -79,15 +79,17 @@ public class Main {
         }
     }
 
-    private static ConsoleLogger systemStreamsLogger() {
+    private static ConsoleLogger systemStreamsLogger(String[] args) {
         ConsoleLogger logger = new ConsoleLogger(System.out, System.err);
 
-        Predicate<String> ignoredLogs = startsWith("POST /")
-                .or(startsWith("GET /"))
-                .or(startsWith("Listening on http://"));
+        if (ignoreConsole(args)) {
+            Predicate<String> ignoredLogs = startsWith("POST /")
+                    .or(startsWith("GET /"))
+                    .or(startsWith("Listening on http://"));
 
-        System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
-        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
+            System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
+            System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
+        }
 
         return logger;
     }
