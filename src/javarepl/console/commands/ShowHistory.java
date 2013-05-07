@@ -3,8 +3,8 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
-import javarepl.console.Console;
 import javarepl.console.ConsoleHistory;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Pair.functions.values;
@@ -14,20 +14,24 @@ import static javarepl.Utils.listValues;
 
 public final class ShowHistory extends Command {
     private static final String COMMAND = ":hist";
+    private final ConsoleLogger logger;
+    private final ConsoleHistory history;
 
-    public ShowHistory() {
+    public ShowHistory(ConsoleLogger logger, ConsoleHistory history) {
         super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
                 startsWith(COMMAND), new StringsCompleter(COMMAND));
+        this.logger = logger;
+        this.history = history;
     }
 
-    public void execute(Console console, String expression) {
-        Integer limit = parseNumericCommand(expression).second().getOrElse(console.history().items().size());
-        Sequence<String> numberedHistory = numberedHistory(console.history()).reverse().take(limit).reverse();
+    public void execute(String expression) {
+        Integer limit = parseNumericCommand(expression).second().getOrElse(history.items().size());
+        Sequence<String> numberedHistory = numberedHistory(history).reverse().take(limit).reverse();
 
         if (!numberedHistory.isEmpty()) {
-            console.logger().info(listValues("History", numberedHistory));
+            logger.info(listValues("History", numberedHistory));
         } else {
-            console.logger().info("No history.");
+            logger.info("No history.");
         }
     }
 

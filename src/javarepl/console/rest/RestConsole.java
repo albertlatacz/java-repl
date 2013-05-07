@@ -1,48 +1,19 @@
 package javarepl.console.rest;
 
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.httpserver.RestServer;
-import javarepl.Evaluator;
 import javarepl.console.Console;
-import javarepl.console.ConsoleHistory;
-import javarepl.console.ConsoleLogger;
-import javarepl.console.ConsoleResult;
-import javarepl.console.commands.Command;
+import javarepl.console.DelegatingConsole;
 
 import static com.googlecode.utterlyidle.BasePath.basePath;
 import static com.googlecode.utterlyidle.ServerConfiguration.defaultConfiguration;
 
-public class RestConsole implements Console {
-
-    private final Console console;
-
+public class RestConsole extends DelegatingConsole {
     public RestConsole(Console console, Integer port) throws Exception {
-        this.console = console;
+        super(console);
 
         ServerConfiguration configuration = defaultConfiguration().port(port);
         RestConsoleApplication application = new RestConsoleApplication(basePath("/"), this);
         new RestServer(application, configuration);
     }
-
-    public ConsoleResult execute(String expression) {
-        return console.execute(expression);
-    }
-
-    public Sequence<Command> commands() {
-        return console.commands();
-    }
-
-    public ConsoleHistory history() {
-        return console.history();
-    }
-
-    public ConsoleLogger logger() {
-        return console.logger();
-    }
-
-    public Evaluator evaluator() {
-        return console.evaluator();
-    }
-
 }

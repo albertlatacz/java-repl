@@ -2,25 +2,33 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
 import javarepl.console.Console;
+import javarepl.console.ConsoleHistory;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
 public final class EvaluateFromHistory extends Command {
     private static final String COMMAND = ":h!";
+    private final Console console;
+    private final ConsoleHistory history;
+    private final ConsoleLogger logger;
 
-    public EvaluateFromHistory() {
+    public EvaluateFromHistory(Console console, ConsoleHistory history, ConsoleLogger logger) {
         super(COMMAND + " num - evaluate expression from history)", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        this.console = console;
+        this.history = history;
+        this.logger = logger;
     }
 
-    public void execute(Console console, String expression) {
-        Integer historyItem = parseNumericCommand(expression).second().getOrElse(console.history().items().size());
-        Option<String> fromHistory = console.history().items().drop(historyItem - 1).headOption();
+    public void execute(String expression) {
+        Integer historyItem = parseNumericCommand(expression).second().getOrElse(history.items().size());
+        Option<String> fromHistory = history.items().drop(historyItem - 1).headOption();
 
         if (!fromHistory.isEmpty()) {
             console.execute(fromHistory.get());
         } else {
-            console.logger().error("Expression not found.\n");
+            logger.error("Expression not found.\n");
         }
     }
 }

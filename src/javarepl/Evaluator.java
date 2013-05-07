@@ -37,8 +37,6 @@ import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
-//import static java.util.Arrays.asList;
-
 public class Evaluator {
 
     private EvaluationClassLoader classLoader;

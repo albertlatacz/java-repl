@@ -167,9 +167,11 @@ public class SimpleConsoleTest {
 
 
     private static ConsoleResult executing(String... items) {
-        SimpleConsole console = new SimpleConsole(consoleConfig().commands(defaultCommands()));
-        System.setOut(new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), console.logger()));
-        System.setErr(new ConsoleLoggerPrintStream(ERROR, Predicates.<String>never(), console.logger()));
+        SimpleConsoleConfig config = consoleConfig().commands(defaultCommands());
+        SimpleConsole console = new SimpleConsole(config);
+
+        System.setOut(new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), config.logger));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, Predicates.<String>never(), config.logger));
 
         ConsoleResult result = null;
         for (String item : items) {

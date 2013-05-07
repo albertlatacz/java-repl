@@ -1,15 +1,18 @@
 package javarepl.console.commands;
 
-import javarepl.console.Console;
+import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
 public final class NotAValidCommand extends Command {
-    public NotAValidCommand() {
+    private final ConsoleLogger logger;
+
+    public NotAValidCommand(ConsoleLogger logger) {
         super(null, startsWith(":"), null);
+        this.logger = logger;
     }
 
-    public void execute(Console console, String expression) {
-        console.logger().error(expression + " is not a valid command");
+    public void execute(String expression) {
+        logger.error(expression + " is not a valid command");
     }
 }

@@ -1,7 +1,8 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.console.Console;
+import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Expression;
 import jline.console.completer.StringsCompleter;
 
@@ -10,18 +11,22 @@ import static javarepl.console.commands.EvaluateExpression.evaluate;
 
 public final class ReplayAllEvaluations extends Command {
     private static final String COMMAND = ":replay";
+    private final Evaluator evaluator;
+    private final ConsoleLogger logger;
 
-    public ReplayAllEvaluations() {
+    public ReplayAllEvaluations(Evaluator evaluator, ConsoleLogger logger) {
         super(COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
+        this.evaluator = evaluator;
+        this.logger = logger;
     }
 
-    public void execute(Console console, String line) {
-        console.logger().info("Replaying all evaluations:");
-        Sequence<Expression> expressions = console.evaluator().expressions();
-        console.evaluator().reset();
+    public void execute(String line) {
+        logger.info("Replaying all evaluations:");
+        Sequence<Expression> expressions = evaluator.expressions();
+        evaluator.reset();
 
         for (Expression expression : expressions) {
-            evaluate(console, expression.source());
+            evaluate(evaluator, logger, expression.source());
         }
     }
 }

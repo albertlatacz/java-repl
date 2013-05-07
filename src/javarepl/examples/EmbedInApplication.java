@@ -24,10 +24,10 @@ public class EmbedInApplication {
         SimpleConsoleConfig config = consoleConfig()
                 .historyFile(new File(getProperty("user.home"), ".javarepl-embedded.history"))
                 .commands(
-                        new ListValues(),
-                        new ShowHistory(),
-                        new EvaluateFromHistory(),
-                        new SearchHistory())
+                        ListValues.class,
+                        ShowHistory.class,
+                        EvaluateFromHistory.class,
+                        SearchHistory.class)
                 .results(
                         result("date", new Date()),
                         result("num", 42));

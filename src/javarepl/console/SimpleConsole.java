@@ -1,6 +1,8 @@
 package javarepl.console;
 
 import com.googlecode.totallylazy.*;
+import com.googlecode.yadic.Container;
+import com.googlecode.yadic.SimpleContainer;
 import javarepl.Evaluator;
 import javarepl.console.commands.*;
 
@@ -11,27 +13,23 @@ import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
 
 public final class SimpleConsole implements Console {
-    private final Evaluator evaluator = new Evaluator();
-    private final ConsoleLogger logger;
-
-    private Sequence<Command> commands = Sequences.empty();
+    private final Container context;
+    private final SimpleConsoleConfig config;
 
     private ConsoleHistory history;
 
     public SimpleConsole(SimpleConsoleConfig config) {
-        logger = config.logger.getOrElse(new ConsoleLogger());
-
-        evaluator.addResults(config.results);
-
-        commands = config.commands
-                .add(new ShowHelp(config.commands))
-                .add(new NotAValidCommand())
-                .add(new ShowResult())
-                .add(new EvaluateExpression());
+        this.config = config;
+        config.evaluator.addResults(config.results);
 
         history = historyFromFile(startsWith(":h!").or(blank()), config.historyFile);
 
         registerShutdownHook();
+
+        context = new SimpleContainer();
+        context.addInstance(Evaluator.class, config.evaluator);
+        context.addInstance(ConsoleLogger.class, config.logger);
+        context.addInstance(Console.class, this);
     }
 
     public ConsoleResult execute(String expression) {
@@ -40,45 +38,60 @@ public final class SimpleConsole implements Console {
         return result;
     }
 
+    public Container context() {
+        final SimpleContainer container = new SimpleContainer(context);
+        container.addInstance(ConsoleHistory.class, history());
+        return container;
+    }
+
     public Sequence<Command> commands() {
-        return commands;
+        Sequence<Command> commands = config.commands.map(createCommandIn(context()));
+
+        return commands.add(new ShowHelp(commands, config.logger))
+                .add(new NotAValidCommand(config.logger))
+                .add(new ShowResult(config.evaluator, config.logger))
+                .add(new EvaluateExpression(config.evaluator, config.logger));
+    }
+
+    private Function1<Class<? extends Command>, Command> createCommandIn(final Container container) {
+        return new Function1<Class<? extends Command>, Command>() {
+            public Command call(Class<? extends Command> aClass) throws Exception {
+                return container.create(aClass);
+            }
+        };
     }
 
     public ConsoleHistory history() {
         return history;
     }
 
-    public ConsoleLogger logger() {
-        return logger;
-    }
-
     public Evaluator evaluator() {
-        return evaluator;
+        return config.evaluator;
     }
 
     private void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                evaluator.clearOutputDirectory();
+                config.evaluator.clearOutputDirectory();
                 history.save();
             }
         });
     }
 
-    public static Command[] defaultCommands() {
-        return Sequences.<Command>sequence()
-                .add(new QuitApplication())
-                .add(new ShowHistory())
-                .add(new SearchHistory())
-                .add(new EvaluateFromHistory())
-                .add(new ResetAllEvaluations())
-                .add(new ReplayAllEvaluations())
-                .add(new AddToClasspath())
-                .add(new LoadSourceFile())
-                .add(new ListValues())
-                .add(new ShowLastSource())
-                .add(new ShowTypeOfExpression())
-                .toArray(Command.class);
+    public static Class<? extends Command>[] defaultCommands() {
+        return Sequences.<Class<? extends Command>>sequence()
+                .add(QuitApplication.class)
+                .add(ShowHistory.class)
+                .add(SearchHistory.class)
+                .add(EvaluateFromHistory.class)
+                .add(ResetAllEvaluations.class)
+                .add(ReplayAllEvaluations.class)
+                .add(AddToClasspath.class)
+                .add(LoadSourceFile.class)
+                .add(ListValues.class)
+                .add(ShowLastSource.class)
+                .add(ShowTypeOfExpression.class)
+                .toArray(Command.class.getClass());
     }
 
     private Rules<String, ConsoleResult> evaluationRules(Console console) {
@@ -93,9 +106,9 @@ public final class SimpleConsole implements Console {
         return new Function1<String, ConsoleResult>() {
             @Override
             public ConsoleResult call(String expression) throws Exception {
-                logger.reset();
-                command.execute(SimpleConsole.this, expression);
-                ConsoleResult result = new ConsoleResult(expression, logger.logs());
+                config.logger.reset();
+                command.execute(expression);
+                ConsoleResult result = new ConsoleResult(expression, config.logger.logs());
                 return result;
             }
         };

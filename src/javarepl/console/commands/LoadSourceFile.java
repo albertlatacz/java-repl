@@ -2,7 +2,8 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
-import javarepl.console.Console;
+import javarepl.Evaluator;
+import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Files.asFile;
@@ -11,23 +12,27 @@ import static java.lang.String.format;
 
 public final class LoadSourceFile extends Command {
     private static final String COMMAND = ":load";
+    private final Evaluator evaluator;
+    private final ConsoleLogger logger;
 
-    public LoadSourceFile() {
+    public LoadSourceFile(Evaluator evaluator, ConsoleLogger logger) {
         super(COMMAND + " <path> - loads source file ", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        this.evaluator = evaluator;
+        this.logger = logger;
     }
 
-    public void execute(Console console, String expression) {
+    public void execute(String expression) {
         Option<String> path = parseStringCommand(expression).second();
 
         if (!path.isEmpty()) {
             try {
-                console.evaluator().evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
-                console.logger().info(format("Loaded source file from %s", path.get()));
+                evaluator.evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
+                logger.info(format("Loaded source file from %s", path.get()));
             } catch (Exception e) {
-                console.logger().error(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
+                logger.error(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
             }
         } else {
-            console.logger().error(format("Path not specified"));
+            logger.error(format("Path not specified"));
         }
     }
 

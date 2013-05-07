@@ -6,9 +6,10 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.pattern;
 import javarepl.Evaluation;
+import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
 import javarepl.Result;
-import javarepl.console.Console;
+import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
@@ -18,19 +19,26 @@ import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
 
 public final class EvaluateExpression extends Command {
-    public EvaluateExpression() {
+
+    private final Evaluator evaluator;
+    private final ConsoleLogger logger;
+
+    public EvaluateExpression(Evaluator evaluator, ConsoleLogger logger) {
         super(null, Predicates.<String>not(blank()), null);
+
+        this.evaluator = evaluator;
+        this.logger = logger;
     }
 
-    public void execute(Console console, String expression) {
-        evaluate(console, expression);
+    public void execute(String expression) {
+        evaluate(evaluator, logger, expression);
     }
 
-    public static void evaluate(Console console, String expression) {
-        Either<? extends Throwable, Evaluation> evaluation = console.evaluator().evaluate(expression);
+    public static void evaluate(Evaluator evaluator, ConsoleLogger logger, String expression) {
+        Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
 
         if (evaluation.isRight()) {
-            console.logger().info(new pattern(evaluation.right().expression(), evaluation.right().result()) {
+            logger.info(new pattern(evaluation.right().expression(), evaluation.right().result()) {
                 String match(Method expr, Option<Result> result) {
                     return "Created method " + expr.signature();
                 }
@@ -49,9 +57,9 @@ public final class EvaluateExpression extends Command {
             }.<String>match());
         } else {
             if (evaluation.left() instanceof ExpressionCompilationException) {
-                console.logger().error(evaluation.left().getMessage());
+                logger.error(evaluation.left().getMessage());
             } else {
-                console.logger().error(evaluation.left().toString());
+                logger.error(evaluation.left().toString());
             }
         }
 

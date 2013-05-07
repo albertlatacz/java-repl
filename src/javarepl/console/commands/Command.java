@@ -22,7 +22,7 @@ public abstract class Command {
         this.completer = completer;
     }
 
-    public abstract void execute(Console console, String expression);
+    public abstract void execute(String expression);
 
     public String description() {
         return description;

@@ -3,10 +3,16 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Predicate;
 import javarepl.Evaluator;
 import javarepl.console.Console;
+import javarepl.console.ConsoleLogger;
 
 public final class ShowResult extends Command {
-    public ShowResult() {
+    private final Evaluator evaluator;
+    private final ConsoleLogger logger;
+
+    public ShowResult(Evaluator evaluator, ConsoleLogger logger) {
         super(null, null, null);
+        this.evaluator = evaluator;
+        this.logger = logger;
     }
 
     @Override
@@ -14,8 +20,8 @@ public final class ShowResult extends Command {
         return containsResult(console.evaluator());
     }
 
-    public void execute(Console console, String expression) {
-        console.logger().info(console.evaluator().result(expression).get().toString(true));
+    public void execute(String expression) {
+        logger.info(evaluator.result(expression).get().toString(true));
     }
 
     private static Predicate<String> containsResult(final Evaluator evaluator) {
