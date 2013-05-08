@@ -6,6 +6,7 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.URLs.packageUrl;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
@@ -153,6 +154,19 @@ public class SimpleConsoleTest {
         assertThat(
                 executing("42", "\"test\"", ":reset", ":list results"),
                 hasLogged(info("Results:\n    \n")));
+    }
+
+    @Test
+    public void supportsEvaluatingFileWithExpressions() {
+        String path = packageUrl(SimpleConsoleTest.class) + "expressions.txt";
+
+        assertThat(
+                executing(":eval " + path),
+                hasLogged(
+                        info("Created method void method()"),
+                        info("Hello world"),
+                        info("Integer num = 42"),
+                        info("Finished evaluating " + path)));
     }
 
     public static int reevaluationCounter;

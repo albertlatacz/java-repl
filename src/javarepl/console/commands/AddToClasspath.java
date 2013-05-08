@@ -27,7 +27,7 @@ public final class AddToClasspath extends Command {
     public void execute(String expression) {
         String path = parseStringCommand(expression).second().getOrNull();
         try {
-            URL url = resolveClasspath(path);
+            URL url = resolveURL(path);
 
             if (isWebUrl(url)) {
                 logger.info(format("Downloading %s...", path));

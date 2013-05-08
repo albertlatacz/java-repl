@@ -53,7 +53,7 @@ public class Utils {
         return e;
     }
 
-    public static URL resolveClasspath(String path) {
+    public static URL resolveURL(String path) {
         try {
             return url(path);
         } catch (Exception e) {

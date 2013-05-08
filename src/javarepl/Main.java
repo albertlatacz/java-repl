@@ -48,6 +48,7 @@ public class Main {
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
                 .commands(defaultCommands())
+                .expression(initialExpression(args))
                 .logger(systemStreamsLogger(args));
 
         Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
@@ -73,11 +74,19 @@ public class Main {
                 System.out.println("");
             }
 
+            if (!consoleConfig.expression.isEmpty()) {
+                console.execute(consoleConfig.expression.get());
+            }
+
             do {
                 console.execute(expressionReader.readExpression().getOrNull());
                 System.out.println("");
             } while (true);
         }
+    }
+
+    private static Option<String> initialExpression(String[] args) {
+        return sequence(args).find(startsWith("--expression=")).map(replaceAll("--expression=", ""));
     }
 
     private static ConsoleLogger systemStreamsLogger(String[] args) {
@@ -147,7 +156,7 @@ public class Main {
             private final PermissionCollection permissions = new Permissions();
 
             {
-                permissions.add(new SocketPermission("*", "accept"));
+                permissions.add(new SocketPermission("*", "accept, connect, resolve"));
                 permissions.add(new RuntimePermission("accessClassInPackage.sun.misc.*"));
                 permissions.add(new RuntimePermission("accessClassInPackage.sun.misc"));
                 permissions.add(new RuntimePermission("getProtectionDomain"));

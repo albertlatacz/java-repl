@@ -49,6 +49,7 @@ public final class Commands {
                 .add(EvaluateFromHistory.class)
                 .add(ResetAllEvaluations.class)
                 .add(ReplayAllEvaluations.class)
+                .add(EvaluateFile.class)
                 .add(AddToClasspath.class)
                 .add(LoadSourceFile.class)
                 .add(ListValues.class)

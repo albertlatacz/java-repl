@@ -24,10 +24,10 @@ public class UtilsTest {
     }
 
     @Test
-    public void returnsResolvedClasspath() {
-        assertThat(resolveClasspath("file:/aaa/bbb").toString(), equalTo("file:/aaa/bbb"));
-        assertThat(resolveClasspath("http://aaa/bbb").toString(), equalTo("http://aaa/bbb"));
-        assertThat(resolveClasspath("aaa/bbb").toString(), equalTo("file:aaa/bbb"));
+    public void returnsResolvedUrl() {
+        assertThat(resolveURL("file:/aaa/bbb").toString(), equalTo("file:/aaa/bbb"));
+        assertThat(resolveURL("http://aaa/bbb").toString(), equalTo("http://aaa/bbb"));
+        assertThat(resolveURL("aaa/bbb").toString(), equalTo("file:aaa/bbb"));
     }
 
     @Test

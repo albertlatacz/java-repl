@@ -1,0 +1,3 @@
+void method(){}
+System.out.println("Hello world")
+int num = 42
