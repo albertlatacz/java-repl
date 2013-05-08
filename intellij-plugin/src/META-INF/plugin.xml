@@ -13,6 +13,7 @@
             <li>Support for most of Java language constructs</li>
             <li>Create imports, methods, classes, enums and interfaces</li>
             <li>Load classes from any jar file or directory (including web urls)</li>
+            <li>Load and evaluate expression from file</li>
             <li>List previous results, imports, created types and methods</li>
             <li>Show history of evaluations</li>
             <li>Search and evaluate expression from history</li>
