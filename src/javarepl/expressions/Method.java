@@ -49,5 +49,13 @@ public final class Method extends Expression {
             };
         }
 
+        public static Function1<Method, String> methodName() {
+            return new Function1<Method, String>() {
+                public String call(Method value) throws Exception {
+                    return value.name();
+                }
+            };
+        }
+
     }
 }

@@ -1,6 +1,9 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
+import javarepl.completion.CodeCompleter;
+import javarepl.completion.CompletionResult;
+import javarepl.completion.ConsoleResultCompleter;
 import javarepl.console.Console;
 import javarepl.console.*;
 import javarepl.console.commands.Commands;
@@ -18,6 +21,7 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
+import java.util.List;
 import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
@@ -196,7 +200,21 @@ public class Main {
 
             private Sequence<Completer> completers() {
                 return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                        .add(new ConsoleCompleter(console));
+                        .add(completerFor(new ConsoleResultCompleter(console)));
+            }
+
+            private Completer completerFor(final CodeCompleter completer) {
+                return new Completer() {
+                    public int complete(String expression, int cursor, List<CharSequence> candidates) {
+                        CompletionResult result = completer.apply(expression);
+                        if (expression.trim().startsWith(":") || result.candidates().isEmpty()) {
+                            return -1;
+                        } else {
+                            candidates.addAll(result.candidates().toList());
+                            return result.position();
+                        }
+                    }
+                };
             }
 
             private MemoryHistory historyFromConsole() {
