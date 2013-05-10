@@ -3,7 +3,7 @@ package javarepl;
 import com.googlecode.totallylazy.*;
 import javarepl.completion.CodeCompleter;
 import javarepl.completion.CompletionResult;
-import javarepl.completion.ConsoleResultCompleter;
+import javarepl.completion.SimpleConsoleCompleter;
 import javarepl.console.Console;
 import javarepl.console.*;
 import javarepl.console.commands.Commands;
@@ -200,7 +200,7 @@ public class Main {
 
             private Sequence<Completer> completers() {
                 return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                        .add(completerFor(new ConsoleResultCompleter(console)));
+                        .add(completerFor(new SimpleConsoleCompleter(console)));
             }
 
             private Completer completerFor(final CodeCompleter completer) {
