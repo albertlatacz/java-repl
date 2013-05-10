@@ -7,6 +7,7 @@ import javarepl.console.commands.Commands;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
+import jline.console.completer.Completer;
 import jline.console.history.MemoryHistory;
 
 import java.io.*;
@@ -189,8 +190,13 @@ public class Main {
                 consoleReader = new ConsoleReader(System.in, outStream);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
-                consoleReader.addCompleter(new AggregateCompleter(console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue()).toList()));
+                consoleReader.addCompleter(new AggregateCompleter(completers().toList()));
                 consoleReader.setHistory(historyFromConsole());
+            }
+
+            private Sequence<Completer> completers() {
+                return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
+                        .add(new ConsoleCompleter(console));
             }
 
             private MemoryHistory historyFromConsole() {

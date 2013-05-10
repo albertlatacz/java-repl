@@ -191,4 +191,17 @@
         <antcall target="deploy"/>
     </target>
 
+    <target name="fast" description="build all">
+        <parallel>
+            <antcall target="update"/>
+            <antcall target="clean"/>
+        </parallel>
+        <antcall target="compile"/>
+        <parallel>
+            <antcall target="package"/>
+        </parallel>
+
+        <antcall target="embed"/>
+    </target>
+
 </project>
