@@ -35,6 +35,8 @@ import static javarepl.Utils.randomOutputDirectory;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
+import static javarepl.rendering.ExpressionSourceRenderer.renderExpressionSource;
+import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
@@ -127,6 +129,10 @@ public class Evaluator {
         return context.expressions();
     }
 
+    public EvaluationContext context() {
+        return context;
+    }
+
     public void reset() {
         clearOutputDirectory();
         initializeEvaluator(evaluationContext());
@@ -183,7 +189,9 @@ public class Evaluator {
             File outputPath = directory(outputDirectory, expression.typePackage().getOrElse("").replace('.', File.separatorChar));
             File outputJavaFile = file(outputPath, expression.type() + ".java");
 
-            String sources = renderExpressionClass(context, expression.type(), expression);
+            String sources = renderExpressionClass(context, expression.type(), expression)
+                    .replace(EXPRESSION_TOKEN, renderExpressionSource(expression));
+
             Files.write(sources.getBytes(), outputJavaFile);
             compile(outputJavaFile);
 
@@ -225,7 +233,9 @@ public class Evaluator {
             EvaluationContext newContext = context.removeExpressionWithKey(expression.key());
 
             File outputJavaFile = file(outputDirectory, className + ".java");
-            final String sources = renderExpressionClass(newContext, className, expression);
+            final String sources = renderExpressionClass(newContext, className, expression)
+                    .replace(EXPRESSION_TOKEN, renderExpressionSource(expression));
+
             Files.write(sources.getBytes(), outputJavaFile);
 
             compile(outputJavaFile);

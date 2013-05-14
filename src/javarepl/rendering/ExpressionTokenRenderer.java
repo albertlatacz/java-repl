@@ -7,32 +7,44 @@ import javarepl.expressions.*;
 import static java.lang.String.format;
 import static javarepl.Utils.randomIdentifier;
 
-public class ExpressionRenderer {
+public class ExpressionTokenRenderer {
+    public static final String EXPRESSION_TOKEN = "%JAVAREPL_EXPR%";
+
     @multimethod
-    public static String renderExpression(Expression expression) {
+    public static String renderExpressionToken(Expression expression) {
         return new multi() {
         }.<String>methodOption(expression)
                 .getOrThrow(new IllegalArgumentException(expression + " not mapped"));
     }
 
     @multimethod
-    private static String renderExpression(Statement expression) {
-        return format("    %s;", expression.source());
+    private static String renderExpressionToken(Statement expression) {
+        return "    " + EXPRESSION_TOKEN + ";";
     }
 
     @multimethod
-    private static String renderExpression(Assignment expression) {
+    private static String renderExpressionToken(Assignment expression) {
         return expressionWithValue(expression.value());
     }
 
     @multimethod
-    private static String renderExpression(AssignmentWithType expression) {
+    private static String renderExpressionToken(AssignmentWithType expression) {
         return expressionWithValue(expression.value(), expression.type());
     }
 
     @multimethod
-    private static String renderExpression(Value expression) {
+    private static String renderExpressionToken(Value expression) {
         return expressionWithValue(expression.source());
+    }
+
+    @multimethod
+    private static String renderExpressionToken(Method expression) {
+        return "  " + EXPRESSION_TOKEN + "\n";
+    }
+
+    @multimethod
+    private static String renderExpressionToken(Import expression) {
+        return EXPRESSION_TOKEN + ";";
     }
 
     private static String expressionWithValue(String value) {
@@ -41,6 +53,6 @@ public class ExpressionRenderer {
 
     private static String expressionWithValue(String value, String returnType) {
         String identifier = randomIdentifier("expr");
-        return format("    %s %s =\n\n   %s;\n\n    return %s;", returnType, identifier, value, identifier);
+        return format("    %s %s =\n\n   %s;\n\n    return %s;", returnType, identifier, EXPRESSION_TOKEN, identifier);
     }
 }

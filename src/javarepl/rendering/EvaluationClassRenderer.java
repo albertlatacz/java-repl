@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static javarepl.Utils.extractType;
 import static javarepl.expressions.Expression.functions.source;
 import static javarepl.expressions.Patterns.methodPattern;
-import static javarepl.rendering.ExpressionRenderer.renderExpression;
+import static javarepl.rendering.ExpressionTokenRenderer.renderExpressionToken;
 import static javarepl.rendering.MethodNameRenderer.renderMethodName;
 
 public class EvaluationClassRenderer {
@@ -55,7 +55,7 @@ public class EvaluationClassRenderer {
 
         writer.println(renderDefaultImports());
         writer.println(renderUserImports(context));
-        writer.println(renderImportExpression(expression));
+        writer.println(renderExpressionToken(expression));
         writer.println(renderClassName(className));
         writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
@@ -77,7 +77,7 @@ public class EvaluationClassRenderer {
         writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
         writer.println(renderPreviousMethods(context));
-        writer.println(renderMethodExpression(expression));
+        writer.println(renderExpressionToken(expression));
         writer.println(renderMethodName(expression));
         writer.println(renderEndOfMethod());
         writer.println(renderEndOfFile());
@@ -134,7 +134,7 @@ public class EvaluationClassRenderer {
         writer.println(renderPreviousEvaluations(context));
         writer.println(renderPreviousMethods(context));
         writer.println(renderMethodName(expression));
-        writer.println(renderExpression(expression));
+        writer.println(renderExpressionToken(expression));
         writer.println(renderEndOfMethod());
         writer.println(renderEndOfFile());
 
@@ -154,14 +154,6 @@ public class EvaluationClassRenderer {
                 .map(source())
                 .toString("\n", "\n\n", "\n")
                 .replaceAll("\n", "\n  ");
-    }
-
-    private static String renderImportExpression(Import expression) {
-        return format("%s;", expression.source());
-    }
-
-    private static String renderMethodExpression(Method expression) {
-        return format("  %s\n", expression.source().replaceAll("\n", "\n  "));
     }
 
     private static String renderUserImports(EvaluationContext context) {
