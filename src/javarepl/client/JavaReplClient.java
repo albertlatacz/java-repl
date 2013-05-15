@@ -26,5 +26,4 @@ public final class JavaREPLClient {
         return "http://" + hostname + ":" + port + "/" + path;
     }
 
-
 }
