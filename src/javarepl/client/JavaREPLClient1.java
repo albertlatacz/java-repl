@@ -6,12 +6,12 @@ import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 
-public final class JavaREPLClient {
+public final class JavaREPLClient1 {
     private final String hostname;
     private final Integer port;
     private final ClientHttpHandler client;
 
-    public JavaREPLClient(String hostname, Integer port) {
+    public JavaREPLClient1(String hostname, Integer port) {
         this.hostname = hostname;
         this.port = port;
         this.client = new ClientHttpHandler(5000);
