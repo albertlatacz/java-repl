@@ -1,6 +1,10 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import javarepl.completion.CodeCompleter;
 import javarepl.completion.CompletionResult;
 import javarepl.completion.SimpleConsoleCompleter;
@@ -97,12 +101,14 @@ public class Main {
     private static ConsoleLogger systemStreamsLogger(String[] args) {
         ConsoleLogger logger = new ConsoleLogger(outStream, errStream);
 
-        Predicate<String> ignoredLogs = ignoreConsole(args)
-                ? startsWith("POST /").or(startsWith("GET /")).or(startsWith("Listening on http://"))
+        LogicalPredicate<String> defaultIgnore = startsWith("POST /").or(startsWith("GET /"));
+
+        LogicalPredicate<String> ignoredLogs = ignoreConsole(args)
+                ? startsWith("Listening on http://")
                 : Predicates.<String>never();
 
-        System.setOut(new ConsoleLoggerPrintStream(INFO, ignoredLogs, logger));
-        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
+        System.setOut(new ConsoleLoggerPrintStream(INFO, defaultIgnore.or(ignoredLogs), logger));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, defaultIgnore.or(ignoredLogs), logger));
 
         return logger;
     }

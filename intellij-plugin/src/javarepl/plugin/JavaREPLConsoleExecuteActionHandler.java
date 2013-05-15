@@ -1,6 +1,5 @@
 package javarepl.plugin;
 
-import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.ide.highlighter.JavaFileType;
@@ -50,7 +49,7 @@ public class JavaREPLConsoleExecuteActionHandler {
         }
     }
 
-    public void runExecuteAction(final LanguageConsoleImpl console,
+    public void runExecuteAction(final JavaREPLLanguageConsole console,
                                  boolean executeImmediately) {
 
         if (executeImmediately) {
@@ -88,7 +87,7 @@ public class JavaREPLConsoleExecuteActionHandler {
         execute(console, consoleHistoryModel);
     }
 
-    private void execute(LanguageConsoleImpl languageConsole,
+    private void execute(JavaREPLLanguageConsole languageConsole,
                          ConsoleHistoryModel consoleHistoryModel) {
 
         final Document document = languageConsole.getCurrentEditor().getDocument();

@@ -4,9 +4,6 @@ import com.intellij.execution.*;
 import com.intellij.execution.configurations.CommandLineBuilder;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.JavaParameters;
-import com.intellij.execution.console.ConsoleHistoryController;
-import com.intellij.execution.console.LanguageConsoleImpl;
-import com.intellij.execution.console.LanguageConsoleViewImpl;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.process.*;
 import com.intellij.execution.ui.ConsoleViewContentType;
@@ -33,6 +30,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.PathUtil;
 import javarepl.Main;
+import javarepl.client.JavaREPLClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,22 +40,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static javarepl.Utils.randomServerPort;
+
 public class JavaREPLConsoleRunner {
     public static final String REPL_TITLE = "Java REPL";
     public static final String REPL_MAIN_CLASS = "javarepl.Main";
 
     public static final String EXECUTE_ACTION_IMMEDIATELY_ID = "JavaREPL.Console.Execute.Immediately";
-    public static final String EXECUTE_ACTION_ID = "JavaREPL.Console.Execute";
 
 
     private final Module module;
     private final Project project;
     private final String consoleTitle;
     private final String workingDir;
+    public Integer port;
 
     private final ConsoleHistoryModel consoleHistoryModel;
-    private LanguageConsoleViewImpl languageConsoleView;
-    private LanguageConsoleImpl languageConsole;
+    private JavaREPLLanguageConsoleView languageConsoleView;
+    private JavaREPLLanguageConsole languageConsole;
 
     private ProcessHandler processHandler;
     private JavaREPLConsoleExecuteActionHandler consoleExecuteActionHandler;
@@ -90,16 +90,17 @@ public class JavaREPLConsoleRunner {
     }
 
     public void initAndRun(final String... statements) throws ExecutionException, IOException {
+        port = randomServerPort();
 
-        languageConsole = new LanguageConsoleImpl(project, consoleTitle, JavaLanguage.INSTANCE);
-        languageConsoleView = new LanguageConsoleViewImpl(languageConsole);
+        languageConsole = new JavaREPLLanguageConsole(project, consoleTitle, JavaLanguage.INSTANCE, new JavaREPLClient("localhost", port));
+        languageConsoleView = new JavaREPLLanguageConsoleView(languageConsole);
 
         GeneralCommandLine commandLine = createCommandLine(module, workingDir);
         processHandler = new ColoredProcessHandler(commandLine.createProcess(), commandLine.getCommandLineString()) {
             @Override
             protected void textAvailable(String text, Key attributes) {
                 languageConsole.setPrompt("java> ");
-                LanguageConsoleImpl.printToConsole(languageConsole, StringUtil.convertLineSeparators(text).replace("java> ", ""), ConsoleViewContentType.NORMAL_OUTPUT, null);
+                JavaREPLLanguageConsole.printToConsole(languageConsole, StringUtil.convertLineSeparators(text).replace("java> ", ""), ConsoleViewContentType.NORMAL_OUTPUT, null);
             }
 
         };
@@ -141,8 +142,6 @@ public class JavaREPLConsoleRunner {
         registerActionShortcuts(actions, panel);
         panel.updateUI();
 
-        createAndRegisterEnterAction(panel);
-
         ExecutionManager.getInstance(project).getContentManager().showRunContent(defaultExecutor, myDescriptor);
 
         final ToolWindow window = ToolWindowManager.getInstance(project).getToolWindow(defaultExecutor.getId());
@@ -154,27 +153,16 @@ public class JavaREPLConsoleRunner {
 
         processHandler.startNotify();
 
-        final LanguageConsoleImpl console = languageConsoleView.getConsole();
+        final JavaREPLLanguageConsole console = languageConsoleView.getConsole();
         for (String statement : statements) {
             final String st = statement + "\n";
 
             final ConsoleViewContentType outputType = ConsoleViewContentType.NORMAL_OUTPUT;
-            LanguageConsoleImpl.printToConsole(console, st, outputType, null);
+            JavaREPLLanguageConsole.printToConsole(console, st, outputType, null);
 
             final JavaREPLConsoleExecuteActionHandler actionHandler = consoleExecuteActionHandler;
             actionHandler.processLine(st);
         }
-
-    }
-
-    private void createAndRegisterEnterAction(JPanel panel) {
-        final AnAction enterAction = new JavaREPLExecuteActionBase(languageConsole, processHandler, JavaREPLConsoleRunner.EXECUTE_ACTION_ID) {
-            public void actionPerformed(AnActionEvent anActionEvent) {
-                consoleExecuteActionHandler.runExecuteAction(languageConsole, false);
-            }
-        };
-        enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), languageConsole.getConsoleEditor().getComponent());
-        enterAction.registerCustomShortcutSet(enterAction.getShortcutSet(), panel);
     }
 
     private static void registerActionShortcuts(final AnAction[] actions, final JComponent component) {
@@ -224,7 +212,7 @@ public class JavaREPLConsoleRunner {
         return actions;
     }
 
-    public ArrayList<AnAction> createConsoleExecActions(final LanguageConsoleImpl languageConsole,
+    public ArrayList<AnAction> createConsoleExecActions(final JavaREPLLanguageConsole languageConsole,
                                                         final ProcessHandler processHandler,
                                                         final ConsoleHistoryModel historyModel) {
 
@@ -234,7 +222,7 @@ public class JavaREPLConsoleRunner {
             }
         };
 
-        final ConsoleHistoryController historyController = new ConsoleHistoryController("JavaREPL", null, languageConsole, historyModel);
+        final JavaREPLConsoleHistoryController historyController = new JavaREPLConsoleHistoryController("JavaREPL", null, languageConsole, historyModel);
         historyController.install();
 
         final AnAction upAction = historyController.getHistoryPrev();
@@ -286,6 +274,7 @@ public class JavaREPLConsoleRunner {
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
         line.addParameter("--simpleConsole");
+        line.addParameter("--port=" + port);
 
         return line;
     }

@@ -8,7 +8,7 @@ import static java.lang.String.format;
 import static javarepl.Utils.randomIdentifier;
 
 public class ExpressionTokenRenderer {
-    public static final String EXPRESSION_TOKEN = "%JAVAREPL_EXPR%";
+    public static final String EXPRESSION_TOKEN = "$JAVAREPL_EXPRESSION_TOKEN$";
 
     @multimethod
     public static String renderExpressionToken(Expression expression) {

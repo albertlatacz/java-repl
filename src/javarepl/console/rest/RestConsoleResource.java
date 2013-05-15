@@ -7,11 +7,16 @@ import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
+import javarepl.Evaluator;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
+import javarepl.expressions.Expression;
 
 import static com.googlecode.funclate.Model.persistent.model;
+import static javarepl.Utils.randomIdentifier;
 import static javarepl.console.ConsoleResult.emptyResult;
+import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
+import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
 public class RestConsoleResource {
     private final RestConsole console;
@@ -28,6 +33,16 @@ public class RestConsoleResource {
     public Model execute(@FormParam("expression") String expr) {
         Option<String> expression = expressionReader.readExpression(expr);
         return resultToModel(expression.isEmpty() ? emptyResult() : console.execute(expression.get()));
+    }
+
+    @GET
+    @Path("template")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model template(@QueryParam("expression") String expr) {
+        Evaluator evaluator = console.context().get(Evaluator.class);
+        Expression expression = evaluator.parseExpression(expr);
+        return model().add("template", renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), expression))
+                .add("token", EXPRESSION_TOKEN);
     }
 
     @GET
