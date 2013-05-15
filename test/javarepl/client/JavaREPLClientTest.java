@@ -13,16 +13,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
-public class JavaREPLClientTest1 {
+public class JavaREPLClientTest {
 
     private RestConsole console;
-    private JavaREPLClient1 client;
+    private JavaREPLClient client;
 
     @Before
     public void setUp() throws Exception {
         int port = randomServerPort();
         console = new RestConsole(new SimpleConsole(ConsoleConfig.consoleConfig()), port);
-        client = new JavaREPLClient1("localhost", port);
+        client = new JavaREPLClient("localhost", port);
     }
 
     @After

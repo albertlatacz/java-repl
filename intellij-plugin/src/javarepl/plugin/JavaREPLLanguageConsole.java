@@ -73,7 +73,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
 import javarepl.client.ExpressionTemplate;
-import javarepl.client.JavaREPLClient1;
+import javarepl.client.JavaREPLClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,7 +100,7 @@ public class JavaREPLLanguageConsole implements Disposable, TypeSafeDataProvider
     private final EditorEx myHistoryViewer;
     private final Document myEditorDocument;
     private LightVirtualFile myVirtualFile;
-    private final JavaREPLClient1 replClient;
+    private final JavaREPLClient replClient;
 
     protected PsiFile myFile; // will change on language change
 
@@ -128,15 +128,15 @@ public class JavaREPLLanguageConsole implements Disposable, TypeSafeDataProvider
         }
     };
 
-    public JavaREPLLanguageConsole(Project project, String title, Language language, JavaREPLClient1 replClient) {
+    public JavaREPLLanguageConsole(Project project, String title, Language language, JavaREPLClient replClient) {
         this(project, title, language, true, replClient);
     }
 
-    public JavaREPLLanguageConsole(Project project, String title, Language language, boolean initComponents, JavaREPLClient1 replClient) {
+    public JavaREPLLanguageConsole(Project project, String title, Language language, boolean initComponents, JavaREPLClient replClient) {
         this(project, title, new LightVirtualFile(title, language, ""), initComponents, replClient);
     }
 
-    public JavaREPLLanguageConsole(Project project, String title, LightVirtualFile lightFile, boolean initComponents, JavaREPLClient1 replClient) {
+    public JavaREPLLanguageConsole(Project project, String title, LightVirtualFile lightFile, boolean initComponents, JavaREPLClient replClient) {
         myProject = project;
         myTitle = title;
         myVirtualFile = lightFile;

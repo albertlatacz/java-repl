@@ -30,7 +30,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.util.PathUtil;
 import javarepl.Main;
-import javarepl.client.JavaREPLClient1;
+import javarepl.client.JavaREPLClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,7 +92,7 @@ public class JavaREPLConsoleRunner {
     public void initAndRun(final String... statements) throws ExecutionException, IOException {
         port = randomServerPort();
 
-        languageConsole = new JavaREPLLanguageConsole(project, consoleTitle, JavaLanguage.INSTANCE, new JavaREPLClient1("localhost", port));
+        languageConsole = new JavaREPLLanguageConsole(project, consoleTitle, JavaLanguage.INSTANCE, new JavaREPLClient("localhost", port));
         languageConsoleView = new JavaREPLLanguageConsoleView(languageConsole);
 
         GeneralCommandLine commandLine = createCommandLine(module, workingDir);
