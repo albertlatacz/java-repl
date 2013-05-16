@@ -1,6 +1,7 @@
 package javarepl.rendering;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 import javarepl.EvaluationContext;
@@ -12,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.replaceAll;
 import static java.lang.String.format;
 import static javarepl.Utils.extractType;
 import static javarepl.expressions.Expression.functions.source;
@@ -146,20 +148,19 @@ public class EvaluationClassRenderer {
             public String call(Result result) throws Exception {
                 return format("  public %s %s = valueOf(\"%s\");", extractType(result.value().getClass()).getCanonicalName(), result.key(), result.key());
             }
-        }).toString("\n", "\n", "\n");
+        }).toString("\n");
     }
 
     private static String renderPreviousMethods(EvaluationContext context) {
         return context.expressionsOfType(Method.class)
-                .map(source())
-                .toString("\n", "\n\n", "\n")
-                .replaceAll("\n", "\n  ");
+                .map(source().then(replaceAll("\n", "\n  ")).then(Strings.format("  %s")))
+                .toString("\n\n");
     }
 
     private static String renderUserImports(EvaluationContext context) {
         return context.expressionsOfType(Import.class)
-                .map(source())
-                .toString("", ";\n", ";");
+                .map(source().then(Strings.format("%s;")))
+                .toString("\n");
     }
 
     private static String renderDefaultImports() {

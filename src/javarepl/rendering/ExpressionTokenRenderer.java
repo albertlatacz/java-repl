@@ -5,10 +5,10 @@ import com.googlecode.totallylazy.multi;
 import javarepl.expressions.*;
 
 import static java.lang.String.format;
-import static javarepl.Utils.randomIdentifier;
 
 public class ExpressionTokenRenderer {
     public static final String EXPRESSION_TOKEN = "$JAVAREPL_EXPRESSION_TOKEN$";
+    public static final String EXPRESSION_VALUE = "$JAVAREPL_EXPRESSION_VALUE$";
 
     @multimethod
     public static String renderExpressionToken(Expression expression) {
@@ -52,7 +52,6 @@ public class ExpressionTokenRenderer {
     }
 
     private static String expressionWithValue(String value, String returnType) {
-        String identifier = randomIdentifier("expr");
-        return format("    %s %s =\n\n   %s;\n\n    return %s;", returnType, identifier, EXPRESSION_TOKEN, identifier);
+        return format("    %s %s =\n\n    %s;\n\n    return %s;", returnType, EXPRESSION_VALUE, EXPRESSION_TOKEN, EXPRESSION_VALUE);
     }
 }
