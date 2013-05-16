@@ -24,4 +24,25 @@ public class CompletionResult {
     public Sequence<String> candidates() {
         return candidates;
     }
+
+    @Override
+    public String toString() {
+        return expression + " -> " + candidates.toString("[", ",", "]") + " @ " + position;
+    }
+
+    @Override
+    public int hashCode() {
+        return (expression != null ? expression.hashCode() : 0) +
+                (candidates != null ? candidates.hashCode() : 0) +
+                (position != null ? position.hashCode() : 0);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof CompletionResult &&
+                other.getClass().equals(getClass()) &&
+                (expression != null && expression.equals(((CompletionResult) other).expression)) &&
+                (candidates != null && candidates.equals(((CompletionResult) other).candidates)) &&
+                (position != null && position.equals(((CompletionResult) other).position));
+    }
 }
