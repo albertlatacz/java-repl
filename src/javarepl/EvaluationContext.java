@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
+import javarepl.expressions.Import;
 
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -21,7 +22,12 @@ public class EvaluationContext {
     }
 
     public static EvaluationContext evaluationContext() {
-        return new EvaluationContext(Sequences.<Expression>empty(), Sequences.<Result>empty(), Option.<String>none());
+        return new EvaluationContext(
+                Sequences.<Expression>sequence(
+                        new Import("import java.util.*", "java.util.*"),
+                        new Import("import java.math.*", "java.math.*"),
+                        new Import("import static java.lang.Math.*", "java.lang.Math.*")),
+                Sequences.<Result>empty(), Option.<String>none());
     }
 
     public Option<String> lastSource() {

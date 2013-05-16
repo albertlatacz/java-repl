@@ -12,7 +12,6 @@ import javarepl.expressions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static java.lang.String.format;
 import static javarepl.Utils.extractType;
@@ -55,8 +54,7 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        writer.println(renderDefaultImports());
-        writer.println(renderUserImports(context));
+        writer.println(renderPreviousImports(context));
         writer.println(renderExpressionToken(expression));
         writer.println(renderClassName(className));
         writer.println(renderClassConstructor(className));
@@ -73,8 +71,7 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        writer.println(renderDefaultImports());
-        writer.println(renderUserImports(context));
+        writer.println(renderPreviousImports(context));
         writer.println(renderClassName(className));
         writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
@@ -93,8 +90,7 @@ public class EvaluationClassRenderer {
         PrintStream writer = new PrintStream(outputStream);
 
         if (expression.typePackage().isEmpty()) {
-            writer.println(renderDefaultImports());
-            writer.println(renderUserImports(context));
+            writer.println(renderPreviousImports(context));
         }
         writer.println(expression.source());
 
@@ -105,8 +101,7 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        writer.println(renderDefaultImports());
-        writer.println(renderUserImports(context));
+        writer.println(renderPreviousImports(context));
         writer.println(renderInterfaceName(className));
         writer.println(renderInterfaceMethod(expression));
         writer.println(renderEndOfFile());
@@ -129,8 +124,7 @@ public class EvaluationClassRenderer {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream writer = new PrintStream(outputStream);
 
-        writer.println(renderDefaultImports());
-        writer.println(renderUserImports(context));
+        writer.println(renderPreviousImports(context));
         writer.println(renderClassName(className));
         writer.println(renderClassConstructor(className));
         writer.println(renderPreviousEvaluations(context));
@@ -157,18 +151,10 @@ public class EvaluationClassRenderer {
                 .toString("\n\n");
     }
 
-    private static String renderUserImports(EvaluationContext context) {
+    private static String renderPreviousImports(EvaluationContext context) {
         return context.expressionsOfType(Import.class)
                 .map(source().then(Strings.format("%s;")))
                 .toString("\n");
-    }
-
-    private static String renderDefaultImports() {
-        return sequence(
-                "import java.util.*;",
-                "import java.math.*;",
-                "import static java.lang.Math.*;"
-        ).toString("\n");
     }
 
     private static String renderClassName(String className) {

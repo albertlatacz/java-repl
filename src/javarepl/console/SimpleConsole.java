@@ -31,7 +31,7 @@ public final class SimpleConsole implements Console {
         context.addInstance(ConsoleLogger.class, config.logger);
         context.add(Commands.class);
 
-        context.get(Evaluator.class).addResults(config.results);
+        evaluator().addResults(config.results);
     }
 
     public ConsoleResult execute(String expression) {

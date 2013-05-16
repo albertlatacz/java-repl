@@ -1,6 +1,4 @@
-* Improve expression listing
 * Simple auto-completion
-* Add more feedback when evaluating expressions
 * Export evaluations to source file
 * Show the list of recent exceptions
 * Support generic typing where possible
