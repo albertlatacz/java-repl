@@ -19,6 +19,6 @@ public final class ResetAllEvaluations extends Command {
 
     public void execute(String expression) {
         evaluator.reset();
-        logger.info("All variables has been cleared");
+        logger.success("All variables has been cleared");
     }
 }

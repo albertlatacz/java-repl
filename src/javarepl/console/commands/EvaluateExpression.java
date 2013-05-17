@@ -38,7 +38,7 @@ public final class EvaluateExpression extends Command {
         Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
 
         if (evaluation.isRight()) {
-            logger.info(new pattern(evaluation.right().expression(), evaluation.right().result()) {
+            logger.success(new pattern(evaluation.right().expression(), evaluation.right().result()) {
                 String match(Method expr, Option<Result> result) {
                     return "Created method " + expr.signature();
                 }

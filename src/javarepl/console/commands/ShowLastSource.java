@@ -19,6 +19,6 @@ public final class ShowLastSource extends Command {
     }
 
     public void execute(String expression) {
-        logger.info(evaluator.lastSource().getOrElse("No source"));
+        logger.success(evaluator.lastSource().getOrElse("No source"));
     }
 }

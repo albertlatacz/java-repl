@@ -8,7 +8,7 @@ import javarepl.console.rest.RestConsole;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.ConsoleLog.Type.SUCCESS;
 import static javarepl.console.commands.Command.parseStringCommand;
 
 /**
@@ -38,7 +38,7 @@ public class ConsoleWithAuthentication {
                     if (!command.second().isEmpty()) {
                         if (command.second().get().equals(password)) {
                             authenticated = true;
-                            return new ConsoleResult(expression, sequence(new ConsoleLog(INFO, "Logged in")));
+                            return new ConsoleResult(expression, sequence(new ConsoleLog(SUCCESS, "Logged in")));
                         } else {
                             return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Invalid password")));
                         }
@@ -51,7 +51,7 @@ public class ConsoleWithAuthentication {
             } else {
                 if (expression.startsWith(":logout")) {
                     authenticated = false;
-                    return new ConsoleResult(expression, sequence(new ConsoleLog(INFO, "Logged out")));
+                    return new ConsoleResult(expression, sequence(new ConsoleLog(SUCCESS, "Logged out")));
                 } else {
                     return super.execute(expression);
                 }

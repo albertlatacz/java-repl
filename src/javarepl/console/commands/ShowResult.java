@@ -15,7 +15,7 @@ public final class ShowResult extends Command {
     }
 
     public void execute(String expression) {
-        logger.info(evaluator.result(expression).get().toString(true));
+        logger.success(evaluator.result(expression).get().toString(true));
     }
 
     private static Predicate<String> containsResult(final Evaluator evaluator) {

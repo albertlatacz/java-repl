@@ -2,7 +2,7 @@ package javarepl.console;
 
 public class ConsoleLog {
     public static enum Type {
-        ERROR, INFO
+        INFO, SUCCESS, ERROR
     }
 
     private final Type type;

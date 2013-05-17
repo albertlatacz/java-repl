@@ -23,7 +23,7 @@ public final class ShowTypeOfExpression extends Command {
         Option<Class> expressionType = evaluator.typeOfExpression(parseStringCommand(expression).second().getOrElse(""));
 
         if (!expressionType.isEmpty()) {
-            logger.info(expressionType.get().getCanonicalName());
+            logger.success(expressionType.get().getCanonicalName());
         } else {
             logger.error("Cannot determine the type of this expression.");
         }

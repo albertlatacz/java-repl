@@ -2,7 +2,6 @@ package javarepl;
 
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import javarepl.completion.CodeCompleter;
@@ -43,7 +42,7 @@ import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.ConsoleLog.Type.SUCCESS;
 import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -53,12 +52,13 @@ public class Main {
 
     public static void main(String... args) throws Exception {
 
+        ConsoleLogger logger = systemStreamsLogger(args);
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
                 .expressions(initialExpressions(args))
-                .logger(systemStreamsLogger(args));
+                .logger(logger);
 
-        Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
+        RestConsole console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
 
         ExpressionReader expressionReader = expressionReader(args, console);
 
@@ -67,29 +67,35 @@ public class Main {
         }
 
         if (!ignoreConsole(args)) {
-            System.out.println(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
+            logger.info("");
+            logger.info(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
                     applicationVersion(),
                     isSandboxed(args) ? "sandboxed" : "unrestricted",
                     getProperty("java.vm.name"),
                     getProperty("java.version")));
         }
 
-        if (environmentChecksPassed()) {
-            if (!ignoreConsole(args)) {
-                System.out.println("Type in expression to evaluate.");
-                System.out.println("Type :help for more options.");
-                System.out.println("");
-            }
-
-            for (String expression : consoleConfig.expressions) {
-                console.execute(expression);
-            }
-
-            do {
-                console.execute(expressionReader.readExpression().getOrNull());
-                System.out.println("");
-            } while (true);
+        if (getSystemJavaCompiler() == null) {
+            logger.error("\nERROR: Java compiler not found.\n" +
+                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
+            return;
         }
+
+        if (!ignoreConsole(args)) {
+            logger.info("Access local web console at http://localhost:" + console.port());
+            logger.info("Type in expression to evaluate or :help for more options.");
+            logger.info("");
+        }
+
+        for (String expression : consoleConfig.expressions) {
+            console.execute(expression);
+        }
+
+        do {
+            console.execute(expressionReader.readExpression().getOrNull());
+            logger.info("");
+        } while (true);
+
     }
 
     private static String[] initialExpressions(String[] args) {
@@ -103,14 +109,12 @@ public class Main {
     private static ConsoleLogger systemStreamsLogger(String[] args) {
         ConsoleLogger logger = new ConsoleLogger(outStream, errStream);
 
-        LogicalPredicate<String> defaultIgnore = startsWith("POST /").or(startsWith("GET /"));
+        LogicalPredicate<String> ignoredLogs = startsWith("POST /")
+                .or(startsWith("GET /"))
+                .or(startsWith("Listening on http://"));
 
-        LogicalPredicate<String> ignoredLogs = ignoreConsole(args)
-                ? startsWith("Listening on http://")
-                : Predicates.<String>never();
-
-        System.setOut(new ConsoleLoggerPrintStream(INFO, defaultIgnore.or(ignoredLogs), logger));
-        System.setErr(new ConsoleLoggerPrintStream(ERROR, defaultIgnore.or(ignoredLogs), logger));
+        System.setOut(new ConsoleLoggerPrintStream(SUCCESS, ignoredLogs, logger));
+        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
 
         return logger;
     }
@@ -153,15 +157,6 @@ public class Main {
 
     private static Option<Integer> inactivityTimeout(String[] args) {
         return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
-    }
-
-    private static boolean environmentChecksPassed() {
-        if (getSystemJavaCompiler() == null) {
-            System.err.println("\nERROR: Java compiler not found.\n" +
-                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
-            return false;
-        }
-        return true;
     }
 
     private static void sandboxApplication() {
@@ -234,7 +229,7 @@ public class Main {
             }
 
             public String call(Sequence<String> lines) throws Exception {
-                consoleReader.setPrompt(lines.isEmpty() ? "java> " : "    | ");
+                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
                 return consoleReader.readLine();
             }
         };

@@ -10,7 +10,7 @@ import static com.googlecode.totallylazy.URLs.packageUrl;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.ConsoleLog.Type.SUCCESS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -189,7 +189,7 @@ public class SimpleConsoleTest {
         ConsoleConfig config = consoleConfig();
         SimpleConsole console = new SimpleConsole(config);
 
-        System.setOut(new ConsoleLoggerPrintStream(INFO, Predicates.<String>never(), config.logger));
+        System.setOut(new ConsoleLoggerPrintStream(SUCCESS, Predicates.<String>never(), config.logger));
         System.setErr(new ConsoleLoggerPrintStream(ERROR, Predicates.<String>never(), config.logger));
 
         ConsoleResult result = null;
@@ -201,7 +201,7 @@ public class SimpleConsoleTest {
     }
 
     private static ConsoleLog info(String messages) {
-        return new ConsoleLog(Type.INFO, messages);
+        return new ConsoleLog(Type.SUCCESS, messages);
     }
 
     private static ConsoleLog error(String messages) {

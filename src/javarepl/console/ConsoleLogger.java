@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.INFO;
+import static javarepl.console.ConsoleLog.Type.*;
 
 public final class ConsoleLogger {
     private Sequence<ConsoleLog> logs = Sequences.empty();
@@ -29,6 +28,10 @@ public final class ConsoleLogger {
         log(new ConsoleLog(INFO, message));
     }
 
+    public final void success(String message) {
+        log(new ConsoleLog(SUCCESS, message));
+    }
+
     public final void error(String message) {
         log(new ConsoleLog(ERROR, message));
     }
@@ -36,10 +39,13 @@ public final class ConsoleLogger {
     public final void log(ConsoleLog log) {
         switch (log.type()) {
             case INFO:
-                infoStream.println(log.message());
+                infoStream.println("\u001B[0m" + log.message());
+                break;
+            case SUCCESS:
+                infoStream.println("\u001B[32m" + log.message() + "\u001B[0m");
                 break;
             case ERROR:
-                errorStream.println(log.message());
+                errorStream.println("\u001B[31m" + log.message() + "\u001B[0m");
                 break;
         }
 

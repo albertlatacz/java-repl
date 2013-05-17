@@ -21,7 +21,7 @@ public final class ReplayAllEvaluations extends Command {
     }
 
     public void execute(String line) {
-        logger.info("Replaying all evaluations:");
+        logger.success("Replaying all evaluations:");
         Sequence<Expression> expressions = evaluator.expressions();
         evaluator.reset();
 

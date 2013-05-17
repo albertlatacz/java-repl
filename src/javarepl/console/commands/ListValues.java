@@ -57,18 +57,18 @@ public final class ListValues extends Command {
     }
 
     private void listMethods() {
-        logger.info(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).map(signature())));
+        logger.success(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).map(signature())));
     }
 
     private void listImports() {
-        logger.info(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(typePackage())));
+        logger.success(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(typePackage())));
     }
 
     private void listTypes() {
-        logger.info(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).map(type())));
+        logger.success(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).map(type())));
     }
 
     private void listResults() {
-        logger.info(listValues("Results", evaluator.results()));
+        logger.success(listValues("Results", evaluator.results()));
     }
 }

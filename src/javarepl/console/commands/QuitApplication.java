@@ -18,7 +18,7 @@ public final class QuitApplication extends Command {
     }
 
     public void execute(String expression) {
-        logger.info("Terminating...");
+        logger.success("Terminating...");
         evaluator.clearOutputDirectory();
         System.exit(0);
     }

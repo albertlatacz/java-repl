@@ -30,7 +30,7 @@ public final class AddToClasspath extends Command {
             URL url = resolveURL(path);
 
             if (isWebUrl(url)) {
-                logger.info(format("Downloading %s...", path));
+                logger.success(format("Downloading %s...", path));
 
                 File outputFile = new File(evaluator.outputDirectory(), randomIdentifier("external"));
                 copyAndClose(url.openStream(), new FileOutputStream(outputFile));
@@ -40,7 +40,7 @@ public final class AddToClasspath extends Command {
                 evaluator.addClasspathUrl(url);
             }
 
-            logger.info(format("Added %s to classpath.", path));
+            logger.success(format("Added %s to classpath.", path));
         } catch (Exception e) {
             logger.error(format("Could not add %s to classpath. %s", path, e.getLocalizedMessage()));
         }

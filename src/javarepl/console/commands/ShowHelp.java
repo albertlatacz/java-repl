@@ -1,6 +1,5 @@
 package javarepl.console.commands;
 
-import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleLogger;
 import jline.console.completer.StringsCompleter;
 
@@ -20,6 +19,6 @@ public final class ShowHelp extends Command {
     }
 
     public void execute(String expression) {
-        logger.log(new ConsoleLog(ConsoleLog.Type.INFO, listValues("Available commands", commands.userCommands().map(asString()).filter(not(nullValue())))));
+        logger.success(listValues("Available commands", commands.userCommands().map(asString()).filter(not(nullValue()))));
     }
 }

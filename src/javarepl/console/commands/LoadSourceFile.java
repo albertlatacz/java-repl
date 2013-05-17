@@ -27,7 +27,7 @@ public final class LoadSourceFile extends Command {
         if (!path.isEmpty()) {
             try {
                 evaluator.evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
-                logger.info(format("Loaded source file from %s", path.get()));
+                logger.success(format("Loaded source file from %s", path.get()));
             } catch (Exception e) {
                 logger.error(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));
             }

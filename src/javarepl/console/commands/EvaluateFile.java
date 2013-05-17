@@ -28,7 +28,7 @@ public final class EvaluateFile extends Command {
             }
             ;
 
-            logger.info(format("Finished evaluating %s", path));
+            logger.success(format("Finished evaluating %s", path));
         } catch (Exception e) {
             logger.error(format("Could evaluate %s. %s", path, e.getLocalizedMessage()));
         }
