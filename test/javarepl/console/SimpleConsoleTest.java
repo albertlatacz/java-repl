@@ -85,20 +85,21 @@ public class SimpleConsoleTest {
 
     @Test
     public void supportsListingOfAllValues() {
-        assertThat(
-                executing("void method1(){}", "\"test\"", "import java.net.*", "class AClass{}", ":list all"),
-                hasLogged(
-                        info("Results:\n" +
-                                "    String res0 = \"test\"\n"),
-                        info("Types:\n" +
-                                "    AClass\n"),
-                        info("Imports:\n" +
-                                "    java.util.*\n" +
-                                "    java.math.*\n" +
-                                "    java.lang.Math.*\n" +
-                                "    java.net.*\n"),
-                        info("Methods:\n" +
-                                "    void method1()\n")));
+        Matcher<ConsoleResult> hasListedAllValues = hasLogged(
+                info("Results:\n" +
+                        "    String res0 = \"test\"\n"),
+                info("Types:\n" +
+                        "    AClass\n"),
+                info("Imports:\n" +
+                        "    java.util.*\n" +
+                        "    java.math.*\n" +
+                        "    java.lang.Math.*\n" +
+                        "    java.net.*\n"),
+                info("Methods:\n" +
+                        "    void method1()\n"));
+
+        assertThat(executing("void method1(){}", "\"test\"", "import java.net.*", "class AClass{}", ":list"), hasListedAllValues);
+        assertThat(executing("void method1(){}", "\"test\"", "import java.net.*", "class AClass{}", ":list unknown_type"), hasListedAllValues);
     }
 
     @Test

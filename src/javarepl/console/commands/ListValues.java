@@ -32,26 +32,18 @@ public final class ListValues extends Command {
     public void execute(String expression) {
         String items = expression.replace(COMMAND, "").trim();
 
-        if (items.equals("all")) {
-            listResults();
-            listTypes();
-            listImports();
-            listMethods();
-        }
-
         if (items.equals("results")) {
             listResults();
-        }
-
-        if (items.equals("types")) {
+        } else if (items.equals("types")) {
             listTypes();
-        }
-
-        if (items.equals("imports")) {
+        } else if (items.equals("imports")) {
             listImports();
-        }
-
-        if (items.equals("methods")) {
+        } else if (items.equals("methods")) {
+            listMethods();
+        } else {
+            listResults();
+            listTypes();
+            listImports();
             listMethods();
         }
     }
