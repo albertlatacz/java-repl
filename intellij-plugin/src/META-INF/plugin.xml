@@ -19,6 +19,7 @@
             <li>Search and evaluate expression from history</li>
             <li>Clear and replay previous evaluations</li>
             <li>Load and evaluate any Java source file</li>
+            <li>Support for code completion and syntax highlighting</li>
         </ul>
         ]]></description>
 

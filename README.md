@@ -3,6 +3,7 @@
 Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 * Support for most of Java language constructs
+* Access from console as well as web terminal via browser
 * Create imports, methods, classes, enums and interfaces
 * Load classes from any jar file or directory (including web urls)
 * Load and evaluate expression from file
@@ -11,7 +12,8 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 * Search and evaluate expression from history
 * Clear and replay previous evaluations
 * Load and evaluate any Java source file
-
+* Basic code completion for results, classes and methods
+* Coloured output for console and web terminal
 
 Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
