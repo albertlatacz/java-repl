@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.*;
 import java.io.File;
 
 import static com.googlecode.totallylazy.Sequences.one;
+import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.predicates.Not.not;
 
 
@@ -47,8 +48,9 @@ public final class ConsoleHistory {
         }
     }
 
-    public void add(String expression) {
-        history = addToHistory(one(expression));
+    public ConsoleHistory add(String expression) {
+        history = addToHistory(one(expression).map(replaceAll("\n", " ")));
+        return this;
     }
 
     public Sequence<String> items() {
@@ -56,7 +58,7 @@ public final class ConsoleHistory {
     }
 
     private Sequence<String> addToHistory(Sequence<String> historyToAdd) {
-        return history.join(historyToAdd).filter(not(ignored)).reverse().take(300).reverse();
+        return history.join(historyToAdd.map(replaceAll("\n", " "))).filter(not(ignored)).reverse().take(300).reverse();
     }
 
 }

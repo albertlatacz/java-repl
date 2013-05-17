@@ -198,7 +198,6 @@ public class Main {
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(new AggregateCompleter(completers().toList()));
-                consoleReader.setHistory(historyFromConsole());
             }
 
             private Sequence<Completer> completers() {
@@ -220,17 +219,18 @@ public class Main {
                 };
             }
 
+            public String call(Sequence<String> lines) throws Exception {
+                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
+                consoleReader.setHistory(historyFromConsole());
+                return consoleReader.readLine();
+            }
+
             private MemoryHistory historyFromConsole() {
                 MemoryHistory history = new MemoryHistory();
                 for (String historyItem : console.context().get(ConsoleHistory.class).items()) {
                     history.add(historyItem);
                 }
                 return history;
-            }
-
-            public String call(Sequence<String> lines) throws Exception {
-                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
-                return consoleReader.readLine();
             }
         };
     }
