@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.ConsoleConfig.consoleConfig;
-import static javarepl.console.commands.Commands.defaultCommands;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class SimpleConsoleCompleterTest {
@@ -56,7 +55,7 @@ public class SimpleConsoleCompleterTest {
     }
 
     private void givenConsoleThatExecuted(String... expressions) {
-        console = new SimpleConsole(consoleConfig().commands(defaultCommands()));
+        console = new SimpleConsole(consoleConfig());
 
         for (String expression : expressions) {
             console.execute(expression);

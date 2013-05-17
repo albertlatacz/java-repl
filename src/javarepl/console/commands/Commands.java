@@ -40,22 +40,4 @@ public final class Commands {
             }
         };
     }
-
-    public static Class<? extends Command>[] defaultCommands() {
-        return Sequences.<Class<? extends Command>>sequence()
-                .add(QuitApplication.class)
-                .add(ShowHistory.class)
-                .add(SearchHistory.class)
-                .add(EvaluateFromHistory.class)
-                .add(ResetAllEvaluations.class)
-                .add(ReplayAllEvaluations.class)
-                .add(EvaluateFile.class)
-                .add(AddToClasspath.class)
-                .add(LoadSourceFile.class)
-                .add(ListValues.class)
-                .add(ShowLastSource.class)
-                .add(ShowTypeOfExpression.class)
-                .toArray(Command.class.getClass());
-    }
-
 }

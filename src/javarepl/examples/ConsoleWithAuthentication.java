@@ -10,7 +10,6 @@ import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
 import static javarepl.console.commands.Command.parseStringCommand;
-import static javarepl.console.commands.Commands.defaultCommands;
 
 /**
  * Example shows how to write console wrapper that restricts JavaREPL access until user logs in with correct password.
@@ -19,7 +18,7 @@ import static javarepl.console.commands.Commands.defaultCommands;
 public class ConsoleWithAuthentication {
 
     public static void main(String... args) throws Exception {
-        new RestConsole(new AuthConsole(new SimpleConsole(consoleConfig().commands(defaultCommands())), "password"), 8001);
+        new RestConsole(new AuthConsole(new SimpleConsole(consoleConfig()), "password"), 8001);
     }
 
     public static class AuthConsole extends DelegatingConsole {

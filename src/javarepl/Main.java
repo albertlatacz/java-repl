@@ -45,7 +45,6 @@ import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.INFO;
 import static javarepl.console.commands.Command.functions.completer;
-import static javarepl.console.commands.Commands.defaultCommands;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -56,8 +55,7 @@ public class Main {
 
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
-                .commands(defaultCommands())
-                .expression(initialExpression(args))
+                .expressions(initialExpressions(args))
                 .logger(systemStreamsLogger(args));
 
         Console console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
@@ -83,8 +81,8 @@ public class Main {
                 System.out.println("");
             }
 
-            if (!consoleConfig.expression.isEmpty()) {
-                console.execute(consoleConfig.expression.get());
+            for (String expression : consoleConfig.expressions) {
+                console.execute(expression);
             }
 
             do {
@@ -94,8 +92,12 @@ public class Main {
         }
     }
 
-    private static Option<String> initialExpression(String[] args) {
-        return sequence(args).find(startsWith("--expression=")).map(replaceAll("--expression=", ""));
+    private static String[] initialExpressions(String[] args) {
+        return sequence(args)
+                .find(startsWith("--expression="))
+                .map(replaceAll("--expression=", ""))
+                .toSequence()
+                .toArray(String.class);
     }
 
     private static ConsoleLogger systemStreamsLogger(String[] args) {
