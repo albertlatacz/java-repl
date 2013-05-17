@@ -105,19 +105,21 @@ public class SimpleConsoleTest {
     public void supportsListingHistoryOfEvaluations() {
         assertThat(
                 executing(":hist"),
-                hasLogged(info("No history.")));
+                hasLogged(info("History:\n" +
+                        "    1  :hist\n")));
 
         assertThat(
                 executing("42", "\"test\"", ":hist"),
                 hasLogged(info("History:\n" +
                         "    1  42\n" +
-                        "    2  \"test\"\n")));
+                        "    2  \"test\"\n" +
+                        "    3  :hist\n")));
 
         assertThat(
                 executing("42", "21", "\"test\"", ":hist 2"),
                 hasLogged(info("History:\n" +
-                        "    2  21\n" +
-                        "    3  \"test\"\n")));
+                        "    3  \"test\"\n" +
+                        "    4  :hist 2\n")));
     }
 
 
@@ -128,13 +130,15 @@ public class SimpleConsoleTest {
                 hasLogged(info("History search for '':\n" +
                         "    1  42\n" +
                         "    2  \"test 1\"\n" +
-                        "    3  \"test 2\"\n")));
+                        "    3  \"test 2\"\n" +
+                        "    4  :h?\n")));
 
         assertThat(
                 executing("42", "\"test 1\"", "\"test 2\"", ":h? test"),
                 hasLogged(info("History search for 'test':\n" +
                         "    2  \"test 1\"\n" +
-                        "    3  \"test 2\"\n")));
+                        "    3  \"test 2\"\n" +
+                        "    4  :h? test\n")));
     }
 
     @Test
@@ -144,14 +148,16 @@ public class SimpleConsoleTest {
                 hasLogged(info("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n" +
-                        "    3  \"test\"\n")));
+                        "    3  \"test\"\n" +
+                        "    4  :hist\n")));
 
         assertThat(
                 executing("42", "\"test\"", ":h! 1", ":hist"),
                 hasLogged(info("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n" +
-                        "    3  42\n")));
+                        "    3  42\n" +
+                        "    4  :hist\n")));
     }
 
     @Test

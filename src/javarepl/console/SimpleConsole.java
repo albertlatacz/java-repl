@@ -35,8 +35,8 @@ public final class SimpleConsole implements Console {
     }
 
     public ConsoleResult execute(String expression) {
-        ConsoleResult result = evaluationRules().apply(expression);
         context.get(ConsoleHistory.class).add(expression);
+        ConsoleResult result = evaluationRules().apply(expression);
         return result;
     }
 
