@@ -22,12 +22,14 @@ public class EvaluationContext {
     }
 
     public static EvaluationContext evaluationContext() {
-        return new EvaluationContext(
-                Sequences.<Expression>sequence(
-                        new Import("import java.util.*", "java.util.*"),
-                        new Import("import java.math.*", "java.math.*"),
-                        new Import("import static java.lang.Math.*", "java.lang.Math.*")),
-                Sequences.<Result>empty(), Option.<String>none());
+        return new EvaluationContext(defaultExpressions(), Sequences.<Result>empty(), Option.<String>none());
+    }
+
+    public static Sequence<Expression> defaultExpressions() {
+        return Sequences.<Expression>sequence(
+                new Import("import java.util.*", "java.util.*"),
+                new Import("import java.math.*", "java.math.*"),
+                new Import("import static java.lang.Math.*", "java.lang.Math.*"));
     }
 
     public Option<String> lastSource() {

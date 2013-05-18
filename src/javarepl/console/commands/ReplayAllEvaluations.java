@@ -7,6 +7,7 @@ import javarepl.expressions.Expression;
 import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
+import static javarepl.EvaluationContext.defaultExpressions;
 import static javarepl.console.commands.EvaluateExpression.evaluate;
 
 public final class ReplayAllEvaluations extends Command {
@@ -22,9 +23,9 @@ public final class ReplayAllEvaluations extends Command {
 
     public void execute(String line) {
         logger.success("Replaying all evaluations:");
-        Sequence<Expression> expressions = evaluator.expressions();
-        evaluator.reset();
+        Sequence<Expression> expressions = evaluator.expressions().removeAll(defaultExpressions());
 
+        evaluator.reset();
         for (Expression expression : expressions) {
             evaluate(evaluator, logger, expression.source());
         }
