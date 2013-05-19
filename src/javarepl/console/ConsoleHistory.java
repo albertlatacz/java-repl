@@ -4,7 +4,7 @@ import com.googlecode.totallylazy.*;
 
 import java.io.File;
 
-import static com.googlecode.totallylazy.Sequences.one;
+import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.predicates.Not.not;
 
@@ -49,7 +49,7 @@ public final class ConsoleHistory {
     }
 
     public ConsoleHistory add(String expression) {
-        history = addToHistory(one(expression).map(replaceAll("\n", " ")));
+        history = addToHistory(option(expression).map(replaceAll("\n", " ")).toSequence());
         return this;
     }
 

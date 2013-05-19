@@ -51,8 +51,7 @@ public class Main {
     private static PrintStream errStream = System.err;
 
     public static void main(String... args) throws Exception {
-
-        ConsoleLogger logger = systemStreamsLogger(args);
+        ConsoleLogger logger = systemStreamsLogger(args, isColored(args));
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(args))
                 .expressions(initialExpressions(args))
@@ -106,8 +105,8 @@ public class Main {
                 .toArray(String.class);
     }
 
-    private static ConsoleLogger systemStreamsLogger(String[] args) {
-        ConsoleLogger logger = new ConsoleLogger(outStream, errStream);
+    private static ConsoleLogger systemStreamsLogger(String[] args, Boolean colored) {
+        ConsoleLogger logger = new ConsoleLogger(outStream, errStream, colored);
 
         LogicalPredicate<String> ignoredLogs = startsWith("POST /")
                 .or(startsWith("GET /"))
@@ -141,6 +140,10 @@ public class Main {
 
     private static boolean ignoreConsole(String[] args) {
         return sequence(args).contains("--ignoreConsole");
+    }
+
+    private static boolean isColored(String[] args) {
+        return !simpleConsole(args) && !ignoreConsole(args);
     }
 
     private static boolean isSandboxed(String[] args) {

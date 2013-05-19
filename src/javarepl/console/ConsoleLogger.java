@@ -13,15 +13,18 @@ public final class ConsoleLogger {
     private Sequence<ConsoleLog> logs = Sequences.empty();
     private final PrintStream infoStream;
     private final PrintStream errorStream;
+    private final Boolean colored;
 
-    public ConsoleLogger(PrintStream infoStream, PrintStream errorStream) {
+    public ConsoleLogger(PrintStream infoStream, PrintStream errorStream, Boolean colored) {
         this.infoStream = infoStream;
         this.errorStream = errorStream;
+        this.colored = colored;
     }
 
     public ConsoleLogger() {
         infoStream = voidOutputStream();
         errorStream = voidOutputStream();
+        colored = false;
     }
 
     public final void info(String message) {
@@ -39,17 +42,27 @@ public final class ConsoleLogger {
     public final void log(ConsoleLog log) {
         switch (log.type()) {
             case INFO:
-                infoStream.println("\u001B[0m" + log.message());
+                printColored(infoStream, log.message(), "\u001B[0m");
                 break;
             case SUCCESS:
-                infoStream.println("\u001B[32m" + log.message() + "\u001B[0m");
+                printColored(infoStream, log.message(), "\u001B[32m");
                 break;
             case ERROR:
-                errorStream.println("\u001B[31m" + log.message() + "\u001B[0m");
+                printColored(errorStream, log.message(), "\u001B[31m");
                 break;
         }
 
         logs = logs.cons(log);
+    }
+
+    private void printColored(PrintStream stream, String message, String color) {
+        if (colored)
+            stream.print(color);
+
+        stream.println(message);
+
+        if (colored)
+            stream.print("\u001B[0m");
     }
 
     public final Sequence<ConsoleLog> logs() {
