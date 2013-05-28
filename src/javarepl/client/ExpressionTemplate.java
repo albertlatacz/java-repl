@@ -4,7 +4,7 @@ public final class ExpressionTemplate {
     private final String template;
     private final String token;
 
-    public ExpressionTemplate(String template, String token) {
+    ExpressionTemplate(String template, String token) {
         this.template = template;
         this.token = token;
     }
