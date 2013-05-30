@@ -44,6 +44,11 @@ public final class JavaREPLClient {
                 sequence(model.getValues("candidates", String.class)));
     }
 
+    public synchronized Sequence<String> history() throws Exception {
+        Model model = parse(client.handle(get(url("history")).build()).entity().toString());
+        return sequence(model.getValues("history", String.class));
+    }
+
     private Function1<Model, EvaluationLog> modelToEvaluationLog() {
         return new Function1<Model, EvaluationLog>() {
             public EvaluationLog call(Model model) throws Exception {

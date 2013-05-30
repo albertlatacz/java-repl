@@ -73,6 +73,17 @@ public class RestConsoleTest {
                 .add("candidates", sequence("res0", "res1", "res2"))));
     }
 
+    @Test
+    public void shouldReturnHistory() throws Exception {
+        client.handle(post(url("execute")).form("expression", "life = 42").build());
+        client.handle(post(url("execute")).form("expression", ":help").build());
+
+        Response response = client.handle(get(url("history")).build());
+
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model().add("history", asList("life = 42", ":help"))));
+    }
+
     private String url(String url) {
         return prefixUrl + "/" + url;
     }

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.one;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.client.EvaluationLog.Type.SUCCESS;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
@@ -58,5 +59,14 @@ public class JavaREPLClientTest {
         assertThat(result.expression(), is("li"));
         assertThat(result.position(), is(0));
         assertThat(result.candidates(), is(one("life")));
+    }
+
+
+    @Test
+    public void returnsHistory() throws Exception {
+        client.execute("life = 42");
+        client.execute(":help");
+
+        assertThat(client.history(), is(sequence("life = 42", ":help")));
     }
 }

@@ -10,6 +10,7 @@ import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
 import javarepl.completion.CompletionResult;
 import javarepl.completion.SimpleConsoleCompleter;
+import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 import javarepl.expressions.Expression;
@@ -36,7 +37,11 @@ public class RestConsoleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Model execute(@FormParam("expression") String expr) {
         Option<String> expression = expressionReader.readExpression(expr);
-        return resultToModel(expression.isEmpty() ? emptyResult() : console.execute(expression.get()));
+        ConsoleResult result = expression.isEmpty() ? emptyResult() : console.execute(expression.get());
+
+        return model()
+                .add("expression", result.expression())
+                .add("logs", result.logs().map(commandResultToModel()));
     }
 
     @GET
@@ -45,7 +50,9 @@ public class RestConsoleResource {
     public Model template(@QueryParam("expression") String expr) {
         Evaluator evaluator = console.context().get(Evaluator.class);
         Expression expression = evaluator.parseExpression(expr);
-        return model().add("template", renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), expression))
+
+        return model()
+                .add("template", renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), expression))
                 .add("token", EXPRESSION_TOKEN);
     }
 
@@ -53,26 +60,24 @@ public class RestConsoleResource {
     @Path("completions")
     @Produces(MediaType.APPLICATION_JSON)
     public Model completions(@QueryParam("expression") String expr) {
-        return completionResultToModel(completer.apply(expr));
-    }
-
-    @GET
-    @Path("")
-    public Response main() {
-        return Responses.seeOther("console.html");
-    }
-
-    private Model completionResultToModel(CompletionResult result) {
+        CompletionResult result = completer.apply(expr);
         return model()
                 .add("expression", result.expression())
                 .add("position", result.position().toString())
                 .add("candidates", result.candidates());
     }
 
-    public static Model resultToModel(ConsoleResult result) {
-        return model()
-                .add("expression", result.expression())
-                .add("logs", result.logs().map(commandResultToModel()));
+    @GET
+    @Path("history")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model history() {
+        return model().add("history", console.context().get(ConsoleHistory.class).items().toList());
+    }
+
+    @GET
+    @Path("")
+    public Response main() {
+        return Responses.seeOther("console.html");
     }
 
     private static Function1<ConsoleLog, Model> commandResultToModel() {

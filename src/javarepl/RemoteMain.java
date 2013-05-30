@@ -8,6 +8,7 @@ import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
 import jline.console.ConsoleReader;
 import jline.console.completer.Completer;
+import jline.console.history.MemoryHistory;
 
 import java.io.IOException;
 import java.util.List;
@@ -76,7 +77,16 @@ public class RemoteMain {
 
             public String call(Sequence<String> lines) throws Exception {
                 consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
+                consoleReader.setHistory(clientHistory());
                 return consoleReader.readLine();
+            }
+
+            private MemoryHistory clientHistory() throws Exception {
+                MemoryHistory history = new MemoryHistory();
+                for (String historyItem : client.history()) {
+                    history.add(historyItem);
+                }
+                return history;
             }
 
             private Completer clientCompleter() {
