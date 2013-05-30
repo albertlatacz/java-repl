@@ -5,9 +5,12 @@ import com.googlecode.totallylazy.Sequence;
 import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
+import javarepl.completion.CompletionResult;
 import jline.console.ConsoleReader;
+import jline.console.completer.Completer;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -20,7 +23,7 @@ public class RemoteMain {
     public static void main(String... args) throws Exception {
         JavaREPLClient client = new JavaREPLClient(hostname(args), port(args));
 
-        ExpressionReader expressionReader = new ExpressionReader(readFromExtendedConsole());
+        ExpressionReader expressionReader = new ExpressionReader(readFromExtendedConsole(client));
 
         String expression = null;
         do {
@@ -60,7 +63,7 @@ public class RemoteMain {
         }
     }
 
-    private static Function1<Sequence<String>, String> readFromExtendedConsole() throws IOException {
+    private static Function1<Sequence<String>, String> readFromExtendedConsole(final JavaREPLClient client) throws IOException {
         return new Function1<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
@@ -68,11 +71,26 @@ public class RemoteMain {
                 consoleReader = new ConsoleReader(System.in, System.out);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
+                consoleReader.addCompleter(clientCompleter());
             }
 
             public String call(Sequence<String> lines) throws Exception {
                 consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
                 return consoleReader.readLine();
+            }
+
+            private Completer clientCompleter() {
+                return new Completer() {
+                    public int complete(String expression, int cursor, List<CharSequence> candidates) {
+                        try {
+                            CompletionResult result = client.completions(expression);
+                            candidates.addAll(result.candidates().toList());
+                            return result.candidates().isEmpty() ? -1 : result.position();
+                        } catch (Exception e) {
+                            return -1;
+                        }
+                    }
+                };
             }
 
         };

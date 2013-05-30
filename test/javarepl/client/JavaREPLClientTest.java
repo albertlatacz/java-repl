@@ -1,5 +1,6 @@
 package javarepl.client;
 
+import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleConfig;
 import javarepl.console.SimpleConsole;
 import javarepl.console.rest.RestConsole;
@@ -7,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.Sequences.one;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.client.EvaluationLog.Type.SUCCESS;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
@@ -46,5 +48,15 @@ public class JavaREPLClientTest {
         assertThat(result.expression(), is("life = 42"));
         assertThat(result.logs().get(0).message(), is("Integer life = 42"));
         assertThat(result.logs().get(0).type(), is(SUCCESS));
+    }
+
+    @Test
+    public void returnsCompletions() throws Exception {
+        client.execute("life = 42");
+        CompletionResult result = client.completions("li");
+
+        assertThat(result.expression(), is("li"));
+        assertThat(result.position(), is(0));
+        assertThat(result.candidates(), is(one("life")));
     }
 }

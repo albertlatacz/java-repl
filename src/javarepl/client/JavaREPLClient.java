@@ -4,6 +4,7 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import javarepl.completion.CompletionResult;
 
 import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -36,6 +37,13 @@ public final class JavaREPLClient {
         return new EvaluationResult(expression, logs.map(modelToEvaluationLog()));
     }
 
+    public synchronized CompletionResult completions(String expr) throws Exception {
+        Model model = parse(client.handle(get(url("completions")).query("expression", expr).build()).entity().toString());
+        return new CompletionResult(model.get("expression", String.class),
+                Integer.valueOf(model.get("position", String.class)),
+                sequence(model.getValues("candidates", String.class)));
+    }
+
     private Function1<Model, EvaluationLog> modelToEvaluationLog() {
         return new Function1<Model, EvaluationLog>() {
             public EvaluationLog call(Model model) throws Exception {
@@ -47,5 +55,4 @@ public final class JavaREPLClient {
     private String url(String path) {
         return "http://" + hostname + ":" + port + "/" + path;
     }
-
 }

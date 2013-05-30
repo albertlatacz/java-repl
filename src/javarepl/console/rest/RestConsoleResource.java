@@ -8,6 +8,8 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
+import javarepl.completion.CompletionResult;
+import javarepl.completion.SimpleConsoleCompleter;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 import javarepl.expressions.Expression;
@@ -21,10 +23,12 @@ import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 public class RestConsoleResource {
     private final RestConsole console;
     private final RestConsoleExpressionReader expressionReader;
+    private final SimpleConsoleCompleter completer;
 
-    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader) {
+    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader, SimpleConsoleCompleter completer) {
         this.console = console;
         this.expressionReader = expressionReader;
+        this.completer = completer;
     }
 
     @POST
@@ -46,9 +50,23 @@ public class RestConsoleResource {
     }
 
     @GET
+    @Path("completions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model completions(@QueryParam("expression") String expr) {
+        return completionResultToModel(completer.apply(expr));
+    }
+
+    @GET
     @Path("")
     public Response main() {
         return Responses.seeOther("console.html");
+    }
+
+    private Model completionResultToModel(CompletionResult result) {
+        return model()
+                .add("expression", result.expression())
+                .add("position", result.position().toString())
+                .add("candidates", result.candidates());
     }
 
     public static Model resultToModel(ConsoleResult result) {

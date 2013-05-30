@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.funclate.Model.persistent.parse;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static java.util.Arrays.asList;
@@ -55,6 +56,21 @@ public class RestConsoleTest {
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response).get("template", String.class),
                 containsString(body(response).get("token", String.class)));
+    }
+
+    @Test
+    public void shouldReturnCompletions() throws Exception {
+        client.handle(post(url("execute")).form("expression", "42").build());
+        client.handle(post(url("execute")).form("expression", "21").build());
+        client.handle(post(url("execute")).form("expression", "7").build());
+
+        Response response = client.handle(get(url("completions")).query("expression", "prefix r").build());
+
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model()
+                .add("expression", "prefix r")
+                .add("position", "7")
+                .add("candidates", sequence("res0", "res1", "res2"))));
     }
 
     private String url(String url) {
