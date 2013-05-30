@@ -12,7 +12,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class SimpleConsoleCompleterTest {
+public class ConsoleCompleterTest {
 
     private Console console;
 
@@ -51,7 +51,7 @@ public class SimpleConsoleCompleterTest {
     }
 
     private CompletionResult completing(String expression) {
-        return new SimpleConsoleCompleter(console).apply(expression);
+        return new ConsoleCompleter(console).apply(expression);
     }
 
     private void givenConsoleThatExecuted(String... expressions) {

@@ -4,16 +4,15 @@ import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
-import javarepl.completion.CodeCompleter;
+import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
-import javarepl.completion.SimpleConsoleCompleter;
+import javarepl.completion.ConsoleCompleter;
 import javarepl.console.Console;
 import javarepl.console.*;
 import javarepl.console.commands.Commands;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.completer.AggregateCompleter;
-import jline.console.completer.Completer;
 import jline.console.history.MemoryHistory;
 
 import java.io.*;
@@ -203,13 +202,13 @@ public class Main {
                 consoleReader.addCompleter(new AggregateCompleter(completers().toList()));
             }
 
-            private Sequence<Completer> completers() {
+            private Sequence<jline.console.completer.Completer> completers() {
                 return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                        .add(completerFor(new SimpleConsoleCompleter(console)));
+                        .add(completerFor(new ConsoleCompleter(console)));
             }
 
-            private Completer completerFor(final CodeCompleter completer) {
-                return new Completer() {
+            private jline.console.completer.Completer completerFor(final Completer completer) {
+                return new jline.console.completer.Completer() {
                     public int complete(String expression, int cursor, List<CharSequence> candidates) {
                         CompletionResult result = completer.apply(expression);
                         if (expression.trim().startsWith(":") || result.candidates().isEmpty()) {

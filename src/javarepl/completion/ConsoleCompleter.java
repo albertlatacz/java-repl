@@ -12,10 +12,10 @@ import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.expressions.Expression.functions.key;
 import static javarepl.expressions.Method.functions.methodName;
 
-public class SimpleConsoleCompleter extends CodeCompleter {
+public class ConsoleCompleter extends Completer {
     public final Console console;
 
-    public SimpleConsoleCompleter(Console console) {
+    public ConsoleCompleter(Console console) {
         this.console = console;
     }
 

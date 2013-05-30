@@ -9,7 +9,7 @@ import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
 import javarepl.completion.CompletionResult;
-import javarepl.completion.SimpleConsoleCompleter;
+import javarepl.completion.ConsoleCompleter;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
@@ -24,9 +24,9 @@ import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 public class RestConsoleResource {
     private final RestConsole console;
     private final RestConsoleExpressionReader expressionReader;
-    private final SimpleConsoleCompleter completer;
+    private final ConsoleCompleter completer;
 
-    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader, SimpleConsoleCompleter completer) {
+    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader, ConsoleCompleter completer) {
         this.console = console;
         this.expressionReader = expressionReader;
         this.completer = completer;
