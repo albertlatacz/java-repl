@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 
@@ -12,7 +11,7 @@ public final class QuitApplication extends Command {
     private final ConsoleLogger logger;
 
     public QuitApplication(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new StringsCompleter(COMMAND));
+        super(COMMAND + " - quit application", equalTo(COMMAND).or(equalTo(null)), new CommandCompleter(COMMAND));
         this.evaluator = evaluator;
         this.logger = logger;
     }

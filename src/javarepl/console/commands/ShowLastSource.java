@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 
@@ -13,7 +12,7 @@ public final class ShowLastSource extends Command {
     private final ConsoleLogger logger;
 
     public ShowLastSource(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " - show source of last evaluated expression", equalTo(COMMAND), new CommandCompleter(COMMAND));
         this.evaluator = evaluator;
         this.logger = logger;
     }

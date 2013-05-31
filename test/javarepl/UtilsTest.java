@@ -1,12 +1,12 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Sequences;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
 
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.util.Arrays.asList;
@@ -33,7 +33,7 @@ public class UtilsTest {
     @Test
     public void returnsPowerSetPermutations() {
         assertThat(powerSetPermutations(sequence(1, 2)),
-                containsInAnyOrder(sequence(1), sequence(2), sequence(1, 2), sequence(2, 1), Sequences.<Integer>empty()));
+                containsInAnyOrder(sequence(1), sequence(2), sequence(1, 2), sequence(2, 1), empty(Integer.class)));
     }
 
     @Test

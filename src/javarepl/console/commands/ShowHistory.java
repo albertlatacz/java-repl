@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Pair.functions.values;
 import static com.googlecode.totallylazy.Strings.replace;
@@ -19,7 +18,7 @@ public final class ShowHistory extends Command {
 
     public ShowHistory(ConsoleLogger logger, ConsoleHistory history) {
         super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
-                startsWith(COMMAND), new StringsCompleter(COMMAND));
+                startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.logger = logger;
         this.history = history;
     }

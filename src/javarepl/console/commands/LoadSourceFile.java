@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Files.asFile;
 import static com.googlecode.totallylazy.Strings.startsWith;
@@ -16,7 +15,7 @@ public final class LoadSourceFile extends Command {
     private final ConsoleLogger logger;
 
     public LoadSourceFile(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " <path> - loads source file ", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <path> - loads source file ", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.evaluator = evaluator;
         this.logger = logger;
     }

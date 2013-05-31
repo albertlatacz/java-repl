@@ -8,6 +8,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.Option.none;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -63,7 +64,7 @@ public class EvaluatorTest {
     public void shouldReturnTypeOfExpression() {
         assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<Class>some(String.class)));
         assertThat(new Evaluator().typeOfExpression("12"), is(Option.<Class>some(Integer.class)));
-        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(Option.<Class>none()));
+        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(Class.class)));
     }
 
 

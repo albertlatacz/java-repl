@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,7 +18,7 @@ public final class AddToClasspath extends Command {
     private final ConsoleLogger logger;
 
     public AddToClasspath(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <path> - includes given file or directory in the classpath", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.evaluator = evaluator;
         this.logger = logger;
     }

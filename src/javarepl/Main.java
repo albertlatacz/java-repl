@@ -1,6 +1,7 @@
 package javarepl;
 
 import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
@@ -28,6 +29,7 @@ import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -119,7 +121,7 @@ public class Main {
 
     private static Option<File> historyFile(String[] args) {
         return isSandboxed(args)
-                ? Option.<File>none()
+                ? none(File.class)
                 : some(new File(getProperty("user.home"), ".javarepl.history"));
     }
 
@@ -204,19 +206,24 @@ public class Main {
 
             private Sequence<jline.console.completer.Completer> completers() {
                 return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                        .add(completerFor(new ConsoleCompleter(console)));
+                        .add(new ConsoleCompleter(console))
+                        .map(toJlineCompleter());
             }
 
-            private jline.console.completer.Completer completerFor(final Completer completer) {
-                return new jline.console.completer.Completer() {
-                    public int complete(String expression, int cursor, List<CharSequence> candidates) {
-                        CompletionResult result = completer.apply(expression);
-                        if (expression.trim().startsWith(":") || result.candidates().isEmpty()) {
-                            return -1;
-                        } else {
-                            candidates.addAll(result.candidates().toList());
-                            return result.position();
-                        }
+            private Mapper<Completer, jline.console.completer.Completer> toJlineCompleter() {
+                return new Mapper<Completer, jline.console.completer.Completer>() {
+                    public jline.console.completer.Completer call(final Completer completer) throws Exception {
+                        return new jline.console.completer.Completer() {
+                            public int complete(String expression, int cursor, List<CharSequence> candidates) {
+                                CompletionResult result = completer.apply(expression);
+                                if (result.candidates().isEmpty()) {
+                                    return -1;
+                                } else {
+                                    candidates.addAll(result.candidates().toList());
+                                    return result.position();
+                                }
+                            }
+                        };
                     }
                 };
             }

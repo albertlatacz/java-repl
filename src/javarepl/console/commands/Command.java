@@ -1,7 +1,7 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.*;
-import jline.console.completer.Completer;
+import javarepl.completion.Completer;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
@@ -57,17 +57,13 @@ public abstract class Command {
         }
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Command, Completer> completer() {
-            return new Function1<Command, Completer>() {
+    public static class functions {
+        public static Mapper<Command, Completer> completer() {
+            return new Mapper<Command, Completer>() {
                 public Completer call(Command command) throws Exception {
                     return command.completer;
                 }
             };
         }
-
-
     }
 }

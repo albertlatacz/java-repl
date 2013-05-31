@@ -3,7 +3,6 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Option;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
@@ -13,7 +12,7 @@ public final class ShowTypeOfExpression extends Command {
     private final ConsoleLogger logger;
 
     public ShowTypeOfExpression(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <expression> - shows the type of an expression without affecting current context", startsWith(COMMAND), new CommandCompleter(COMMAND));
 
         this.evaluator = evaluator;
         this.logger = logger;

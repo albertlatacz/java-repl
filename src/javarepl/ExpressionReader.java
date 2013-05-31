@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.*;
 import java.util.LinkedList;
 import java.util.Map;
 
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.characters;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -29,7 +30,7 @@ public class ExpressionReader {
         } while (!expressionIsTerminated(lines));
 
         return lines.contains(null)
-                ? Option.<String>none()
+                ? none(String.class)
                 : some(lines.toString("\n").trim());
     }
 

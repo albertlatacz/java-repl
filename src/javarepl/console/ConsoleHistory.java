@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.*;
 import java.io.File;
 
 import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.predicates.Not.not;
 
@@ -13,7 +14,7 @@ public final class ConsoleHistory {
     private final Option<File> file;
     private final Predicate<String> ignored;
 
-    private Sequence<String> history = Sequences.empty();
+    private Sequence<String> history = empty();
 
     private ConsoleHistory(Sequence<String> history, Predicate<String> ignored, Option<File> file) {
         this.ignored = ignored;
@@ -22,7 +23,7 @@ public final class ConsoleHistory {
     }
 
     public static final ConsoleHistory emptyHistory(Predicate<String> ignored, Option<File> file) {
-        return new ConsoleHistory(Sequences.<String>empty(), ignored, file);
+        return new ConsoleHistory(empty(String.class), ignored, file);
     }
 
     public static final ConsoleHistory historyFromFile(Predicate<String> ignored, Option<File> file) {

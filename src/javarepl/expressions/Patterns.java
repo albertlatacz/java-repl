@@ -3,6 +3,7 @@ package javarepl.expressions;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.regex.Regex;
 
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.regex.Regex.regex;
 import static java.util.regex.Pattern.DOTALL;
@@ -53,7 +54,7 @@ public class Patterns {
     }
 
     private static Regex regexPermutations(Regex... patterns) {
-        return regex(powerSetPermutations(sequence(patterns)).remove(Sequences.<Regex>empty())
+        return regex(powerSetPermutations(sequence(patterns)).remove(empty(Regex.class))
                 .map(Sequences.toString("(?:", "", ")"))
                 .toString("(?:", "|", ")"));
     }

@@ -10,7 +10,9 @@ import javarepl.console.commands.*;
 
 import java.io.File;
 
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.option;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public final class ConsoleConfig {
@@ -31,7 +33,7 @@ public final class ConsoleConfig {
     }
 
     public static ConsoleConfig consoleConfig() {
-        return new ConsoleConfig(new Evaluator(), Option.<File>none(), Sequences.<String>empty(), new ConsoleLogger(), defaultCommands(), Sequences.<Result>empty());
+        return new ConsoleConfig(new Evaluator(), none(File.class), empty(String.class), new ConsoleLogger(), defaultCommands(), empty(Result.class));
     }
 
     public ConsoleConfig evaluator(Evaluator evaluator) {

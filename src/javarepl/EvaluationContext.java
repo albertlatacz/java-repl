@@ -2,12 +2,14 @@ package javarepl;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 
+import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.Sequences.empty;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Result.functions.key;
 
 public class EvaluationContext {
@@ -22,14 +24,15 @@ public class EvaluationContext {
     }
 
     public static EvaluationContext evaluationContext() {
-        return new EvaluationContext(defaultExpressions(), Sequences.<Result>empty(), Option.<String>none());
+        return new EvaluationContext(defaultExpressions(), empty(Result.class), none(String.class));
     }
 
     public static Sequence<Expression> defaultExpressions() {
-        return Sequences.<Expression>sequence(
+        return sequence(
                 new Import("import java.util.*", "java.util.*"),
                 new Import("import java.math.*", "java.math.*"),
-                new Import("import static java.lang.Math.*", "java.lang.Math.*"));
+                new Import("import static java.lang.Math.*", "java.lang.Math.*")
+        ).safeCast(Expression.class);
     }
 
     public Option<String> lastSource() {

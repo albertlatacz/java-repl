@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Sequence;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Expression;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static javarepl.EvaluationContext.defaultExpressions;
@@ -16,7 +15,7 @@ public final class ReplayAllEvaluations extends Command {
     private final ConsoleLogger logger;
 
     public ReplayAllEvaluations(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " - replay all evaluations", equalTo(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " - replay all evaluations", equalTo(COMMAND), new CommandCompleter(COMMAND));
         this.evaluator = evaluator;
         this.logger = logger;
     }

@@ -1,7 +1,6 @@
 package javarepl.console.commands;
 
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Predicates.*;
@@ -13,7 +12,7 @@ public final class ShowHelp extends Command {
     private final ConsoleLogger logger;
 
     public ShowHelp(Commands commands, ConsoleLogger logger) {
-        super(COMMAND + " - shows this help", equalTo(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " - shows this help", equalTo(COMMAND), new CommandCompleter(COMMAND));
         this.commands = commands;
         this.logger = logger;
     }

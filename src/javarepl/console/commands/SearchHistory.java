@@ -2,7 +2,6 @@ package javarepl.console.commands;
 
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.contains;
 import static com.googlecode.totallylazy.Strings.startsWith;
@@ -15,7 +14,7 @@ public final class SearchHistory extends Command {
     private final ConsoleHistory history;
 
     public SearchHistory(ConsoleLogger logger, ConsoleHistory history) {
-        super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <term> - searches the history", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.logger = logger;
         this.history = history;
     }

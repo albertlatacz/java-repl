@@ -1,7 +1,8 @@
 package javarepl.console;
 
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+
+import static com.googlecode.totallylazy.Sequences.empty;
 
 public class ConsoleResult {
     private final String expression;
@@ -21,6 +22,6 @@ public class ConsoleResult {
     }
 
     public static ConsoleResult emptyResult() {
-        return new ConsoleResult("", Sequences.<ConsoleLog>empty());
+        return new ConsoleResult("", empty(ConsoleLog.class));
     }
 }

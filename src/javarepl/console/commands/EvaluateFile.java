@@ -3,7 +3,6 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Strings;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
@@ -15,7 +14,7 @@ public final class EvaluateFile extends Command {
     private final Evaluator evaluator;
 
     public EvaluateFile(ConsoleLogger logger, Evaluator evaluator) {
-        super(COMMAND + " <path> - evaluates all expressions from file (expression per line)", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " <path> - evaluates all expressions from file (expression per line)", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.logger = logger;
         this.evaluator = evaluator;
     }

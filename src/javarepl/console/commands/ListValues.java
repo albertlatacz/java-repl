@@ -5,8 +5,6 @@ import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
-import jline.console.completer.ArgumentCompleter;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.startsWith;
@@ -23,7 +21,7 @@ public final class ListValues extends Command {
 
     public ListValues(Evaluator evaluator, ConsoleLogger logger) {
         super(COMMAND + " <results|types|methods|imports|all> - list specified values",
-                startsWith(COMMAND), new ArgumentCompleter(new StringsCompleter(COMMAND), new StringsCompleter("results", "methods", "imports", "types", "all")));
+                startsWith(COMMAND), new CommandCompleter(COMMAND, sequence("results", "methods", "imports", "types", "all")));
 
         this.evaluator = evaluator;
         this.logger = logger;

@@ -22,6 +22,7 @@ import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Option.*;
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.predicates.Not.not;
 import static java.io.File.pathSeparator;
@@ -248,7 +249,7 @@ public class Evaluator {
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
             Sequence<Result> modifiedResults = sequence(expressionInstance.getClass().getDeclaredFields())
-                    .foldLeft(Sequences.<Result>empty(), new Function2<Sequence<Result>, Field, Sequence<Result>>() {
+                    .foldLeft(empty(Result.class), new Function2<Sequence<Result>, Field, Sequence<Result>>() {
                         public Sequence<Result> call(Sequence<Result> results, Field field) throws Exception {
                             Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
 

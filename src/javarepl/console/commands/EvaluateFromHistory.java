@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Option;
 import javarepl.console.Console;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;
-import jline.console.completer.StringsCompleter;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
 
@@ -15,7 +14,7 @@ public final class EvaluateFromHistory extends Command {
     private final ConsoleLogger logger;
 
     public EvaluateFromHistory(Console console, ConsoleHistory history, ConsoleLogger logger) {
-        super(COMMAND + " num - evaluate expression from history)", startsWith(COMMAND), new StringsCompleter(COMMAND));
+        super(COMMAND + " num - evaluate expression from history)", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.console = console;
         this.history = history;
         this.logger = logger;
