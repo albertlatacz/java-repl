@@ -1,6 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Predicate;
 
 import javax.tools.Diagnostic;
@@ -25,8 +25,8 @@ public class ExpressionCompilationException extends Exception {
                 .toString("\n");
     }
 
-    private static Function1<Diagnostic, String> diagnosticToMessage(final File file) {
-        return new Function1<Diagnostic, String>() {
+    private static Mapper<Diagnostic, String> diagnosticToMessage(final File file) {
+        return new Mapper<Diagnostic, String>() {
             public String call(Diagnostic diagnostic) throws Exception {
                 String line = lines(file).drop((int) diagnostic.getLineNumber() - 1).head();
                 String marker = repeat(' ').take((int) diagnostic.getColumnNumber() - 1).toString("", "", "^");

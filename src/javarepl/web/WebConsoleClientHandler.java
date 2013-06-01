@@ -1,6 +1,6 @@
 package javarepl.web;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
@@ -79,7 +79,7 @@ public final class WebConsoleClientHandler {
         if (response.status() == Status.OK)
             return response;
 
-        return exitCode().map(new Function1<Integer, Response>() {
+        return exitCode().map(new Mapper<Integer, Response>() {
             public Response call(Integer code) throws Exception {
                 switch (code) {
                     case EXPRESSION_TIMEOUT:

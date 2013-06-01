@@ -1,6 +1,6 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 
 public abstract class Expression {
     private final String source;
@@ -32,19 +32,17 @@ public abstract class Expression {
                 (source != null && source.equals(((Expression) other).source));
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Expression, String> source() {
-            return new Function1<Expression, String>() {
+    public static final class functions {
+        public static Mapper<Expression, String> source() {
+            return new Mapper<Expression, String>() {
                 public String call(Expression value) throws Exception {
                     return value.source;
                 }
             };
         }
 
-        public static Function1<Expression, String> key() {
-            return new Function1<Expression, String>() {
+        public static Mapper<Expression, String> key() {
+            return new Mapper<Expression, String>() {
                 public String call(Expression value) throws Exception {
                     return value.key();
                 }

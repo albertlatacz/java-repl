@@ -1,6 +1,6 @@
 package javarepl.rendering;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 
@@ -67,8 +67,8 @@ public class ValueRenderer {
         return Arrays.toString(value);
     }
 
-    public static Function1<Object, String> renderValue() {
-        return new Function1<Object, String>() {
+    public static Mapper<Object, String> renderValue() {
+        return new Mapper<Object, String>() {
             public String call(Object value) throws Exception {
                 return renderValue(value);
             }

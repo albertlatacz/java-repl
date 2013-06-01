@@ -1,7 +1,7 @@
 package javarepl.console.rest;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
@@ -80,8 +80,8 @@ public class RestConsoleResource {
         return Responses.seeOther("console.html");
     }
 
-    private static Function1<ConsoleLog, Model> commandResultToModel() {
-        return new Function1<ConsoleLog, Model>() {
+    private static Mapper<ConsoleLog, Model> commandResultToModel() {
+        return new Mapper<ConsoleLog, Model>() {
             public Model call(ConsoleLog consoleLog) throws Exception {
                 return model().add("type", consoleLog.type())
                         .add("message", consoleLog.message());

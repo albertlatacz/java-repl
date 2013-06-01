@@ -1,6 +1,6 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 
 import static javarepl.Utils.canonicalName;
@@ -38,19 +38,17 @@ public final class Method extends Expression {
         return name + arguments.map(canonicalName()).toString(", ");
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Method, String> signature() {
-            return new Function1<Method, String>() {
+    public static final class functions {
+        public static Mapper<Method, String> signature() {
+            return new Mapper<Method, String>() {
                 public String call(Method value) throws Exception {
                     return value.signature();
                 }
             };
         }
 
-        public static Function1<Method, String> methodName() {
-            return new Function1<Method, String>() {
+        public static Mapper<Method, String> methodName() {
+            return new Mapper<Method, String>() {
                 public String call(Method value) throws Exception {
                     return value.name();
                 }

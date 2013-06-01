@@ -1,6 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
@@ -64,8 +64,8 @@ public class RemoteMain {
         }
     }
 
-    private static Function1<Sequence<String>, String> readFromExtendedConsole(final JavaREPLClient client) throws IOException {
-        return new Function1<Sequence<String>, String>() {
+    private static Mapper<Sequence<String>, String> readFromExtendedConsole(final JavaREPLClient client) throws IOException {
+        return new Mapper<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
             {

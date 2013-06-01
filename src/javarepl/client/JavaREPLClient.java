@@ -1,7 +1,7 @@
 package javarepl.client;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.completion.CompletionResult;
@@ -49,8 +49,8 @@ public final class JavaREPLClient {
         return sequence(model.getValues("history", String.class));
     }
 
-    private Function1<Model, EvaluationLog> modelToEvaluationLog() {
-        return new Function1<Model, EvaluationLog>() {
+    private Mapper<Model, EvaluationLog> modelToEvaluationLog() {
+        return new Mapper<Model, EvaluationLog>() {
             public EvaluationLog call(Model model) throws Exception {
                 return new EvaluationLog(Type.valueOf(model.get("type", String.class)), model.get("message", String.class));
             }

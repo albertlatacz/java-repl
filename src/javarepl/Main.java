@@ -1,6 +1,5 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
@@ -193,8 +192,8 @@ public class Main {
         System.setSecurityManager(new SecurityManager());
     }
 
-    private static Function1<Sequence<String>, String> readFromExtendedConsole(final Console console) throws IOException {
-        return new Function1<Sequence<String>, String>() {
+    private static Mapper<Sequence<String>, String> readFromExtendedConsole(final Console console) throws IOException {
+        return new Mapper<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
             {
@@ -244,8 +243,8 @@ public class Main {
         };
     }
 
-    private static Function1<Sequence<String>, String> readFromSimpleConsole() {
-        return new Function1<Sequence<String>, String>() {
+    private static Mapper<Sequence<String>, String> readFromSimpleConsole() {
+        return new Mapper<Sequence<String>, String>() {
             private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             public String call(Sequence<String> lines) throws Exception {
@@ -254,8 +253,8 @@ public class Main {
         };
     }
 
-    private static Function1<Sequence<String>, String> ignoreConsoleInput() {
-        return new Function1<Sequence<String>, String>() {
+    private static Mapper<Sequence<String>, String> ignoreConsoleInput() {
+        return new Mapper<Sequence<String>, String>() {
             public String call(Sequence<String> strings) throws Exception {
                 while (true) {
                     Thread.sleep(100);

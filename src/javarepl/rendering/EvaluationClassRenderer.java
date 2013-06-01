@@ -1,6 +1,6 @@
 package javarepl.rendering;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
@@ -138,7 +138,7 @@ public class EvaluationClassRenderer {
     }
 
     private static String renderPreviousEvaluations(EvaluationContext context) {
-        return context.results().map(new Function1<Result, String>() {
+        return context.results().map(new Mapper<Result, String>() {
             public String call(Result result) throws Exception {
                 return format("  public %s %s = valueOf(\"%s\");", extractType(result.value().getClass()).getCanonicalName(), result.key(), result.key());
             }

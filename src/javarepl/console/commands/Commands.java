@@ -1,7 +1,7 @@
 package javarepl.console.commands;
 
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.yadic.Container;
@@ -33,8 +33,8 @@ public final class Commands {
         return commands.map(createCommandInstance(context));
     }
 
-    public static final Function1<Class<? extends Command>, Command> createCommandInstance(final Container context) {
-        return new Function1<Class<? extends Command>, Command>() {
+    public static final Mapper<Class<? extends Command>, Command> createCommandInstance(final Container context) {
+        return new Mapper<Class<? extends Command>, Command>() {
             public Command call(Class<? extends Command> aClass) throws Exception {
                 return context.create(aClass);
             }

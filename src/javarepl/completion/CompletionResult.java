@@ -1,5 +1,6 @@
 package javarepl.completion;
 
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 
 public class CompletionResult {
@@ -44,5 +45,23 @@ public class CompletionResult {
                 (expression != null && expression.equals(((CompletionResult) other).expression)) &&
                 (candidates != null && candidates.equals(((CompletionResult) other).candidates)) &&
                 (position != null && position.equals(((CompletionResult) other).position));
+    }
+
+    public static final class functions {
+        public static Mapper<CompletionResult, Integer> position() {
+            return new Mapper<CompletionResult, Integer>() {
+                public Integer call(CompletionResult result) throws Exception {
+                    return result.position();
+                }
+            };
+        }
+
+        public static Mapper<CompletionResult, Sequence<String>> candidates() {
+            return new Mapper<CompletionResult, Sequence<String>>() {
+                public Sequence<String> call(CompletionResult result) throws Exception {
+                    return result.candidates();
+                }
+            };
+        }
     }
 }

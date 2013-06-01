@@ -1,6 +1,6 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 
 import static java.util.UUID.randomUUID;
 
@@ -20,11 +20,9 @@ public final class Import extends Expression {
         return typePackage;
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Import, String> typePackage() {
-            return new Function1<Import, String>() {
+    public static final class functions {
+        public static Mapper<Import, String> typePackage() {
+            return new Mapper<Import, String>() {
                 public String call(Import value) throws Exception {
                     return value.typePackage();
                 }

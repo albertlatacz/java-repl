@@ -16,9 +16,9 @@ public class ExpressionReader {
     final static Sequence<Character> closedBrackets = sequence(']', '}', ')');
     final static Map<Character, Character> matchingBrackets = Maps.map(closedBrackets.zip(openBrackets));
 
-    private final Function1<Sequence<String>, String> lineReader;
+    private final Mapper<Sequence<String>, String> lineReader;
 
-    public ExpressionReader(Function1<Sequence<String>, String> lineReader) {
+    public ExpressionReader(Mapper<Sequence<String>, String> lineReader) {
         this.lineReader = lineReader;
     }
 
@@ -85,8 +85,8 @@ public class ExpressionReader {
         return lines.windowed(2).contains(sequence("", ""));
     }
 
-    public static Function1<Sequence<String>, String> lines(final String... strings) {
-        return new Function1<Sequence<String>, String>() {
+    public static Mapper<Sequence<String>, String> lines(final String... strings) {
+        return new Mapper<Sequence<String>, String>() {
             Sequence<String> toRead = sequence(strings);
 
             public String call(Sequence<String> lines) throws Exception {

@@ -1,6 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import javarepl.expressions.Expression;
 
@@ -44,19 +44,17 @@ public class Evaluation {
                 (result != null && result.equals(((Evaluation) other).result));
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Evaluation, Option<Result>> result() {
-            return new Function1<Evaluation, Option<Result>>() {
+    public static final class functions {
+        public static Mapper<Evaluation, Option<Result>> result() {
+            return new Mapper<Evaluation, Option<Result>>() {
                 public Option<Result> call(Evaluation value) throws Exception {
                     return value.result;
                 }
             };
         }
 
-        public static Function1<Evaluation, Expression> expression() {
-            return new Function1<Evaluation, Expression>() {
+        public static Mapper<Evaluation, Expression> expression() {
+            return new Mapper<Evaluation, Expression>() {
                 public Expression call(Evaluation value) throws Exception {
                     return value.expression;
                 }

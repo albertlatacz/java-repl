@@ -1,7 +1,7 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Functions;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Rule;
 import com.googlecode.totallylazy.Rules;
 import com.googlecode.yadic.Container;
@@ -69,8 +69,8 @@ public final class SimpleConsole implements Console {
         return rules.addLast(Rule.rule(always(), Functions.<String, ConsoleResult>returns1(emptyResult())));
     }
 
-    private Function1<String, ConsoleResult> asFunction(final Command command) {
-        return new Function1<String, ConsoleResult>() {
+    private Mapper<String, ConsoleResult> asFunction(final Command command) {
+        return new Mapper<String, ConsoleResult>() {
             public ConsoleResult call(String expression) throws Exception {
                 context.get(ConsoleLogger.class).reset();
                 command.execute(expression);

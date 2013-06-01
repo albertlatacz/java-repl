@@ -1,6 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
@@ -96,7 +96,7 @@ public class Utils {
 
         return cartesianProductPower(items, times - 1)
                 .cartesianProduct(items)
-                .map(new Function1<Pair<Sequence<T>, T>, Sequence<T>>() {
+                .map(new Mapper<Pair<Sequence<T>, T>, Sequence<T>>() {
                     public Sequence<T> call(Pair<Sequence<T>, T> pair) {
                         return pair.first().add(pair.second()).unique();
                     }
@@ -104,8 +104,8 @@ public class Utils {
                 .unique();
     }
 
-    public static Function1<Class<?>, String> canonicalName() {
-        return new Function1<Class<?>, String>() {
+    public static Mapper<Class<?>, String> canonicalName() {
+        return new Mapper<Class<?>, String>() {
             public String call(Class<?> aClass) throws Exception {
                 return aClass.getCanonicalName();
             }

@@ -1,6 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 
 import static com.googlecode.totallylazy.Option.none;
@@ -55,19 +55,17 @@ public class Result {
                 (value != null && value.equals(((Result) other).value));
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Result, String> key() {
-            return new Function1<Result, String>() {
+    public static final class functions {
+        public static Mapper<Result, String> key() {
+            return new Mapper<Result, String>() {
                 public String call(Result result) throws Exception {
                     return result.key;
                 }
             };
         }
 
-        public static Function1<Result, Object> value() {
-            return new Function1<Result, Object>() {
+        public static Mapper<Result, Object> value() {
+            return new Mapper<Result, Object>() {
                 public Object call(Result result) throws Exception {
                     return result.value;
                 }

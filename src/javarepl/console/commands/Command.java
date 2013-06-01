@@ -57,7 +57,7 @@ public abstract class Command {
         }
     }
 
-    public static class functions {
+    public static final class functions {
         public static Mapper<Command, Completer> completer() {
             return new Mapper<Command, Completer>() {
                 public Completer call(Command command) throws Exception {

@@ -248,19 +248,7 @@ public class Evaluator {
 
             Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
 
-            Sequence<Result> modifiedResults = sequence(expressionInstance.getClass().getDeclaredFields())
-                    .foldLeft(empty(Result.class), new Function2<Sequence<Result>, Field, Sequence<Result>>() {
-                        public Sequence<Result> call(Sequence<Result> results, Field field) throws Exception {
-                            Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
-
-                            if (result.isEmpty())
-                                return results;
-
-                            return results.add(Result.result(field.getName(), field.get(expressionInstance)));
-
-                        }
-                    });
-
+            Sequence<Result> modifiedResults = modifiedResults(expressionInstance);
 
             if (resultObject != null) {
                 Result result = Result.result(nextResultKeyFor(expression), resultObject);
@@ -273,6 +261,25 @@ public class Evaluator {
         } catch (Throwable e) {
             return left(Utils.unwrapException(e));
         }
+    }
+
+    private Sequence<Result> modifiedResults(final Object expressionInstance) {
+        return sequence(expressionInstance.getClass().getDeclaredFields())
+                .reduceLeft(new Reducer<Field, Sequence<Result>>() {
+                    public Sequence<Result> call(Sequence<Result> results, Field field) throws Exception {
+                        Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
+
+                        if (result.isEmpty())
+                            return results;
+
+                        return results.add(Result.result(field.getName(), field.get(expressionInstance)));
+
+                    }
+
+                    public Sequence<Result> identity() {
+                        return empty(Result.class);
+                    }
+                });
     }
 
     private String nextResultKeyFor(Expression expression) {

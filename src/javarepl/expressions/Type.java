@@ -1,7 +1,7 @@
 package javarepl.expressions;
 
 
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 
 public final class Type extends Expression {
@@ -31,11 +31,9 @@ public final class Type extends Expression {
         return (!typePackage.isEmpty() ? typePackage.get() + "." : "") + type;
     }
 
-    public static enum functions {
-        ;
-
-        public static Function1<Type, String> type() {
-            return new Function1<Type, String>() {
+    public static final class functions {
+        public static Mapper<Type, String> type() {
+            return new Mapper<Type, String>() {
                 public String call(Type value) throws Exception {
                     return value.type;
                 }

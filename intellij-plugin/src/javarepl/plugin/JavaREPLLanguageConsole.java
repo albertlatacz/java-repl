@@ -65,9 +65,7 @@ import com.intellij.psi.impl.file.impl.FileManager;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.SideBorder;
-import com.intellij.util.Function;
 import com.intellij.util.ObjectUtils;
-import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.AbstractLayoutManager;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.update.MergingUpdateQueue;
@@ -641,40 +639,6 @@ public class JavaREPLLanguageConsole implements Disposable, TypeSafeDataProvider
                 myConsoleEditor.getDocument().setText(query);
             }
         });
-    }
-
-    public static void printToConsole(
-            @NotNull final JavaREPLLanguageConsole console,
-            @NotNull final ConsoleViewContentType mainType,
-            @NotNull final List<Pair<String, ConsoleViewContentType>> textToPrint) {
-        final List<Pair<String, TextAttributes>> attributedText = ContainerUtil.map(
-                textToPrint,
-                new Function<Pair<String, ConsoleViewContentType>, Pair<String, TextAttributes>>() {
-                    @Override
-                    public Pair<String, TextAttributes> fun(Pair<String, ConsoleViewContentType> input) {
-                        final TextAttributes mainAttributes = mainType.getAttributes();
-                        final TextAttributes attributes;
-                        if (input.getSecond() == null) {
-                            attributes = mainAttributes;
-                        } else {
-                            attributes = input.getSecond().getAttributes().clone();
-                            attributes.setBackgroundColor(mainAttributes.getBackgroundColor());
-                        }
-                        return Pair.create(input.getFirst(), attributes);
-                    }
-                }
-        );
-
-        Application application = ApplicationManager.getApplication();
-        if (application.isDispatchThread()) {
-            console.printToHistory(attributedText);
-        } else {
-            application.invokeLater(new Runnable() {
-                public void run() {
-                    console.printToHistory(attributedText);
-                }
-            }, ModalityState.stateForComponent(console.getComponent()));
-        }
     }
 
     public static void printToConsole(@NotNull final JavaREPLLanguageConsole console,

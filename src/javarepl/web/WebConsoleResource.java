@@ -1,7 +1,7 @@
 package javarepl.web;
 
 import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Function1;
+import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
@@ -80,8 +80,8 @@ public class WebConsoleResource {
         return Responses.seeOther("console.html");
     }
 
-    private Function1<WebConsoleClientHandler, Model> clientHandlerToModel() {
-        return new Function1<WebConsoleClientHandler, Model>() {
+    private Mapper<WebConsoleClientHandler, Model> clientHandlerToModel() {
+        return new Mapper<WebConsoleClientHandler, Model>() {
             public Model call(WebConsoleClientHandler webConsoleClientHandler) throws Exception {
                 return model()
                         .add("id", webConsoleClientHandler.id())
