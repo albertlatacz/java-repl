@@ -1,5 +1,6 @@
 package javarepl.console.commands;
 
+import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;
 

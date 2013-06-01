@@ -1,6 +1,7 @@
 package javarepl.console.commands;
 
 import javarepl.Evaluator;
+import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Predicates.equalTo;

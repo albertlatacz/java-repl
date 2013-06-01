@@ -3,6 +3,7 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.numbers.Numbers;
+import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;
 

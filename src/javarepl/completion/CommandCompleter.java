@@ -1,8 +1,6 @@
-package javarepl.console.commands;
+package javarepl.completion;
 
 import com.googlecode.totallylazy.Sequence;
-import javarepl.completion.Completer;
-import javarepl.completion.CompletionResult;
 
 import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.Strings.startsWith;

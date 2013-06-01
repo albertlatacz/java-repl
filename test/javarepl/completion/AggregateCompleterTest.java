@@ -1,6 +1,5 @@
 package javarepl.completion;
 
-import javarepl.console.commands.CommandCompleter;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.empty;

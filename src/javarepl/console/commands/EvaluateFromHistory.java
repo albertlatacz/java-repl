@@ -1,6 +1,7 @@
 package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Option;
+import javarepl.completion.CommandCompleter;
 import javarepl.console.Console;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLogger;

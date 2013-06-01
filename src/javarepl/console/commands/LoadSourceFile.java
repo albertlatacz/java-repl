@@ -3,6 +3,7 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
 import javarepl.Evaluator;
+import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
 import static com.googlecode.totallylazy.Files.asFile;

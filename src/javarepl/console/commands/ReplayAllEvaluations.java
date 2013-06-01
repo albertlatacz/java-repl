@@ -2,6 +2,7 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Sequence;
 import javarepl.Evaluator;
+import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Expression;
 
