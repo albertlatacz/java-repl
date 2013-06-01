@@ -7,14 +7,19 @@ import com.googlecode.totallylazy.Rules;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.SimpleContainer;
 import javarepl.Evaluator;
+import javarepl.completion.AggregateCompleter;
+import javarepl.completion.Completer;
+import javarepl.completion.ConsoleCompleter;
 import javarepl.console.commands.Command;
 import javarepl.console.commands.Commands;
 
 import static com.googlecode.totallylazy.Predicates.always;
+import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
+import static javarepl.console.commands.Command.functions.completer;
 
 public final class SimpleConsole implements Console {
     private final Container context;
@@ -30,6 +35,8 @@ public final class SimpleConsole implements Console {
         context.addInstance(Evaluator.class, config.evaluator);
         context.addInstance(ConsoleLogger.class, config.logger);
         context.add(Commands.class);
+        context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(completer()).filter(notNullValue())
+                .add(new ConsoleCompleter(this))));
 
         evaluator().addResults(config.results);
     }

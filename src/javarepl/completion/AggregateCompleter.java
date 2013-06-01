@@ -7,15 +7,14 @@ import com.googlecode.totallylazy.Sequence;
 
 import static com.googlecode.totallylazy.Groups.groupKey;
 import static com.googlecode.totallylazy.Sequences.empty;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.completion.CompletionResult.functions.candidates;
 import static javarepl.completion.CompletionResult.functions.position;
 
 public class AggregateCompleter extends Completer {
     private final Sequence<Completer> completers;
 
-    public AggregateCompleter(Completer... completers) {
-        this.completers = sequence(completers);
+    public AggregateCompleter(Sequence<Completer> completers) {
+        this.completers = completers;
     }
 
     public CompletionResult call(String expression) throws Exception {

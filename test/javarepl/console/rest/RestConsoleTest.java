@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.funclate.Model.persistent.parse;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static java.util.Arrays.asList;
@@ -70,7 +69,7 @@ public class RestConsoleTest {
         assertThat(body(response), is(model()
                 .add("expression", "prefix r")
                 .add("position", "7")
-                .add("candidates", sequence("res0", "res1", "res2"))));
+                .add("candidates", asList("res0", "res1", "res2"))));
     }
 
     @Test

@@ -8,8 +8,8 @@ import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
+import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
-import javarepl.completion.ConsoleCompleter;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
@@ -24,12 +24,10 @@ import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 public class RestConsoleResource {
     private final RestConsole console;
     private final RestConsoleExpressionReader expressionReader;
-    private final ConsoleCompleter completer;
 
-    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader, ConsoleCompleter completer) {
+    public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader) {
         this.console = console;
         this.expressionReader = expressionReader;
-        this.completer = completer;
     }
 
     @POST
@@ -60,11 +58,11 @@ public class RestConsoleResource {
     @Path("completions")
     @Produces(MediaType.APPLICATION_JSON)
     public Model completions(@QueryParam("expression") String expr) {
-        CompletionResult result = completer.apply(expr);
+        CompletionResult result = console.context().get(Completer.class).apply(expr);
         return model()
                 .add("expression", result.expression())
                 .add("position", result.position().toString())
-                .add("candidates", result.candidates());
+                .add("candidates", result.candidates().toList());
     }
 
     @GET

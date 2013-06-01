@@ -11,9 +11,9 @@ public class AggregateCompleterTest {
 
     @Test
     public void shouldAggregateCompletions() {
-        AggregateCompleter completer = new AggregateCompleter(
+        AggregateCompleter completer = new AggregateCompleter(sequence(
                 new StringCompleter(sequence("text", "someText", "otherText")),
-                new CommandCompleter("someCommand", sequence("param1", "param2")));
+                new CommandCompleter("someCommand", sequence("param1", "param2"))));
 
         assertThat(completer.apply("so"), is(new CompletionResult("so", 0, sequence("someText", "someCommand"))));
         assertThat(completer.apply("prefix so"), is(new CompletionResult("prefix so", 7, sequence("someText"))));

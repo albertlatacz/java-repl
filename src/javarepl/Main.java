@@ -6,13 +6,10 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
-import javarepl.completion.ConsoleCompleter;
 import javarepl.console.Console;
 import javarepl.console.*;
-import javarepl.console.commands.Commands;
 import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
-import jline.console.completer.AggregateCompleter;
 import jline.console.history.MemoryHistory;
 
 import java.io.*;
@@ -30,7 +27,6 @@ import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
@@ -43,7 +39,6 @@ import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;
-import static javarepl.console.commands.Command.functions.completer;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -200,29 +195,19 @@ public class Main {
                 consoleReader = new ConsoleReader(System.in, outStream);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
-                consoleReader.addCompleter(new AggregateCompleter(completers().toList()));
+                consoleReader.addCompleter(asJLineCompleter(console.context().get(Completer.class)));
             }
 
-            private Sequence<jline.console.completer.Completer> completers() {
-                return console.context().get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                        .add(new ConsoleCompleter(console))
-                        .map(toJlineCompleter());
-            }
-
-            private Mapper<Completer, jline.console.completer.Completer> toJlineCompleter() {
-                return new Mapper<Completer, jline.console.completer.Completer>() {
-                    public jline.console.completer.Completer call(final Completer completer) throws Exception {
-                        return new jline.console.completer.Completer() {
-                            public int complete(String expression, int cursor, List<CharSequence> candidates) {
-                                CompletionResult result = completer.apply(expression);
-                                if (result.candidates().isEmpty()) {
-                                    return -1;
-                                } else {
-                                    candidates.addAll(result.candidates().toList());
-                                    return result.position();
-                                }
-                            }
-                        };
+            private jline.console.completer.Completer asJLineCompleter(final Completer completer) {
+                return new jline.console.completer.Completer() {
+                    public int complete(String expression, int cursor, List<CharSequence> candidates) {
+                        CompletionResult result = completer.apply(expression);
+                        if (result.candidates().isEmpty()) {
+                            return -1;
+                        } else {
+                            candidates.addAll(result.candidates().toList());
+                            return result.position();
+                        }
                     }
                 };
             }
