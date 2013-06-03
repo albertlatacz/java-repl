@@ -10,12 +10,16 @@ import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
 import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
+import javarepl.console.ConsoleConfig;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 import javarepl.expressions.Expression;
 
+import java.util.Map;
+
 import static com.googlecode.funclate.Model.persistent.model;
+import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.console.ConsoleResult.emptyResult;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
@@ -28,6 +32,26 @@ public class RestConsoleResource {
     public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader) {
         this.console = console;
         this.expressionReader = expressionReader;
+    }
+
+    @GET
+    @Path("config")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model config() {
+        ConsoleConfig consoleConfig = console.context().get(ConsoleConfig.class);
+        return model()
+                .add("version", applicationVersion())
+                .add("sandboxed", consoleConfig.sandboxed)
+                .add("systemProperties", model((Map) System.getProperties()));
+    }
+
+
+    @GET
+    @Path("status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model status() {
+        return model()
+                .add("isAlive", true);
     }
 
     @POST

@@ -3,28 +3,19 @@ package javarepl;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.predicates.LogicalPredicate;
-import javarepl.completion.Completer;
+import javarepl.client.EvaluationLog;
+import javarepl.client.EvaluationResult;
+import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
-import javarepl.console.Console;
-import javarepl.console.*;
-import javarepl.console.rest.RestConsole;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
 
-import java.io.*;
-import java.lang.management.ManagementPermission;
-import java.lang.reflect.ReflectPermission;
-import java.net.SocketPermission;
-import java.security.CodeSource;
-import java.security.PermissionCollection;
-import java.security.Permissions;
-import java.security.Policy;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.List;
-import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -36,215 +27,170 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
-import static javarepl.console.ConsoleConfig.consoleConfig;
-import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.SUCCESS;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
-    private static PrintStream outStream = System.out;
-    private static PrintStream errStream = System.err;
+    public static final InputStream inStream = System.in;
+    public static final PrintStream outStream = System.out;
+    public static final PrintStream errStream = System.err;
+
+    private static Option<Process> process = none();
+    private static JavaREPLClient client;
 
     public static void main(String... args) throws Exception {
-        ConsoleLogger logger = systemStreamsLogger(args, isColored(args));
-        ConsoleConfig consoleConfig = consoleConfig()
-                .historyFile(historyFile(args))
-                .expressions(initialExpressions(args))
-                .logger(logger);
+        client = createClient(args);
+        ExpressionReader expressionReader = new ExpressionReader(jlineConsole(client));
 
-        RestConsole console = new RestConsole(new TimingOutConsole(new SimpleConsole(consoleConfig), expressionTimeout(args), inactivityTimeout(args)), port(args));
-
-        ExpressionReader expressionReader = expressionReader(args, console);
-
-        if (isSandboxed(args)) {
-            sandboxApplication();
-        }
-
-        if (!ignoreConsole(args)) {
-            logger.info("");
-            logger.info(format("Welcome to JavaREPL version %s (%s, %s, Java %s)",
-                    applicationVersion(),
-                    isSandboxed(args) ? "sandboxed" : "unrestricted",
-                    getProperty("java.vm.name"),
-                    getProperty("java.version")));
-        }
-
-        if (getSystemJavaCompiler() == null) {
-            logger.error("\nERROR: Java compiler not found.\n" +
-                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
-            return;
-        }
-
-        if (!ignoreConsole(args)) {
-            logger.info("Access local web console at http://localhost:" + console.port());
-            logger.info("Type in expression to evaluate or :help for more options.");
-            logger.info("");
-        }
-
-        for (String expression : consoleConfig.expressions) {
-            console.execute(expression);
-        }
-
+        String expression = null;
+        Option<EvaluationResult> result = none();
         do {
-            console.execute(expressionReader.readExpression().getOrNull());
-            logger.info("");
-        } while (true);
+            expression = expressionReader.readExpression().getOrNull();
 
-    }
-
-    private static String[] initialExpressions(String[] args) {
-        return sequence(args)
-                .find(startsWith("--expression="))
-                .map(replaceAll("--expression=", ""))
-                .toSequence()
-                .toArray(String.class);
-    }
-
-    private static ConsoleLogger systemStreamsLogger(String[] args, Boolean colored) {
-        ConsoleLogger logger = new ConsoleLogger(outStream, errStream, colored);
-
-        LogicalPredicate<String> ignoredLogs = startsWith("POST /")
-                .or(startsWith("GET /"))
-                .or(startsWith("Listening on http://"));
-
-        System.setOut(new ConsoleLoggerPrintStream(SUCCESS, ignoredLogs, logger));
-        System.setErr(new ConsoleLoggerPrintStream(ERROR, ignoredLogs, logger));
-
-        return logger;
-    }
-
-    private static Option<File> historyFile(String[] args) {
-        return isSandboxed(args)
-                ? none(File.class)
-                : some(new File(getProperty("user.home"), ".javarepl.history"));
-    }
-
-    private static ExpressionReader expressionReader(String[] args, Console console) throws IOException {
-        if (simpleConsole(args))
-            return new ExpressionReader(readFromSimpleConsole());
-
-        if (ignoreConsole(args))
-            return new ExpressionReader(ignoreConsoleInput());
-
-        return new ExpressionReader(readFromExtendedConsole(console));
-    }
-
-    private static boolean simpleConsole(String[] args) {
-        return sequence(args).contains("--simpleConsole");
-    }
-
-    private static boolean ignoreConsole(String[] args) {
-        return sequence(args).contains("--ignoreConsole");
-    }
-
-    private static boolean isColored(String[] args) {
-        return !simpleConsole(args) && !ignoreConsole(args);
-    }
-
-    private static boolean isSandboxed(String[] args) {
-        return sequence(args).contains("--sandboxed");
-    }
-
-    private static Integer port(String[] args) {
-        return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue))).getOrElse(randomServerPort());
-    }
-
-    private static Option<Integer> expressionTimeout(String[] args) {
-        return sequence(args).find(startsWith("--expressionTimeout=")).map(compose(replaceAll("--expressionTimeout=", ""), compose(valueOf, intValue)));
-    }
-
-    private static Option<Integer> inactivityTimeout(String[] args) {
-        return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
-    }
-
-    private static void sandboxApplication() {
-        Policy.setPolicy(new Policy() {
-            private final PermissionCollection permissions = new Permissions();
-
-            {
-                permissions.add(new SocketPermission("*", "accept, connect, resolve"));
-                permissions.add(new RuntimePermission("accessClassInPackage.sun.misc.*"));
-                permissions.add(new RuntimePermission("accessClassInPackage.sun.misc"));
-                permissions.add(new RuntimePermission("getProtectionDomain"));
-                permissions.add(new RuntimePermission("accessDeclaredMembers"));
-                permissions.add(new RuntimePermission("createClassLoader"));
-                permissions.add(new RuntimePermission("closeClassLoader"));
-                permissions.add(new RuntimePermission("modifyThreadGroup"));
-                permissions.add(new RuntimePermission("getStackTrace"));
-                permissions.add(new ManagementPermission("monitor"));
-                permissions.add(new ReflectPermission("suppressAccessChecks"));
-                permissions.add(new PropertyPermission("*", "read"));
-                permissions.add(new FilePermission(temporaryDirectory("JavaREPL").getAbsolutePath() + "/-", "read, write, delete"));
-                permissions.add(new FilePermission("<<ALL FILES>>", "read"));
+            if (expression != null) {
+                result = client.execute(expression);
+                if (!result.isEmpty())
+                    printResult(result.get());
             }
 
-            @Override
-            public PermissionCollection getPermissions(CodeSource codesource) {
-                return permissions;
+
+        } while (expression != null && !result.isEmpty());
+    }
+
+    private static JavaREPLClient createClient(String[] args) throws Exception {
+        Option<String> hostname = hostname(args);
+        Option<Integer> port = port(args);
+
+        outStream.println(format("Welcome to JavaREPL version %s (%s, Java %s)",
+                applicationVersion(),
+                getProperty("java.vm.name"),
+                getProperty("java.version")));
+
+        if (hostname.isEmpty() && port.isEmpty()) {
+            return startNewLocalInstance("localhost", randomServerPort());
+        } else {
+            return connectToRemoteInstance(hostname.getOrElse("localhost"), port.getOrElse(randomServerPort()));
+        }
+    }
+
+    private static JavaREPLClient connectToRemoteInstance(String hostname, Integer port) {
+        JavaREPLClient replClient = new JavaREPLClient(hostname, port);
+
+        if (!replClient.isAlive()) {
+            errStream.println("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
+            System.exit(0);
+        }
+
+        return replClient;
+    }
+
+    private static JavaREPLClient startNewLocalInstance(String hostname, Integer port) throws Exception {
+        if (getSystemJavaCompiler() == null) {
+            errStream.println("\nERROR: Java compiler not found.\n" +
+                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
+            System.exit(0);
+        }
+
+        outStream.println("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
+
+        ProcessBuilder builder = new ProcessBuilder("java", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(), "--port=" + port);
+        builder.redirectErrorStream(true);
+
+        process = some(builder.start());
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                outStream.println("\nTerminating...");
+                process.get().destroy();
             }
         });
 
-        System.setSecurityManager(new SecurityManager());
+        JavaREPLClient replClient = new JavaREPLClient(hostname, port);
+        if (!waitUntilInstanceStarted(replClient)) {
+            errStream.println("\nERROR: Could not start REPL instance at http://" + hostname + ":" + port);
+            System.exit(0);
+        }
+
+        return replClient;
     }
 
-    private static Mapper<Sequence<String>, String> readFromExtendedConsole(final Console console) throws IOException {
+    private static boolean waitUntilInstanceStarted(JavaREPLClient client) throws Exception {
+        for (int i = 0; i < 50; i++) {
+            Thread.sleep(100);
+            if (client.isAlive())
+                return true;
+        }
+
+        return false;
+    }
+
+    private static Option<Integer> port(String[] args) {
+        return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue)));
+    }
+
+    private static Option<String> hostname(String[] args) {
+        return sequence(args).find(startsWith("--hostname=")).map(replaceAll("--hostname=", ""));
+    }
+
+    private static void printResult(EvaluationResult result) {
+        for (EvaluationLog log : result.logs()) {
+            printEvaluationLog(log);
+        }
+        System.out.println();
+    }
+
+    public static final void printEvaluationLog(EvaluationLog log) {
+        switch (log.type()) {
+            case INFO:
+                System.out.println("\u001B[0m" + log.message() + "\u001B[0m");
+                break;
+            case SUCCESS:
+                System.out.println("\u001B[32m" + log.message() + "\u001B[0m");
+                break;
+            case ERROR:
+                System.err.println("\u001B[31m" + log.message() + "\u001B[0m");
+                break;
+        }
+    }
+
+    private static Mapper<Sequence<String>, String> jlineConsole(final JavaREPLClient client) throws IOException {
         return new Mapper<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
             {
-                consoleReader = new ConsoleReader(System.in, outStream);
+                consoleReader = new ConsoleReader(inStream, outStream);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
-                consoleReader.addCompleter(asJLineCompleter(console.context().get(Completer.class)));
+                consoleReader.addCompleter(clientCompleter());
             }
 
-            private jline.console.completer.Completer asJLineCompleter(final Completer completer) {
+            public String call(Sequence<String> lines) throws Exception {
+                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
+                consoleReader.setHistory(clientHistory());
+                return consoleReader.readLine();
+            }
+
+            private MemoryHistory clientHistory() throws Exception {
+                MemoryHistory history = new MemoryHistory();
+                for (String historyItem : client.history()) {
+                    history.add(historyItem);
+                }
+                return history;
+            }
+
+            private jline.console.completer.Completer clientCompleter() {
                 return new jline.console.completer.Completer() {
                     public int complete(String expression, int cursor, List<CharSequence> candidates) {
-                        CompletionResult result = completer.apply(expression);
-                        if (result.candidates().isEmpty()) {
-                            return -1;
-                        } else {
+                        try {
+                            CompletionResult result = client.completions(expression);
                             candidates.addAll(result.candidates().toList());
-                            return result.position();
+                            return result.candidates().isEmpty() ? -1 : result.position();
+                        } catch (Exception e) {
+                            return -1;
                         }
                     }
                 };
             }
 
-            public String call(Sequence<String> lines) throws Exception {
-                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
-                consoleReader.setHistory(historyFromConsole());
-                return consoleReader.readLine();
-            }
-
-            private MemoryHistory historyFromConsole() {
-                MemoryHistory history = new MemoryHistory();
-                for (String historyItem : console.context().get(ConsoleHistory.class).items()) {
-                    history.add(historyItem);
-                }
-                return history;
-            }
         };
     }
 
-    private static Mapper<Sequence<String>, String> readFromSimpleConsole() {
-        return new Mapper<Sequence<String>, String>() {
-            private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-            public String call(Sequence<String> lines) throws Exception {
-                return reader.readLine();
-            }
-        };
-    }
-
-    private static Mapper<Sequence<String>, String> ignoreConsoleInput() {
-        return new Mapper<Sequence<String>, String>() {
-            public String call(Sequence<String> strings) throws Exception {
-                while (true) {
-                    Thread.sleep(100);
-                }
-            }
-        };
-    }
 }

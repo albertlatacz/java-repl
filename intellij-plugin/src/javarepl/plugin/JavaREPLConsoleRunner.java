@@ -44,7 +44,7 @@ import static javarepl.Utils.randomServerPort;
 
 public class JavaREPLConsoleRunner {
     public static final String REPL_TITLE = "Java REPL";
-    public static final String REPL_MAIN_CLASS = "javarepl.Main";
+    public static final String REPL_MAIN_CLASS = "javarepl.Repl";
 
     public static final String EXECUTE_ACTION_IMMEDIATELY_ID = "JavaREPL.Console.Execute.Immediately";
 
@@ -273,7 +273,6 @@ public class JavaREPLConsoleRunner {
         Map<String, String> envParams = new HashMap<String, String>();
         envParams.putAll(System.getenv());
         line.setEnvParams(envParams);
-        line.addParameter("--simpleConsole");
         line.addParameter("--port=" + port);
 
         return line;

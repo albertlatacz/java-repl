@@ -83,6 +83,17 @@ public class RestConsoleTest {
         assertThat(body(response), is(model().add("history", asList("life = 42", ":help"))));
     }
 
+
+    @Test
+    public void shouldReturnCorrectStatus() throws Exception {
+        Response response = client.handle(get(url("status")).build());
+
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model()
+                .add("isAlive", true)));
+
+    }
+
     private String url(String url) {
         return prefixUrl + "/" + url;
     }

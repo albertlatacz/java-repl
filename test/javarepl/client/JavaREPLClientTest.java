@@ -44,7 +44,7 @@ public class JavaREPLClientTest {
 
     @Test
     public void returnsResultAfterExecuting() throws Exception {
-        EvaluationResult result = client.execute("life = 42");
+        EvaluationResult result = client.execute("life = 42").get();
 
         assertThat(result.expression(), is("life = 42"));
         assertThat(result.logs().get(0).message(), is("Integer life = 42"));
@@ -68,5 +68,10 @@ public class JavaREPLClientTest {
         client.execute(":help");
 
         assertThat(client.history(), is(sequence("life = 42", ":help")));
+    }
+
+    @Test
+    public void checksIfEndpointIsAlive() throws Exception {
+        assertThat(client.isAlive(), is(true));
     }
 }

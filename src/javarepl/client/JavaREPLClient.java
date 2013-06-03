@@ -2,11 +2,15 @@ package javarepl.client;
 
 import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Mapper;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.completion.CompletionResult;
 
 import static com.googlecode.funclate.Model.persistent.parse;
+import static com.googlecode.totallylazy.Option.none;
+import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
@@ -29,12 +33,17 @@ public final class JavaREPLClient {
     }
 
 
-    public synchronized EvaluationResult execute(String expr) throws Exception {
-        Model model = parse(client.handle(post(url("execute")).form("expression", expr).build()).entity().toString());
+    public synchronized Option<EvaluationResult> execute(String expr) throws Exception {
+        String json = client.handle(post(url("execute")).form("expression", expr).build()).entity().toString();
+
+        if (json.isEmpty())
+            return none();
+
+        Model model = parse(json);
         Sequence<Model> logs = sequence(model.getValues("logs", Model.class));
         String expression = model.get("expression", String.class);
 
-        return new EvaluationResult(expression, logs.map(modelToEvaluationLog()));
+        return some(new EvaluationResult(expression, logs.map(modelToEvaluationLog())));
     }
 
     public synchronized CompletionResult completions(String expr) throws Exception {
@@ -44,8 +53,17 @@ public final class JavaREPLClient {
                 sequence(model.getValues("candidates", String.class)));
     }
 
+    public synchronized boolean isAlive() {
+        try {
+            return parse(client.handle(get(url("status")).build()).entity().toString()).get("isAlive", Boolean.class);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public synchronized Sequence<String> history() throws Exception {
-        Model model = parse(client.handle(get(url("history")).build()).entity().toString());
+        Response history = client.handle(get(url("history")).build());
+        Model model = parse(history.entity().toString());
         return sequence(model.getValues("history", String.class));
     }
 

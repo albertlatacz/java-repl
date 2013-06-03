@@ -6,7 +6,7 @@ import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
-import javarepl.Main;
+import javarepl.Repl;
 
 import java.io.File;
 import java.util.UUID;
@@ -41,10 +41,10 @@ public final class WebConsoleClientHandler {
     private void createProcess() {
         if (port.isEmpty()) {
             try {
-                File path = new File(decode(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
+                File path = new File(decode(Repl.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
                 String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
                 port = some(randomServerPort());
-                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Main.class.getCanonicalName(),
+                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Repl.class.getCanonicalName(),
                         "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
                 process = some(builder.start());
