@@ -73,6 +73,12 @@ body {
     padding: 0.1em;
 }
 
+#console div.jquery-console-message-completion {
+    color: #5d5d5d;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
 #console div.jquery-console-message-service-error {
     color: #CC7832;
     font-family: monospace;
