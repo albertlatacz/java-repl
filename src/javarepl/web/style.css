@@ -67,6 +67,12 @@ body {
     text-align: left;
 }
 
+#console div.jquery-console-message-completion {
+    color: #5d5d5d;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
 #console div.jquery-console-message-value {
     color: #CC7832;
     font-family: monospace;

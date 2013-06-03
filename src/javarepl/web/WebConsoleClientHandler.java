@@ -75,6 +75,17 @@ public final class WebConsoleClientHandler {
         }
     }
 
+    public Response completions(String expression) {
+        createProcess();
+
+        try {
+            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.get("http://localhost:" + port.get() + "/" + "completions").query("expression", expression).build()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return response(INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private Response reportProcessError(final Response response) {
         if (response.status() == Status.OK)
             return response;

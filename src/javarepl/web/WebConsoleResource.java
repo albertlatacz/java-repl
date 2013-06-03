@@ -52,6 +52,20 @@ public class WebConsoleResource {
         }
     }
 
+    @GET
+    @Hidden
+    @Path("completions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response completions(@QueryParam("id") String id, @QueryParam("expression") String expression) {
+        Option<WebConsoleClientHandler> clientHandler = agent.client(id);
+
+        if (!clientHandler.isEmpty()) {
+            return clientHandler.get().completions(expression);
+        } else {
+            return response(BAD_REQUEST);
+        }
+    }
+
     @POST
     @Hidden
     @Path("remove")

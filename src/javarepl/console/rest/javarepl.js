@@ -77,9 +77,7 @@ $(document).ready(function () {
 
             for (var i = candidates[0].length - 1; i > 0; i--) {
                 var prefixedCandidatesCount = _.filter(candidates,function (cand) {
-                    return cand.length > i
-                        ? cand.substr(0, i) == candidates[0].substr(0, i) :
-                        false
+                    return cand.length > i ? cand.substr(0, i) == candidates[0].substr(0, i) : false
                 }).length;
                 if (candidates.length == prefixedCandidatesCount) {
                     controller.promptText(promptText.substr(0, parseInt(completionResult.position)) + candidates[0].substr(0, i));

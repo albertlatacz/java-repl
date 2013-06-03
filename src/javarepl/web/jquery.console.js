@@ -637,6 +637,8 @@
             return promptText;
         };
 
+        extern.commandResult = commandResult;
+
         ////////////////////////////////////////////////////////////////////////
         // Update the prompt display
         function updatePromptDisplay() {
