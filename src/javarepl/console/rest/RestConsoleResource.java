@@ -4,8 +4,6 @@ import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Responses;
 import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
 import javarepl.completion.Completer;
@@ -94,12 +92,6 @@ public class RestConsoleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Model history() {
         return model().add("history", console.context().get(ConsoleHistory.class).items().toList());
-    }
-
-    @GET
-    @Path("")
-    public Response main() {
-        return Responses.seeOther("console.html");
     }
 
     private static Mapper<ConsoleLog, Model> commandResultToModel() {
