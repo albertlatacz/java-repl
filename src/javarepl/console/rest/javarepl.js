@@ -37,7 +37,7 @@ $(document).ready(function () {
         },
         completeHandle: function (prefix) {
             var completionResult;
-            $.ajax({type: 'GET', async: false, url: '/completions', data: {expression: prefix}})
+            $.ajax({type: 'GET', async: false, cache: false, url: '/completions', data: {expression: prefix}})
                 .done(function (data) {
                     completionResult = data;
                 });

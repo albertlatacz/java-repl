@@ -70,7 +70,7 @@ $(document).ready(function () {
         },
         completeHandle: function (prefix) {
             var completionResult;
-            $.ajax({type: 'GET', async: false, url: '/completions', data: {id: clientId, expression: prefix}})
+            $.ajax({type: 'GET', async: false, cache: false, url: '/completions', data: {id: clientId, expression: prefix}})
                 .done(function (data) {
                     completionResult = data;
                 });
