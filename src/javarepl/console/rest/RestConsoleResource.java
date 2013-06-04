@@ -19,7 +19,6 @@ import java.util.Map;
 import static com.googlecode.funclate.Model.persistent.model;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomIdentifier;
-import static javarepl.console.ConsoleResult.emptyResult;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
@@ -56,12 +55,23 @@ public class RestConsoleResource {
     @Path("execute")
     @Produces(MediaType.APPLICATION_JSON)
     public Model execute(@FormParam("expression") String expr) {
-        Option<String> expression = expressionReader.readExpression(expr);
-        ConsoleResult result = expression.isEmpty() ? emptyResult() : console.execute(expression.get());
+        ConsoleResult result = console.execute(expr);
 
         return model()
                 .add("expression", result.expression())
                 .add("logs", result.logs().map(commandResultToModel()));
+    }
+
+    @POST
+    @Path("readExpression")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Model readExpression(@FormParam("line") String line) {
+        Option<String> expression = expressionReader.readExpression(line);
+        return expression.map(new Mapper<String, Model>() {
+            public Model call(String expression) throws Exception {
+                return model().add("expression", expression);
+            }
+        }).getOrElse(model());
     }
 
     @GET

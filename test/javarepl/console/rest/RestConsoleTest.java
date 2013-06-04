@@ -94,6 +94,18 @@ public class RestConsoleTest {
 
     }
 
+    @Test
+    public void shouldReadExpression() throws Exception {
+        Response response = client.handle(post(url("readExpression")).form("line", "{").build());
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model()));
+
+        response = client.handle(post(url("readExpression")).form("line", "}").build());
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model().add("expression", "{\n}")));
+
+    }
+
     private String url(String url) {
         return prefixUrl + "/" + url;
     }

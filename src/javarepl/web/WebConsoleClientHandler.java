@@ -75,6 +75,17 @@ public final class WebConsoleClientHandler {
         }
     }
 
+    public Response readExpression(String line) {
+        createProcess();
+
+        try {
+            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port.get() + "/" + "readExpression").form("line", line).build()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return response(INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public Response completions(String expression) {
         createProcess();
 

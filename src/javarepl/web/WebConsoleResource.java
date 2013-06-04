@@ -52,6 +52,20 @@ public class WebConsoleResource {
         }
     }
 
+    @POST
+    @Hidden
+    @Path("readExpression")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readExpression(@FormParam("id") String id, @FormParam("line") String line) {
+        Option<WebConsoleClientHandler> clientHandler = agent.client(id);
+
+        if (!clientHandler.isEmpty()) {
+            return clientHandler.get().readExpression(line);
+        } else {
+            return response(BAD_REQUEST);
+        }
+    }
+
     @GET
     @Hidden
     @Path("completions")

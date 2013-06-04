@@ -4,6 +4,17 @@ function removeClient(clientId) {
     $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
 }
 
+function readExpressionLine(clientId, line) {
+    var expression = null;
+
+    $.ajax({type: 'POST', async: false, url: '/readExpression', data: {id: clientId, line: line}})
+        .done(function (data) {
+            expression = data.expression;
+        });
+
+    return expression;
+}
+
 var requesting = false;
 var clientId = null;
 var welcomeMessage = null;
@@ -26,44 +37,49 @@ $(document).ready(function () {
         promptLabel: 'java> ',
         commandValidate: function (line) {
             return !requesting;
-
         },
         commandHandle: function (line, report) {
-            $.post('/execute', {id: clientId, expression: line})
-                .done(function (data) {
-                    var messages = [];
+            var expression = readExpressionLine(clientId, line);
 
-                    var hadError = false;
+            if (expression) {
+                $.post('/execute', {id: clientId, expression: expression})
+                    .done(function (data) {
+                        var messages = [];
+                        var hadError = false;
 
-                    for (var i = 0; i < data.logs.length; i++) {
-                        var type = data.logs[i].type == "ERROR" ? "jquery-console-message-error" : "jquery-console-message-success";
+                        for (var i = 0; i < data.logs.length; i++) {
+                            var type = data.logs[i].type == "ERROR" ? "jquery-console-message-error" : "jquery-console-message-success";
 
-                        if (data.logs[i].type == "ERROR") {
-                            hadError = true;
+                            if (data.logs[i].type == "ERROR") {
+                                hadError = true;
+                            }
+                            messages.push({msg: data.logs[i].message, className: type})
                         }
-                        messages.push({msg: data.logs[i].message, className: type})
-                    }
 
-                    if (!hadError) {
-                        _gaq.push(["_trackEvent", "console", "evaluation", "success"]);
-                    } else {
-                        _gaq.push(["_trackEvent", "console", "evaluation", "error"]);
-                    }
+                        if (!hadError) {
+                            _gaq.push(["_trackEvent", "console", "evaluation", "success"]);
+                        } else {
+                            _gaq.push(["_trackEvent", "console", "evaluation", "error"]);
+                        }
 
-                    report(messages);
-                    requesting = false;
-                })
-                .fail(function (xhr, textStatus, errorThrown) {
-                    report([
-                        {msg: "Service timeout. Starting new session...", className: "jquery-console-message-service-error"}
-                    ]);
-
-                    removeClient(clientId);
-                    $.post('/create', function (data) {
-                        clientId = data.id;
+                        report(messages);
                         requesting = false;
+                    })
+                    .fail(function (xhr, textStatus, errorThrown) {
+                        report([
+                            {msg: "Service timeout. Starting new session...", className: "jquery-console-message-service-error"}
+                        ]);
+
+                        removeClient(clientId);
+                        $.post('/create', function (data) {
+                            clientId = data.id;
+                            requesting = false;
+                        });
                     });
-                });
+            } else {
+                report([]);
+                requesting = false;
+            }
 
             return [];
 

@@ -134,7 +134,6 @@ public class Main {
         for (EvaluationLog log : result.logs()) {
             printEvaluationLog(log);
         }
-        System.out.println();
     }
 
     public static final void printEvaluationLog(EvaluationLog log) {
