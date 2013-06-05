@@ -8,18 +8,15 @@ import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.Repl;
 
-import java.io.File;
 import java.util.UUID;
 
+import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.Responses.response;
 import static com.googlecode.utterlyidle.Status.GATEWAY_TIMEOUT;
 import static com.googlecode.utterlyidle.Status.INTERNAL_SERVER_ERROR;
-import static java.io.File.pathSeparator;
-import static java.lang.Thread.sleep;
-import static java.net.URLDecoder.decode;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.console.TimingOutConsole.EXPRESSION_TIMEOUT;
 import static javarepl.console.TimingOutConsole.INACTIVITY_TIMEOUT;
@@ -41,20 +38,38 @@ public final class WebConsoleClientHandler {
     private void createProcess() {
         if (port.isEmpty()) {
             try {
-                File path = new File(decode(Repl.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "ISO-8859-1"));
-                String classpath = sequence(System.getProperty("java.class.path")).add(path.toURI().toURL().toString()).toString(pathSeparator);
                 port = some(randomServerPort());
-                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", classpath, Repl.class.getCanonicalName(),
+                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(),
                         "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
                 process = some(builder.start());
 
-                sleep(1000);
+                waitUntilProcessStarted();
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private boolean isAlive() {
+        try {
+            return parse(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
+                    .get("isAlive", Boolean.class);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean waitUntilProcessStarted() throws Exception {
+        for (int i = 0; i < 50; i++) {
+            Thread.sleep(100);
+            if (isAlive())
+                return true;
+        }
+
+        return false;
     }
 
     public void shutdown() {

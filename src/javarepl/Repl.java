@@ -36,7 +36,6 @@ import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;
-import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Repl {
     public static void main(String... args) throws Exception {
@@ -50,12 +49,6 @@ public class Repl {
                     sandboxed ? "sandboxed" : "unrestricted",
                     getProperty("java.vm.name"),
                     getProperty("java.version")));
-        }
-
-        if (getSystemJavaCompiler() == null) {
-            logger.error("\nERROR: Java compiler not found.\n" +
-                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
-            System.exit(2000);
         }
 
         ConsoleConfig consoleConfig = consoleConfig()

@@ -10,6 +10,7 @@ import javarepl.Evaluator;
 import javarepl.completion.AggregateCompleter;
 import javarepl.completion.Completer;
 import javarepl.completion.ConsoleCompleter;
+import javarepl.completion.TypeCompleter;
 import javarepl.console.commands.Command;
 import javarepl.console.commands.Commands;
 
@@ -36,7 +37,8 @@ public final class SimpleConsole implements Console {
         context.addInstance(ConsoleLogger.class, config.logger);
         context.add(Commands.class);
         context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(completer()).filter(notNullValue())
-                .add(new ConsoleCompleter(this))));
+                .add(new ConsoleCompleter(this))
+                .add(new TypeCompleter())));
 
         evaluator().addResults(config.results);
     }

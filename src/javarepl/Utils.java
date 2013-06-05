@@ -7,20 +7,23 @@ import com.googlecode.totallylazy.Sequences;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.net.URL;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
 import static com.googlecode.totallylazy.Callables.size;
-import static com.googlecode.totallylazy.Files.randomFilename;
-import static com.googlecode.totallylazy.Files.temporaryDirectory;
+import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Predicates.is;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
-import static com.googlecode.totallylazy.Sequences.characters;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.*;
+import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPrivate;
@@ -51,6 +54,14 @@ public class Utils {
             return unwrapException(((InvocationTargetException) e).getTargetException());
 
         return e;
+    }
+
+    public static Mapper<String, URL> resolveURL() {
+        return new Mapper<String, URL>() {
+            public URL call(String path) throws Exception {
+                return resolveURL(path);
+            }
+        };
     }
 
     public static URL resolveURL(String path) {
@@ -131,5 +142,33 @@ public class Utils {
         File file = temporaryDirectory("JavaREPL/" + randomFilename());
         file.deleteOnExit();
         return file;
+    }
+
+
+    public static JarFile jarFile(URI path) {
+        try {
+            return new JarFile(new File(path));
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't create jar file for path " + path, e);
+        }
+    }
+
+    public static Mapper<JarEntry, String> jarEntryName() {
+        return new Mapper<JarEntry, String>() {
+            public String call(JarEntry jarEntry) throws Exception {
+                return jarEntry.getName();
+            }
+        };
+    }
+
+
+    public static Sequence<String> entries(File file) {
+        if (file.isDirectory()) {
+            return recursiveFiles(file)
+                    .map(path().then(replace(file.getPath() + File.separator, "")));
+        } else {
+            return memorise(jarFile(file.toURI()).entries())
+                    .map(jarEntryName());
+        }
     }
 }

@@ -10,6 +10,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -184,6 +185,11 @@ public class Evaluator {
     private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
         if (classLoader.isClassLoaded(expression.canonicalName())) {
             return left(new UnsupportedOperationException("Redefining classes not supported"));
+        }
+
+        if (getSystemJavaCompiler() == null) {
+            return left(new FileNotFoundException("Java compiler not found." +
+                    "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly."));
         }
 
         try {
