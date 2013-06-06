@@ -167,8 +167,13 @@ public class Utils {
             return recursiveFiles(file)
                     .map(path().then(replace(file.getPath() + File.separator, "")));
         } else {
-            return memorise(jarFile(file.toURI()).entries())
-                    .map(jarEntryName());
+            try {
+                return memorise(new JarFile(new File(file.toURI())).entries())
+                        .map(jarEntryName());
+            } catch (Exception e) {
+                System.err.println("Couldn't load entries from jar " + file.toURI() + ". " + e.getLocalizedMessage());
+                return empty();
+            }
         }
     }
 }

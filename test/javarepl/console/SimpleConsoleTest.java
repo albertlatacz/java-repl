@@ -58,6 +58,7 @@ public class SimpleConsoleTest {
         assertThat(
                 executing("import java.io.*;", "\"test\"", "import java.net.*", ":list imports"),
                 hasLogged(info("Imports:\n" +
+                        "    java.lang.*\n" +
                         "    java.util.*\n" +
                         "    java.math.*\n" +
                         "    java.lang.Math.*\n" +
@@ -91,6 +92,7 @@ public class SimpleConsoleTest {
                 info("Types:\n" +
                         "    AClass\n"),
                 info("Imports:\n" +
+                        "    java.lang.*\n" +
                         "    java.util.*\n" +
                         "    java.math.*\n" +
                         "    java.lang.Math.*\n" +

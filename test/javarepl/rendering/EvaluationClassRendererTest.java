@@ -17,6 +17,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForStatement() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new Statement("someStatement")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -34,6 +35,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForValue() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new Value("someValue")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -55,6 +57,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForAssignment() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new Assignment("someAssignment", "someKey", "someValue")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -76,6 +79,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForAssignmentWithType() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new AssignmentWithType("someAssignmentWithType", "SomeType", "someKey", "someValue")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -97,6 +101,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForImport() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new Import("someImport", "some.import")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -113,6 +118,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersTemplateForMethod() {
         assertThat(renderExpressionClass(evaluationContext(), "AClass", new Method("someMethod", Object.class, "someMethodName", Sequences.<Class<?>>empty())), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -139,6 +145,7 @@ public class EvaluationClassRendererTest {
                 .addExpression(new Method("char method1(char i){\nreturn i;\n}", char.class, "method2", Sequences.<Class<?>>sequence(char.class)));
 
         assertThat(renderExpressionClass(context, "AClass", new Statement("someStatement")), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")
@@ -165,6 +172,7 @@ public class EvaluationClassRendererTest {
     @Test
     public void rendersMethodSignatureDetection() {
         assertThat(renderMethodSignatureDetection(evaluationContext(), "AClass", "int someMethod(int param1, String param2){return param;}"), is(new StringBuilder()
+                .append("import java.lang.*;\n")
                 .append("import java.util.*;\n")
                 .append("import java.math.*;\n")
                 .append("import static java.lang.Math.*;\n")

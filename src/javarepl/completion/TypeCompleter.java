@@ -1,7 +1,6 @@
 package javarepl.completion;
 
 
-import com.googlecode.totallylazy.Function;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -10,22 +9,27 @@ import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.comparators.Comparators.ascending;
+import static javarepl.completion.ResolvedClass.functions.canonicalClassName;
 import static javarepl.completion.ResolvedPackage.functions.packageName;
 
-public class TypeCompleter extends Completer {
-    private final Function<Sequence<ResolvedPackage>> packagesResolver = packagesResolver();
+public final class TypeCompleter extends Completer {
+    private final TypeResolver typeResolver;
+
+    public TypeCompleter(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     public CompletionResult call(String expression) throws Exception {
-        Sequence<ResolvedPackage> packages = packagesResolver.apply();
         final int lastSpace = expression.lastIndexOf(" ") + 1;
         final String packagePart = expression.substring(lastSpace);
         final int beginIndex = packagePart.lastIndexOf('.') + 1;
 
-        Sequence<ResolvedPackage> resolvedPackages = packages.filter(where(packageName(), startsWith(packagePart)));
+        Sequence<ResolvedPackage> resolvedPackages = typeResolver.packages().filter(where(packageName(), startsWith(packagePart)));
 
         Sequence<String> classesInPackage = beginIndex > 0 ?
-                packages.filter(where(packageName(), equalTo(packagePart.substring(0, beginIndex - 1))))
+                typeResolver.packages().filter(where(packageName(), equalTo(packagePart.substring(0, beginIndex - 1))))
                         .flatMap(ResolvedPackage.functions.classes())
+                        .map(canonicalClassName())
                         .filter(startsWith(packagePart)) :
                 empty(String.class);
 
@@ -36,14 +40,6 @@ public class TypeCompleter extends Completer {
                 .sort(ascending(String.class));
 
         return new CompletionResult(expression, lastSpace + beginIndex, candidates);
-    }
-
-    private Function<Sequence<ResolvedPackage>> packagesResolver() {
-        return new Function<Sequence<ResolvedPackage>>() {
-            public Sequence<ResolvedPackage> call() throws Exception {
-                return TypeResolver.packages();
-            }
-        }.lazy();
     }
 
     private Mapper<String, String> candidatePackagePrefix(final int fromIndex) {

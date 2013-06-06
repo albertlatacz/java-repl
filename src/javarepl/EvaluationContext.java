@@ -29,6 +29,7 @@ public class EvaluationContext {
 
     public static Sequence<Expression> defaultExpressions() {
         return sequence(
+                new Import("import java.lang.*", "java.lang.*"),
                 new Import("import java.util.*", "java.util.*"),
                 new Import("import java.math.*", "java.math.*"),
                 new Import("import static java.lang.Math.*", "java.lang.Math.*")

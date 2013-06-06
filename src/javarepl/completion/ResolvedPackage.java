@@ -7,15 +7,17 @@ import com.googlecode.totallylazy.Sequence;
 
 import java.io.File;
 
+import static javarepl.completion.TypeResolver.functions.classResolver;
+
 public class ResolvedPackage {
     private final String packageName;
     private final File file;
-    private final Function<Sequence<String>> classResolver;
+    private final Function<Sequence<ResolvedClass>> classResolver;
 
     public ResolvedPackage(File file, String packageName) {
         this.packageName = packageName;
         this.file = file;
-        this.classResolver = classResolver();
+        this.classResolver = classResolver(this);
     }
 
     public String packageName() {
@@ -26,16 +28,8 @@ public class ResolvedPackage {
         return file;
     }
 
-    public Sequence<String> classes() {
+    public Sequence<ResolvedClass> classes() {
         return classResolver.apply();
-    }
-
-    private Function<Sequence<String>> classResolver() {
-        return new Function<Sequence<String>>() {
-            public Sequence<String> call() throws Exception {
-                return TypeResolver.classes(file, packageName);
-            }
-        }.lazy();
     }
 
     @Override
@@ -64,9 +58,9 @@ public class ResolvedPackage {
             };
         }
 
-        public static Mapper<ResolvedPackage, Sequence<String>> classes() {
-            return new Mapper<ResolvedPackage, Sequence<String>>() {
-                public Sequence<String> call(ResolvedPackage resolvedPackage) throws Exception {
+        public static Mapper<ResolvedPackage, Sequence<ResolvedClass>> classes() {
+            return new Mapper<ResolvedPackage, Sequence<ResolvedClass>>() {
+                public Sequence<ResolvedClass> call(ResolvedPackage resolvedPackage) throws Exception {
                     return resolvedPackage.classes();
                 }
             };

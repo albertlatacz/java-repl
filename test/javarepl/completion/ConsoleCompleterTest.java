@@ -8,12 +8,15 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.Functions.returns;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ConsoleCompleterTest {
 
+    private TypeResolver typeResolver = new TypeResolver(returns(empty(ResolvedPackage.class)));
     private Console console;
 
     @Test
@@ -51,7 +54,7 @@ public class ConsoleCompleterTest {
     }
 
     private CompletionResult completing(String expression) {
-        return new ConsoleCompleter(console).apply(expression);
+        return new ConsoleCompleter(console, typeResolver).apply(expression);
     }
 
     private void givenConsoleThatExecuted(String... expressions) {

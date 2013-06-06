@@ -2,7 +2,6 @@ package javarepl.console.rest;
 
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
-import javarepl.completion.ConsoleCompleter;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.modules.Modules.applicationInstance;
@@ -13,8 +12,7 @@ public class RestConsoleApplication extends RestApplication {
         super(basePath,
                 bindingsModule(annotatedClass(RestConsoleResource.class)),
                 applicationInstance(console),
-                applicationInstance(new RestConsoleExpressionReader()),
-                applicationInstance(new ConsoleCompleter(console)));
+                applicationInstance(new RestConsoleExpressionReader()));
 
         add(new RestConsoleModule());
     }

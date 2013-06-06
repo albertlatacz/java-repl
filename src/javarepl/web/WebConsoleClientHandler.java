@@ -39,7 +39,7 @@ public final class WebConsoleClientHandler {
         if (port.isEmpty()) {
             try {
                 port = some(randomServerPort());
-                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx96M", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(),
+                ProcessBuilder builder = new ProcessBuilder("java", "-Xmx128M", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(),
                         "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300");
                 builder.redirectErrorStream(true);
                 process = some(builder.start());
