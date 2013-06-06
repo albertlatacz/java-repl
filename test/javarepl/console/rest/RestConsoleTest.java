@@ -63,11 +63,11 @@ public class RestConsoleTest {
         client.handle(post(url("execute")).form("expression", "21").build());
         client.handle(post(url("execute")).form("expression", "7").build());
 
-        Response response = client.handle(get(url("completions")).query("expression", "prefix r").build());
+        Response response = client.handle(get(url("completions")).query("expression", "prefix res").build());
 
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response), is(model()
-                .add("expression", "prefix r")
+                .add("expression", "prefix res")
                 .add("position", "7")
                 .add("candidates", asList("res0", "res1", "res2"))));
     }

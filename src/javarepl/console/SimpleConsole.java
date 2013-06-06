@@ -15,6 +15,7 @@ import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.completion.Completers.javaKeywordCompleter;
 import static javarepl.completion.TypeResolver.functions.defaultPackageResolver;
 import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
@@ -36,8 +37,11 @@ public final class SimpleConsole implements Console {
         context.addInstance(TypeResolver.class, new TypeResolver(defaultPackageResolver()));
         context.add(Commands.class);
         context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(completer()).filter(notNullValue())
+                .add(javaKeywordCompleter())
                 .add(new ConsoleCompleter(this, context.get(TypeResolver.class)))
-                .add(new TypeCompleter(context.get(TypeResolver.class)))));
+                .add(new TypeCompleter(context.get(TypeResolver.class)))
+
+        ));
 
         evaluator().addResults(config.results);
     }
