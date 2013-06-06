@@ -8,13 +8,10 @@ import com.googlecode.utterlyidle.annotations.*;
 import javarepl.Evaluator;
 import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
-import javarepl.console.ConsoleConfig;
 import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 import javarepl.expressions.Expression;
-
-import java.util.Map;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static javarepl.Utils.applicationVersion;
@@ -32,14 +29,11 @@ public class RestConsoleResource {
     }
 
     @GET
-    @Path("config")
+    @Path("version")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model config() {
-        ConsoleConfig consoleConfig = console.context().get(ConsoleConfig.class);
+    public Model version() {
         return model()
-                .add("version", applicationVersion())
-                .add("sandboxed", consoleConfig.sandboxed)
-                .add("systemProperties", model((Map) System.getProperties()));
+                .add("version", applicationVersion());
     }
 
 

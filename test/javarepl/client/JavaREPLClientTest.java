@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.client.EvaluationLog.Type.SUCCESS;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
@@ -68,6 +69,11 @@ public class JavaREPLClientTest {
         client.execute(":help");
 
         assertThat(client.history(), is(sequence("life = 42", ":help")));
+    }
+
+    @Test
+    public void returnsVersion() throws Exception {
+        assertThat(client.version(), is(applicationVersion()));
     }
 
     @Test

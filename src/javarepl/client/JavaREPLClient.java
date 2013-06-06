@@ -61,6 +61,14 @@ public final class JavaREPLClient {
         }
     }
 
+    public synchronized String version() {
+        try {
+            return parse(client.handle(get(url("version")).build()).entity().toString()).get("version", String.class);
+        } catch (Exception e) {
+            return "[unknown]";
+        }
+    }
+
     public synchronized Sequence<String> history() throws Exception {
         Response history = client.handle(get(url("history")).build());
         Model model = parse(history.entity().toString());

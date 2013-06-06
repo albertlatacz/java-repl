@@ -15,6 +15,7 @@ import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static java.util.Arrays.asList;
+import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -91,6 +92,16 @@ public class RestConsoleTest {
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response), is(model()
                 .add("isAlive", true)));
+
+    }
+
+    @Test
+    public void shouldReturnCorrectVersion() throws Exception {
+        Response response = client.handle(get(url("version")).build());
+
+        assertThat(response.status(), is(Status.OK));
+        assertThat(body(response), is(model()
+                .add("version", applicationVersion())));
 
     }
 

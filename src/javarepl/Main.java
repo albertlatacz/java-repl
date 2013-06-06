@@ -78,6 +78,13 @@ public class Main {
         if (!replClient.isAlive()) {
             errStream.println("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
+        } else {
+            outStream.println("Connected to remote instance at http://" + hostname + ":" + port);
+        }
+
+        String remoteInstanceVersion = replClient.version();
+        if (!remoteInstanceVersion.equals(applicationVersion())) {
+            errStream.println("WARNING: Client version (" + applicationVersion() + ") is different from remote instance version (" + remoteInstanceVersion + ")");
         }
 
         return replClient;
