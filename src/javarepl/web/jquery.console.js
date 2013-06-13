@@ -38,6 +38,8 @@
 //   Google Chrome 5.0.375.55 (Mac)
 
 (function ($) {
+    var isWebkit = !!~navigator.userAgent.indexOf(' AppleWebKit/');
+
     $.fn.console = function (config) {
         ////////////////////////////////////////////////////////////////////////
         // Constants
@@ -84,6 +86,9 @@
             // C-k
             75: deleteUntilEnd
         };
+        if (config.ctrlCodes) {
+            $.extend(ctrlCodes, config.ctrlCodes);
+        }
         var altCodes = {
             // M-f
             70: moveToNextWord,
@@ -228,7 +233,7 @@
         container.click(function () {
             inner.addClass('jquery-console-focus');
             inner.removeClass('jquery-console-nofocus');
-            if ($.browser.webkit) {
+            if (isWebkit) {
                 typer.focusWithoutScrolling();
             } else {
                 typer.css('position', 'fixed').focus();
@@ -295,18 +300,22 @@
             if (isIgnorableKey(e)) {
                 return false;
             }
-            // // C-v: don't insert on paste event
+            // C-v: don't insert on paste event
             if ((e.ctrlKey || e.metaKey) && String.fromCharCode(keyCode).toLowerCase() == 'v') {
                 return true;
             }
             if (acceptInput && cancelKeyPress != keyCode && keyCode >= 32) {
                 if (cancelKeyPress) return false;
-                if (typeof config.charInsertTrigger == 'undefined' ||
-                    (typeof config.charInsertTrigger == 'function' &&
-                        config.charInsertTrigger(keyCode, promptText)))
+                if (
+                    typeof config.charInsertTrigger == 'undefined' || (
+                        typeof config.charInsertTrigger == 'function' &&
+                            config.charInsertTrigger(keyCode, promptText)
+                        )
+                    ) {
                     typer.consoleInsert(keyCode);
+                }
             }
-            if ($.browser.webkit) return false;
+            if (isWebkit) return false;
         });
 
         function isIgnorableKey(e) {
@@ -373,8 +382,9 @@
         };
 
         function forwardDelete() {
-            if (deleteCharAtPos())
+            if (deleteCharAtPos()) {
                 updatePromptDisplay();
+            }
         };
 
         function deleteUntilEnd() {
@@ -629,7 +639,7 @@
         };
 
         extern.promptText = function (text) {
-            if (text) {
+            if (typeof text === 'string') {
                 promptText = text;
                 column = promptText.length;
                 updatePromptDisplay();
