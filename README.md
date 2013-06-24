@@ -58,9 +58,10 @@ $ <PATH_TO_JDK>/bin/java -jar javarepl.jar
 
 
 ## Donations
-Running [www.javarepl.com](http://www.javarepl.com/) on Amazon EC2 has associated costs.
-Donating small amount will help to move the service onto more powerful machine, which provides faster execution
-and allows more users. If you like JavaREPL you can tip it via [GitTip](https://www.gittip.com/albertlatacz/).
+If you like JavaREPL you can tip it via [Gittip](https://www.gittip.com/albertlatacz/)
+
+Donating small amount will help to move the service onto more powerful EC2 machine, which provides faster execution
+and allows more users.
 
 
 ## License
