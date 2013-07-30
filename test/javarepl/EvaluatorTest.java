@@ -40,6 +40,7 @@ public class EvaluatorTest {
         assertThat(evaluating("class NewClass {public int field=20;}"), hasNoResult());
         assertThat(evaluating("class NewClass {public int field=20;}", "new NewClass().field"), hasResult(20));
         assertThat(evaluating("int max(int a, int b) { return a > b ? a : b; }", "max(20, 30)"), hasResult(30));
+        assertThat(evaluating("String res = null", "res"), hasResult(null));
     }
 
     @Test

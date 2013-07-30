@@ -26,7 +26,6 @@ public final class EvaluateFile extends Command {
             for (String line : Strings.lines(resolveURL(path).openStream())) {
                 EvaluateExpression.evaluate(evaluator, logger, line);
             }
-            ;
 
             logger.success(format("Finished evaluating %s", path));
         } catch (Exception e) {

@@ -1,9 +1,10 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Option;
+
 import static com.googlecode.totallylazy.Predicates.equalTo;
 import static com.googlecode.totallylazy.Predicates.where;
 import static javarepl.Result.functions.key;
-import static javarepl.Result.functions.value;
 
 @SuppressWarnings("unused")
 public abstract class EvaluationTemplate {
@@ -15,10 +16,12 @@ public abstract class EvaluationTemplate {
 
     @SuppressWarnings("unchecked")
     public final <T> T valueOf(final String key) {
-        return (T) context.results()
-                .filter(where(key(), equalTo(key)))
-                .map(value())
-                .headOption()
-                .getOrThrow(new IllegalArgumentException("Result '" + key + "' not found"));
+        Option<Result> result = context.results()
+                .find(where(key(), equalTo(key)));
+
+        if (result.isEmpty())
+            throw new IllegalArgumentException("Result '" + key + "' not found");
+
+        return (T) result.get().value();
     }
 }

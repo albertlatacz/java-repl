@@ -34,6 +34,14 @@ public class Utils {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
 
+    public static Class<?> extractType(Object object) {
+        if (object == null) {
+            return Object.class;
+        } else {
+            return extractType(object.getClass());
+        }
+    }
+
     public static Class<?> extractType(Class<?> clazz) {
         if (clazz.isAnonymousClass()) {
             if (clazz.getSuperclass().equals(Object.class)) {
@@ -84,7 +92,6 @@ public class Utils {
                 JarInputStream jarStream = new JarInputStream(new FileInputStream(path));
                 Manifest manifest = jarStream.getManifest();
                 return manifest.getMainAttributes().getValue("Implementation-Version");
-
             }
         } catch (Exception e) {
             // ignore

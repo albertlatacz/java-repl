@@ -140,7 +140,7 @@ public class EvaluationClassRenderer {
     private static String renderPreviousEvaluations(EvaluationContext context) {
         return context.results().map(new Mapper<Result, String>() {
             public String call(Result result) throws Exception {
-                return format("  public %s %s = valueOf(\"%s\");", extractType(result.value().getClass()).getCanonicalName(), result.key(), result.key());
+                return format("  public %s %s = valueOf(\"%s\");", result.type().getCanonicalName(), result.key(), result.key());
             }
         }).toString("\n");
     }

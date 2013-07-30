@@ -27,7 +27,7 @@ public class SimpleConsoleTest {
         assertThat(executing("import java.net.*;"), hasLogged(info("Imported java.net.*")));
         assertThat(executing("int method(Integer i){return i;}"), hasLogged(info("Created method int method(java.lang.Integer)")));
         assertThat(executing("class SomeClass{}"), hasLogged(info("Created type SomeClass")));
-        assertThat(executing("int i = 42"), hasLogged(info("Integer i = 42")));
+        assertThat(executing("int i = 42"), hasLogged(info("int i = 42")));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class SimpleConsoleTest {
                 hasLogged(
                         info("Created method void method()"),
                         info("Hello world"),
-                        info("Integer num = 42"),
+                        info("int num = 42"),
                         info("Finished evaluating " + path)));
     }
 

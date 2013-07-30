@@ -3,6 +3,8 @@ package javarepl;
 import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.annotations.multimethod;
 import javarepl.expressions.*;
+import javarepl.expressions.Method;
+import javarepl.expressions.Type;
 import javarepl.expressions.Value;
 
 import javax.tools.DiagnosticCollector;
@@ -11,8 +13,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.net.URL;
 import java.util.regex.MatchResult;
 
@@ -97,8 +98,13 @@ public class Evaluator {
     }
 
     private AssignmentWithType createAssignmentWithType(String expression) {
-        MatchResult match = Patterns.assignmentWithTypeNamePattern.match(expression);
-        return new AssignmentWithType(expression, match.group(1), match.group(2), match.group(3));
+        try {
+            MatchResult match = Patterns.assignmentWithTypeNamePattern.match(expression);
+            java.lang.reflect.Method declaredMethod = detectMethod(match.group(1) + " " + randomIdentifier("method") + "(){}");
+            return new AssignmentWithType(expression, declaredMethod.getReturnType(), match.group(2), match.group(3));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Assignment createAssignmentExpression(String expression) {
@@ -154,7 +160,7 @@ public class Evaluator {
         if (evaluation.isRight()) {
             Option<Result> result = evaluation.right().result();
             if (!result.isEmpty()) {
-                expressionType = some((Class) result.get().value().getClass());
+                expressionType = some((Class) result.get().type());
             }
         }
 
@@ -214,23 +220,25 @@ public class Evaluator {
 
     private Method createMethodExpression(String expression) {
         try {
-            final String className = randomIdentifier("Method");
-            final File outputJavaFile = file(outputDirectory, className + ".java");
-
-            final String sources = renderMethodSignatureDetection(context, className, expression);
-            Files.write(sources.getBytes(), outputJavaFile);
-
-            compile(outputJavaFile);
-
-            Class<?> expressionClass = classLoader.loadClass(className);
-
-            java.lang.reflect.Method declaredMethod = expressionClass.getDeclaredMethods()[0];
-
+            java.lang.reflect.Method declaredMethod = detectMethod(expression);
             return new Method(expression, declaredMethod.getReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes()));
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private java.lang.reflect.Method detectMethod(String expression) throws Exception {
+        final String className = randomIdentifier("Method");
+        final File outputJavaFile = file(outputDirectory, className + ".java");
+
+        final String sources = renderMethodSignatureDetection(context, className, expression);
+        Files.write(sources.getBytes(), outputJavaFile);
+
+        compile(outputJavaFile);
+
+        Class<?> expressionClass = classLoader.loadClass(className);
+
+        return expressionClass.getDeclaredMethods()[0];
     }
 
     private Either<? extends Throwable, Evaluation> evaluateExpression(final Expression expression) {
@@ -252,12 +260,13 @@ public class Evaluator {
 
             final Object expressionInstance = constructor.newInstance(newContext);
 
-            Object resultObject = expressionClass.getMethod("evaluate").invoke(expressionInstance);
+            java.lang.reflect.Method method = expressionClass.getMethod("evaluate");
+            Object resultObject = method.invoke(expressionInstance);
 
             Sequence<Result> modifiedResults = modifiedResults(expressionInstance);
 
-            if (resultObject != null) {
-                Result result = Result.result(nextResultKeyFor(expression), resultObject);
+            if (resultObject != null || !method.getReturnType().equals(void.class)) {
+                Result result = Result.result(nextResultKeyFor(expression), resultObject, typeFor(expression));
                 context = newContext.addExpression(expression).addResults(modifiedResults.add(result)).lastSource(sources);
                 return right(evaluation(expression, some(result)));
             } else {
@@ -292,6 +301,12 @@ public class Evaluator {
         return (expression instanceof Value)
                 ? context.nextResultKey()
                 : expression.key();
+    }
+
+    private Option<Class<?>> typeFor(Expression expression) {
+        return (expression instanceof AssignmentWithType)
+            ? Option.<Class<?>>some(((AssignmentWithType) expression).type())
+            : Option.<Class<?>>none();
     }
 
     private void compile(File file) throws Exception {

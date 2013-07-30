@@ -1,11 +1,11 @@
 package javarepl.expressions;
 
 public final class AssignmentWithType extends Expression {
-    private final String type;
+    private final Class<?> type;
     private final String key;
     private final String value;
 
-    public AssignmentWithType(String source, String type, String key, String value) {
+    public AssignmentWithType(String source, Class<?> type, String key, String value) {
         super(source);
 
         this.type = type;
@@ -17,7 +17,7 @@ public final class AssignmentWithType extends Expression {
         return key;
     }
 
-    public String type() {
+    public Class<?> type() {
         return type;
     }
 

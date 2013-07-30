@@ -15,22 +15,22 @@ public class MethodNameRenderer {
 
     @multimethod
     private static String renderMethodName(Statement expression) {
-        return methodNameWithType("void");
+        return methodNameWithType(void.class);
     }
 
     @multimethod
     private static String renderMethodName(Import expression) {
-        return methodNameWithType("void");
+        return methodNameWithType(void.class);
     }
 
     @multimethod
     private static String renderMethodName(Method expression) {
-        return methodNameWithType("void");
+        return methodNameWithType(void.class);
     }
 
     @multimethod
     private static String renderMethodName(Assignment expression) {
-        return methodNameWithType("Object");
+        return methodNameWithType(Object.class);
     }
 
     @multimethod
@@ -40,10 +40,10 @@ public class MethodNameRenderer {
 
     @multimethod
     private static String renderMethodName(Value expression) {
-        return methodNameWithType("Object");
+        return methodNameWithType(Object.class);
     }
 
-    private static String methodNameWithType(String returnType) {
-        return format("  public %s evaluate() throws Exception {", returnType);
+    private static String methodNameWithType(Class<?> returnType) {
+        return format("  public %s evaluate() throws Exception {", returnType.getCanonicalName());
     }
 }
