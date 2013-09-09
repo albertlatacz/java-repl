@@ -1,7 +1,6 @@
 * Simple auto-completion
 * Export evaluations to source file
 * Show the list of recent exceptions
-* Support generic typing where possible
 * Push automatically to ec2
 
 

@@ -32,7 +32,8 @@ public class RestConsole extends DelegatingConsole {
             server.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            super.shutdown();
         }
-        super.shutdown();
     }
 }
