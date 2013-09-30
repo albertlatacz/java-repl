@@ -17,7 +17,6 @@ import java.lang.reflect.*;
 import java.net.URL;
 import java.util.regex.MatchResult;
 
-import static com.googlecode.totallylazy.Callables.toString;
 import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.*;
@@ -310,7 +309,18 @@ public class Evaluator {
     }
 
     private void compile(File file) throws Exception {
-        String classpath = sequence(System.getProperty("java.class.path")).join(sequence(classLoader.getURLs()).map(toString)).toString(pathSeparator);
+        String classpath =
+                    sequence(System.getProperty("java.class.path"))
+                    .join(sequence(classLoader.getURLs())
+                    .map(new Function1<URL, String>()
+                        {
+                            @Override
+                            public String call(URL url) throws Exception
+                            {
+                                return new File(url.getFile()).getPath();
+                            }
+                        }))
+                    .toString(pathSeparator);
         JavaCompiler compiler = getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
@@ -324,5 +334,4 @@ public class Evaluator {
             fileManager.close();
         }
     }
-
 }
