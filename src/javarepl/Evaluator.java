@@ -3,8 +3,6 @@ package javarepl;
 import com.googlecode.totallylazy.*;
 import com.googlecode.totallylazy.annotations.multimethod;
 import javarepl.expressions.*;
-import javarepl.expressions.Method;
-import javarepl.expressions.Type;
 import javarepl.expressions.Value;
 
 import javax.tools.DiagnosticCollector;
@@ -13,7 +11,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.regex.MatchResult;
 
@@ -189,10 +188,6 @@ public class Evaluator {
 
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
-        if (classLoader.isClassLoaded(expression.canonicalName())) {
-            return left(new UnsupportedOperationException("Redefining classes not supported"));
-        }
-
         if (getSystemJavaCompiler() == null) {
             return left(new FileNotFoundException("Java compiler not found." +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly."));
@@ -305,8 +300,8 @@ public class Evaluator {
 
     private Option<Class<?>> typeFor(Expression expression) {
         return (expression instanceof AssignmentWithType)
-            ? Option.<Class<?>>some(((AssignmentWithType) expression).type())
-            : Option.<Class<?>>none();
+                ? Option.<Class<?>>some(((AssignmentWithType) expression).type())
+                : Option.<Class<?>>none();
     }
 
     private void compile(File file) throws Exception {
