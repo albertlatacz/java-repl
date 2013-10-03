@@ -187,9 +187,20 @@ public class Evaluator {
         }.<Either<? extends Throwable, Evaluation>>methodOption(expression).getOrElse(evaluateExpression(expression));
     }
 
+    private boolean isJRebelPresent() {
+        try {
+            Class.forName("org.zeroturnaround.javarebel.Reloader");
+        }
+        catch(Exception ignored) {
+            return false;
+        }
+
+        return true;
+    }
+
     @multimethod
     private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
-        if (classLoader.isClassLoaded(expression.canonicalName())) {
+        if (classLoader.isClassLoaded(expression.canonicalName()) && !isJRebelPresent()) {
             return left(new UnsupportedOperationException("Redefining classes not supported"));
         }
 
