@@ -1,9 +1,6 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Mapper;
-import com.googlecode.totallylazy.Pair;
-import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -168,6 +165,13 @@ public class Utils {
         };
     }
 
+    public static Function1<URL, String> urlAsFilePath() {
+        return new Function1<URL, String>() {
+            public String call(URL url) throws Exception {
+                return new File(url.getFile()).getPath();
+            }
+        };
+    }
 
     public static Sequence<String> entries(File file) {
         if (file.isDirectory()) {

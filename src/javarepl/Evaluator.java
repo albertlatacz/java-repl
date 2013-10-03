@@ -31,8 +31,7 @@ import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
 import static javarepl.Result.noResult;
-import static javarepl.Utils.randomIdentifier;
-import static javarepl.Utils.randomOutputDirectory;
+import static javarepl.Utils.*;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
@@ -305,17 +304,9 @@ public class Evaluator {
 
     private void compile(File file) throws Exception {
         String classpath =
-                    sequence(System.getProperty("java.class.path"))
-                    .join(sequence(classLoader.getURLs())
-                    .map(new Function1<URL, String>()
-                        {
-                            @Override
-                            public String call(URL url) throws Exception
-                            {
-                                return new File(url.getFile()).getPath();
-                            }
-                        }))
-                    .toString(pathSeparator);
+                sequence(System.getProperty("java.class.path"))
+                        .join(sequence(classLoader.getURLs()).map(urlAsFilePath()))
+                        .toString(pathSeparator);
         JavaCompiler compiler = getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
