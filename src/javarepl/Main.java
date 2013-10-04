@@ -7,6 +7,7 @@ import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
+import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
 import org.fusesource.jansi.AnsiOutputStream;
@@ -55,6 +56,8 @@ public class Main {
 
     private static void configureOutputStreams() {
         boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        TerminalFactory.configure(isWindows ? TerminalFactory.Type.NONE : TerminalFactory.Type.AUTO);
+
         System.setOut(new PrintStream(isWindows ? new AnsiOutputStream(System.out) : wrapOutputStream(System.out)));
         System.setErr(new PrintStream(isWindows ? new AnsiOutputStream(System.err) : wrapOutputStream(System.err)));
     }
