@@ -9,9 +9,10 @@ import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
-import org.fusesource.jansi.AnsiConsole;
+import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.compose;
@@ -27,13 +28,15 @@ import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
+import static org.fusesource.jansi.AnsiConsole.wrapOutputStream;
 
 public class Main {
 
     private static Option<Process> process = none();
 
     public static void main(String... args) throws Exception {
-        AnsiConsole.systemInstall();
+        configureOutputStreams();
+
         JavaREPLClient client = clientFor(hostname(args), port(args));
         ExpressionReader expressionReader = expressionReaderFor(client);
 
@@ -48,6 +51,12 @@ public class Main {
                     printResult(result.get());
             }
         }
+    }
+
+    private static void configureOutputStreams() {
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        System.setOut(new PrintStream(isWindows ? new AnsiOutputStream(System.out) : wrapOutputStream(System.out)));
+        System.setErr(new PrintStream(isWindows ? new AnsiOutputStream(System.err) : wrapOutputStream(System.err)));
     }
 
     private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
