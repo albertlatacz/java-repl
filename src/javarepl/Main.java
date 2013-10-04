@@ -9,10 +9,9 @@ import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.compose;
@@ -30,37 +29,29 @@ import static javarepl.Utils.randomServerPort;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
-    public static final InputStream inStream = System.in;
-    public static final PrintStream outStream = System.out;
-    public static final PrintStream errStream = System.err;
 
     private static Option<Process> process = none();
-    private static JavaREPLClient client;
 
     public static void main(String... args) throws Exception {
-        client = createClient(args);
-        ExpressionReader expressionReader = new ExpressionReader(jlineConsole(client));
+        AnsiConsole.systemInstall();
+        JavaREPLClient client = clientFor(hostname(args), port(args));
+        ExpressionReader expressionReader = expressionReaderFor(client);
 
-        String expression = null;
+        Option<String> expression = none();
         Option<EvaluationResult> result = none();
-        do {
-            expression = expressionReader.readExpression().getOrNull();
+        while (expression.isEmpty() || !result.isEmpty()) {
+            expression = expressionReader.readExpression();
 
-            if (expression != null) {
-                result = client.execute(expression);
+            if (!expression.isEmpty()) {
+                result = client.execute(expression.get());
                 if (!result.isEmpty())
                     printResult(result.get());
             }
-
-
-        } while (expression != null && !result.isEmpty());
+        }
     }
 
-    private static JavaREPLClient createClient(String[] args) throws Exception {
-        Option<String> hostname = hostname(args);
-        Option<Integer> port = port(args);
-
-        outStream.println(format("Welcome to JavaREPL version %s (%s, Java %s)",
+    private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
+        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)",
                 applicationVersion(),
                 getProperty("java.vm.name"),
                 getProperty("java.version")));
@@ -76,15 +67,15 @@ public class Main {
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
 
         if (!replClient.isAlive()) {
-            errStream.println("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
+            System.err.println("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
         } else {
-            outStream.println("Connected to remote instance at http://" + hostname + ":" + port);
+            System.out.println("Connected to remote instance at http://" + hostname + ":" + port);
         }
 
         String remoteInstanceVersion = replClient.version();
         if (!remoteInstanceVersion.equals(applicationVersion())) {
-            errStream.println("WARNING: Client version (" + applicationVersion() + ") is different from remote instance version (" + remoteInstanceVersion + ")");
+            System.err.println("WARNING: Client version (" + applicationVersion() + ") is different from remote instance version (" + remoteInstanceVersion + ")");
         }
 
         return replClient;
@@ -92,12 +83,12 @@ public class Main {
 
     private static JavaREPLClient startNewLocalInstance(String hostname, Integer port) throws Exception {
         if (getSystemJavaCompiler() == null) {
-            errStream.println("\nERROR: Java compiler not found.\n" +
+            System.err.println("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
             System.exit(0);
         }
 
-        outStream.println("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
+        System.out.println("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
 
         ProcessBuilder builder = new ProcessBuilder("java", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(), "--port=" + port);
         builder.redirectErrorStream(true);
@@ -105,14 +96,14 @@ public class Main {
         process = some(builder.start());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                outStream.println("\nTerminating...");
+                System.out.println("\nTerminating...");
                 process.get().destroy();
             }
         });
 
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
         if (!waitUntilInstanceStarted(replClient)) {
-            errStream.println("\nERROR: Could not start REPL instance at http://" + hostname + ":" + port);
+            System.err.println("\nERROR: Could not start REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
         }
 
@@ -157,12 +148,12 @@ public class Main {
         }
     }
 
-    private static Mapper<Sequence<String>, String> jlineConsole(final JavaREPLClient client) throws IOException {
-        return new Mapper<Sequence<String>, String>() {
+    private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {
+        return new ExpressionReader(new Mapper<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
             {
-                consoleReader = new ConsoleReader(inStream, outStream);
+                consoleReader = new ConsoleReader(System.in, System.out);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(clientCompleter());
@@ -196,7 +187,7 @@ public class Main {
                 };
             }
 
-        };
+        });
     }
 
 }
