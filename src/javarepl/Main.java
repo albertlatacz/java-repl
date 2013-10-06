@@ -3,25 +3,20 @@ package javarepl;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
-import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
-import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.List;
 
 import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.replaceAll;
-import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.Strings.*;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -29,14 +24,14 @@ import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
-import static org.fusesource.jansi.AnsiConsole.wrapOutputStream;
 
 public class Main {
 
     private static Option<Process> process = none();
+    private static ResultPrinter console;
 
     public static void main(String... args) throws Exception {
-        configureOutputStreams();
+        console = new ResultPrinter(printColors(args));
 
         JavaREPLClient client = clientFor(hostname(args), port(args));
         ExpressionReader expressionReader = expressionReaderFor(client);
@@ -49,21 +44,13 @@ public class Main {
             if (!expression.isEmpty()) {
                 result = client.execute(expression.get());
                 if (!result.isEmpty())
-                    printResult(result.get());
+                    console.printEvaluationResult(result.get());
             }
         }
     }
 
-    private static void configureOutputStreams() {
-        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        TerminalFactory.configure(isWindows ? TerminalFactory.Type.NONE : TerminalFactory.Type.AUTO);
-
-        System.setOut(new PrintStream(isWindows ? new AnsiOutputStream(System.out) : wrapOutputStream(System.out)));
-        System.setErr(new PrintStream(isWindows ? new AnsiOutputStream(System.err) : wrapOutputStream(System.err)));
-    }
-
     private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
-        System.out.println(format("Welcome to JavaREPL version %s (%s, Java %s)",
+        console.printInfo(format("Welcome to JavaREPL version %s (%s, Java %s)",
                 applicationVersion(),
                 getProperty("java.vm.name"),
                 getProperty("java.version")));
@@ -79,15 +66,15 @@ public class Main {
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
 
         if (!replClient.isAlive()) {
-            System.err.println("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
+            console.printError("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
         } else {
-            System.out.println("Connected to remote instance at http://" + hostname + ":" + port);
+            console.printInfo("Connected to remote instance at http://" + hostname + ":" + port);
         }
 
         String remoteInstanceVersion = replClient.version();
         if (!remoteInstanceVersion.equals(applicationVersion())) {
-            System.err.println("WARNING: Client version (" + applicationVersion() + ") is different from remote instance version (" + remoteInstanceVersion + ")");
+            console.printError("WARNING: Client version (" + applicationVersion() + ") is different from remote instance version (" + remoteInstanceVersion + ")");
         }
 
         return replClient;
@@ -95,12 +82,12 @@ public class Main {
 
     private static JavaREPLClient startNewLocalInstance(String hostname, Integer port) throws Exception {
         if (getSystemJavaCompiler() == null) {
-            System.err.println("\nERROR: Java compiler not found.\n" +
+            console.printError("\nERROR: Java compiler not found.\n" +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly.");
             System.exit(0);
         }
 
-        System.out.println("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
+        console.printInfo("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
 
         ProcessBuilder builder = new ProcessBuilder("java", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(), "--port=" + port);
         builder.redirectErrorStream(true);
@@ -108,14 +95,14 @@ public class Main {
         process = some(builder.start());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
-                System.out.println("\nTerminating...");
+                console.printInfo("\nTerminating...");
                 process.get().destroy();
             }
         });
 
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
         if (!waitUntilInstanceStarted(replClient)) {
-            System.err.println("\nERROR: Could not start REPL instance at http://" + hostname + ":" + port);
+            console.printError("\nERROR: Could not start REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
         }
 
@@ -140,24 +127,11 @@ public class Main {
         return sequence(args).find(startsWith("--hostname=")).map(replaceAll("--hostname=", ""));
     }
 
-    private static void printResult(EvaluationResult result) {
-        for (EvaluationLog log : result.logs()) {
-            printEvaluationLog(log);
-        }
-    }
-
-    public static final void printEvaluationLog(EvaluationLog log) {
-        switch (log.type()) {
-            case INFO:
-                System.out.println("\u001B[0m" + log.message() + "\u001B[0m");
-                break;
-            case SUCCESS:
-                System.out.println("\u001B[32m" + log.message() + "\u001B[0m");
-                break;
-            case ERROR:
-                System.err.println("\u001B[31m" + log.message() + "\u001B[0m");
-                break;
-        }
+    private static Boolean printColors(String[] args) {
+        return sequence(args)
+                .find(startsWith("--colors="))
+                .map(replaceAll("--colors=", "").then(asBoolean()))
+                .getOrElse(true);
     }
 
     private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {
@@ -172,7 +146,7 @@ public class Main {
             }
 
             public String call(Sequence<String> lines) throws Exception {
-                consoleReader.setPrompt(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m");
+                consoleReader.setPrompt(console.ansiColored(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m"));
                 consoleReader.setHistory(clientHistory());
                 return consoleReader.readLine();
             }
@@ -198,7 +172,6 @@ public class Main {
                     }
                 };
             }
-
         });
     }
 
