@@ -16,7 +16,7 @@ class ResultPrinter {
     }
 
     public void printError(String message) {
-        AnsiConsole.out.println(ansiColored(message));
+        AnsiConsole.err.println(ansiColored(message));
     }
 
     public void printInfo(String message) {

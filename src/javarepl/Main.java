@@ -8,6 +8,7 @@ import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionResult;
 import jline.console.ConsoleReader;
 import jline.console.history.MemoryHistory;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.IOException;
 import java.util.List;
@@ -139,7 +140,7 @@ public class Main {
             private final ConsoleReader consoleReader;
 
             {
-                consoleReader = new ConsoleReader(System.in, System.out);
+                consoleReader = new ConsoleReader(System.in, AnsiConsole.out);
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(clientCompleter());
