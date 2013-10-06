@@ -30,8 +30,8 @@
                 <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.@2"/>
                 <rule pattern="jline.*" result="javarepl.internal.jline.@1"/>
 
-                <rule pattern="org.fusesource.**.*" result="javarepl.org.fusesource.@1.@2"/>
-                <rule pattern="org.fusesource.*" result="javarepl.org.fusesource.@1"/>
+                <rule pattern="org.fusesource.**.*" result="org.fusesource.@1.@2"/>
+                <rule pattern="org.fusesource.*" result="org.fusesource.@1"/>
 
                 <rule pattern="antlr.*" result="javarepl.internal.antlr.@1"/>
 

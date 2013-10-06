@@ -1,5 +1,5 @@
-mvn:jline:jline:jar:2.11
 mvn:org.fusesource.jansi:jansi:jar:1.11
+mvn:jline:jline:jar:2.11
 
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar:3.2.1
