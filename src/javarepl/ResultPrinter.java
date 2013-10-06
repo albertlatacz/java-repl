@@ -2,6 +2,7 @@ package javarepl;
 
 import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
+import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.AnsiOutputStream;
 
 import java.io.ByteArrayOutputStream;
@@ -15,11 +16,11 @@ class ResultPrinter {
     }
 
     public void printError(String message) {
-        System.err.println(ansiColored(message));
+        AnsiConsole.out.println(ansiColored(message));
     }
 
     public void printInfo(String message) {
-        System.out.println(ansiColored(message));
+        AnsiConsole.out.println(ansiColored(message));
     }
 
     public void printEvaluationResult(EvaluationResult result) {
