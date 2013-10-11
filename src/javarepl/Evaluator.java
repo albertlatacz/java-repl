@@ -260,7 +260,7 @@ public class Evaluator {
 
             if (resultObject != null || !method.getReturnType().equals(void.class)) {
                 Result result = Result.result(nextResultKeyFor(expression), resultObject, typeFor(expression));
-                context = newContext.addExpression(expression).addResults(modifiedResults.add(result)).lastSource(sources);
+                context = newContext.addExpression(expression).addResults(modifiedResults.append(result)).lastSource(sources);
                 return right(evaluation(expression, some(result)));
             } else {
                 context = newContext.addExpression(expression).addResults(modifiedResults).lastSource(sources);
@@ -280,7 +280,7 @@ public class Evaluator {
                         if (result.isEmpty())
                             return results;
 
-                        return results.add(Result.result(field.getName(), field.get(expressionInstance)));
+                        return results.append(Result.result(field.getName(), field.get(expressionInstance)));
 
                     }
 

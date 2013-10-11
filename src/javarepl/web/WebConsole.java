@@ -33,17 +33,17 @@ public class WebConsole {
 
     public synchronized Option<WebConsoleClientHandler> createClient() {
         WebConsoleClientHandler clientHandler = new WebConsoleClientHandler();
-        clients = clients.put(clientHandler.id(), clientHandler);
+        clients = clients.insert(clientHandler.id(), clientHandler);
         return some(clientHandler);
     }
 
 
     public synchronized Option<WebConsoleClientHandler> removeClient(String id) {
-        Option<WebConsoleClientHandler> clientHandler = clients.get(id);
+        Option<WebConsoleClientHandler> clientHandler = clients.lookup(id);
 
         if (!clientHandler.isEmpty()) {
             clientHandler.get().shutdown();
-            clients = clients.remove(clientHandler.get().id());
+            clients = clients.delete(clientHandler.get().id());
         }
 
         return clientHandler;
@@ -51,7 +51,7 @@ public class WebConsole {
 
 
     public Option<WebConsoleClientHandler> client(String id) {
-        return clients.get(id);
+        return clients.lookup(id);
     }
 
     public Sequence<WebConsoleClientHandler> clients() {

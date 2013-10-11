@@ -17,7 +17,8 @@ import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.*;
+import static com.googlecode.totallylazy.Strings.replaceAll;
+import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -129,10 +130,7 @@ public class Main {
     }
 
     private static Boolean printColors(String[] args) {
-        return sequence(args)
-                .find(startsWith("--colors="))
-                .map(replaceAll("--colors=", "").then(asBoolean()))
-                .getOrElse(true);
+        return !sequence(args).contains("--noColors");
     }
 
     private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {

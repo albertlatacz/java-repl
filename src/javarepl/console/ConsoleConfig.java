@@ -69,18 +69,18 @@ public final class ConsoleConfig {
 
     public static Sequence<Class<? extends Command>> defaultCommands() {
         return Sequences.<Class<? extends Command>>sequence()
-                .add(QuitApplication.class)
-                .add(ShowHistory.class)
-                .add(SearchHistory.class)
-                .add(EvaluateFromHistory.class)
-                .add(ResetAllEvaluations.class)
-                .add(ReplayAllEvaluations.class)
-                .add(EvaluateFile.class)
-                .add(AddToClasspath.class)
-                .add(LoadSourceFile.class)
-                .add(ListValues.class)
-                .add(ShowLastSource.class)
-                .add(ShowTypeOfExpression.class);
+                .append(QuitApplication.class)
+                .append(ShowHistory.class)
+                .append(SearchHistory.class)
+                .append(EvaluateFromHistory.class)
+                .append(ResetAllEvaluations.class)
+                .append(ReplayAllEvaluations.class)
+                .append(EvaluateFile.class)
+                .append(AddToClasspath.class)
+                .append(LoadSourceFile.class)
+                .append(ListValues.class)
+                .append(ShowLastSource.class)
+                .append(ShowTypeOfExpression.class);
     }
 
 }

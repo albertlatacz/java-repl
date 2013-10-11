@@ -54,7 +54,7 @@ public class Patterns {
     }
 
     private static Regex regexPermutations(Regex... patterns) {
-        return regex(powerSetPermutations(sequence(patterns)).remove(empty(Regex.class))
+        return regex(powerSetPermutations(sequence(patterns)).delete(empty(Regex.class))
                 .map(Sequences.toString("(?:", "", ")"))
                 .toString("(?:", "|", ")"));
     }

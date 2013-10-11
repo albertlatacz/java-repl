@@ -26,7 +26,7 @@ public class ExpressionReader {
         Sequence<String> lines = Sequences.empty();
 
         do {
-            lines = lines.add(lineReader.apply(lines));
+            lines = lines.append(lineReader.apply(lines));
         } while (!expressionIsTerminated(lines));
 
         return lines.contains(null)

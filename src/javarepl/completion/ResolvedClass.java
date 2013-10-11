@@ -44,16 +44,16 @@ public final class ResolvedClass {
     public static class functions {
         public static Mapper<ResolvedClass, String> className() {
             return new Mapper<ResolvedClass, String>() {
-                public String call(ResolvedClass resolvedPackage) throws Exception {
-                    return resolvedPackage.className();
+                public String call(ResolvedClass resolvedClass) throws Exception {
+                    return resolvedClass.className();
                 }
             };
         }
 
         public static Mapper<ResolvedClass, String> canonicalClassName() {
             return new Mapper<ResolvedClass, String>() {
-                public String call(ResolvedClass resolvedPackage) throws Exception {
-                    return resolvedPackage.canonicalClassName();
+                public String call(ResolvedClass resolvedClass) throws Exception {
+                    return resolvedClass.canonicalClassName();
                 }
             };
         }

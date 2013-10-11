@@ -10,6 +10,7 @@ import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.comparators.Comparators.ascending;
 import static javarepl.completion.ResolvedClass.functions.canonicalClassName;
+import static javarepl.completion.ResolvedPackage.functions.classes;
 import static javarepl.completion.ResolvedPackage.functions.packageName;
 
 public final class TypeCompleter extends Completer {
@@ -26,12 +27,12 @@ public final class TypeCompleter extends Completer {
 
         Sequence<ResolvedPackage> resolvedPackages = typeResolver.packages().filter(where(packageName(), startsWith(packagePart)));
 
-        Sequence<String> classesInPackage = beginIndex > 0 ?
-                typeResolver.packages().filter(where(packageName(), equalTo(packagePart.substring(0, beginIndex - 1))))
-                        .flatMap(ResolvedPackage.functions.classes())
-                        .map(canonicalClassName())
-                        .filter(startsWith(packagePart)) :
-                empty(String.class);
+        Sequence<String> classesInPackage = beginIndex > 0
+                ? typeResolver.packages().filter(where(packageName(), equalTo(packagePart.substring(0, beginIndex - 1))))
+                .flatMap(classes())
+                .map(canonicalClassName())
+                .filter(startsWith(packagePart))
+                : empty(String.class);
 
         Sequence<String> candidates = resolvedPackages.map(packageName()).join(classesInPackage)
                 .map(candidatePackagePrefix(beginIndex))

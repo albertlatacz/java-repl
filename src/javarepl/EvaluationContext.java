@@ -70,7 +70,7 @@ public class EvaluationContext {
     }
 
     public EvaluationContext addResult(Result result) {
-        return new EvaluationContext(expressions, results.add(result), lastSource);
+        return new EvaluationContext(expressions, results.append(result), lastSource);
     }
 
     public EvaluationContext addResults(Sequence<Result> result) {
@@ -78,7 +78,7 @@ public class EvaluationContext {
     }
 
     public EvaluationContext addExpression(Expression expression) {
-        return new EvaluationContext(expressions.add(expression), results, lastSource);
+        return new EvaluationContext(expressions.append(expression), results, lastSource);
     }
 
     public EvaluationContext removeExpressionWithKey(String key) {

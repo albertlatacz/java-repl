@@ -23,7 +23,7 @@ public final class ReplayAllEvaluations extends Command {
 
     public void execute(String line) {
         logger.success("Replaying all evaluations:");
-        Sequence<Expression> expressions = evaluator.expressions().removeAll(defaultExpressions());
+        Sequence<Expression> expressions = evaluator.expressions().deleteAll(defaultExpressions());
 
         evaluator.reset();
         for (Expression expression : expressions) {

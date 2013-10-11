@@ -4,7 +4,7 @@ package javarepl.console.commands;
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Predicates;
-import com.googlecode.totallylazy.pattern;
+import com.googlecode.totallylazy.match;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
@@ -35,26 +35,30 @@ public final class EvaluateExpression extends Command {
     }
 
     public static void evaluate(Evaluator evaluator, ConsoleLogger logger, String expression) {
-        Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
+        final Either<? extends Throwable, Evaluation> evaluation = evaluator.evaluate(expression);
+
 
         if (evaluation.isRight()) {
-            logger.success(new pattern(evaluation.right().expression(), evaluation.right().result()) {
-                String match(Method expr, Option<Result> result) {
+            final Option<Result> result = evaluation.right().result();
+            Option<String> messsage = new match<Expression, String>() {
+                String value(Method expr) {
                     return "Created method " + expr.signature();
                 }
 
-                String match(Import expr, Option<Result> result) {
+                String value(Import expr) {
                     return "Imported " + expr.typePackage();
                 }
 
-                String match(Type expr, Option<Result> result) {
+                String value(Type expr) {
                     return "Created type " + expr.canonicalName();
                 }
 
-                String match(Expression expr, Option<Result> result) {
+                String value(Expression expr) {
                     return result.map(asString()).getOrElse("");
                 }
-            }.<String>match());
+            }.apply(evaluation.right().expression());
+
+            logger.success(messsage.get());
         } else {
             if (evaluation.left() instanceof ExpressionCompilationException) {
                 logger.error(evaluation.left().getMessage());

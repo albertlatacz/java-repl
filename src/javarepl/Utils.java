@@ -102,7 +102,7 @@ public class Utils {
     }
 
     public static <T> Sequence<Sequence<T>> powerSetPermutations(Sequence<T> items) {
-        return cartesianProductPower(items, items.size()).add(Sequences.<T>empty());
+        return cartesianProductPower(items, items.size()).append(Sequences.<T>empty());
     }
 
     private static <T> Sequence<Sequence<T>> cartesianProductPower(Sequence<T> items, int times) {
@@ -113,7 +113,7 @@ public class Utils {
                 .cartesianProduct(items)
                 .map(new Mapper<Pair<Sequence<T>, T>, Sequence<T>>() {
                     public Sequence<T> call(Pair<Sequence<T>, T> pair) {
-                        return pair.first().add(pair.second()).unique();
+                        return pair.first().append(pair.second()).unique();
                     }
                 })
                 .unique();

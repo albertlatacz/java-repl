@@ -12,7 +12,7 @@ public class RestConsoleExpressionReader {
     private Sequence<String> lines = Sequences.empty();
 
     public Option<String> readExpression(String line) {
-        lines = lines.add(line);
+        lines = lines.append(line);
         if (expressionIsTerminated(lines)) {
             Option<String> result = some(lines.toString("\n"));
             lines = Sequences.empty();
