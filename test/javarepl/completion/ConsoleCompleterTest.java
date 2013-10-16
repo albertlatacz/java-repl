@@ -1,18 +1,14 @@
 package javarepl.completion;
 
-import com.googlecode.totallylazy.Sequence;
 import javarepl.console.Console;
 import javarepl.console.SimpleConsole;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Functions.returns;
 import static com.googlecode.totallylazy.Sequences.empty;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.completion.CompleterTestHelper.*;
 import static javarepl.console.ConsoleConfig.consoleConfig;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThat;
 
 public class ConsoleCompleterTest {
 
@@ -63,29 +59,5 @@ public class ConsoleCompleterTest {
         for (String expression : expressions) {
             console.execute(expression);
         }
-    }
-
-    private static Sequence<String> candidates(String... candidates) {
-        return sequence(candidates);
-    }
-
-    private static int position(int position) {
-        return position;
-    }
-
-
-    private Matcher<CompletionResult> completesTo(final Sequence<String> candidates, final int position) {
-        return new TypeSafeMatcher<CompletionResult>() {
-            private CompletionResult result;
-
-            protected boolean matchesSafely(CompletionResult completionResult) {
-                result = completionResult;
-                return completionResult.candidates().equals(candidates) && completionResult.position() == position;
-            }
-
-            public void describeTo(Description description) {
-                description.appendText(new CompletionResult(result.expression(), position, candidates).toString());
-            }
-        };
     }
 }

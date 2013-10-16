@@ -21,6 +21,7 @@ public class Result {
     public static Result result(String key, Object value, Option<Class<?>> type) {
         return new Result(key, value, type);
     }
+
     public static Result result(String key, Object value) {
         return result(key, value, Option.<Class<?>>none());
     }
@@ -34,7 +35,7 @@ public class Result {
     }
 
     public Class<?> type() {
-        return type.getOrElse(value != null ? value.getClass() : Object.class);
+        return extractType(type.getOrElse(value != null ? value.getClass() : Object.class));
     }
 
     public static Option<Result> noResult() {

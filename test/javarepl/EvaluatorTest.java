@@ -68,6 +68,12 @@ public class EvaluatorTest {
         assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(Class.class)));
     }
 
+    @Test
+    public void shouldReturnClassFromExpression() {
+        assertThat(new Evaluator().classFrom("String"), is(Option.<Class>some(String.class)));
+        assertThat(new Evaluator().classFrom("java.util.Map.Entry"), is(Option.<Class>some(java.util.Map.Entry.class)));
+        assertThat(new Evaluator().classFrom("invalid"), is(none(Class.class)));
+    }
 
     private static Matcher<Either<? extends Throwable, Evaluation>> hasNoResult() {
         return new FeatureMatcher<Either<? extends Throwable, Evaluation>, Object>(Matchers.<Object>is(Result.noResult()), "result value", "result value") {

@@ -40,6 +40,7 @@ public final class SimpleConsole implements Console {
                 .append(javaKeywordCompleter())
                 .append(new ConsoleCompleter(this, context.get(TypeResolver.class)))
                 .append(new TypeCompleter(context.get(TypeResolver.class)))
+                .append(new StaticMemberCompleter(context.get(Evaluator.class)))
 
         ));
 

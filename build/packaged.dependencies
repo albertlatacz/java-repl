@@ -6,6 +6,8 @@ mvn:org.antlr:stringtemplate:jar:3.2.1
 mvn:cglib:cglib-nodep:jar:2.2
 mvn:org.objenesis:objenesis:jar:1.2
 
+s3://albertlatacz.published/repo/totally-reflective:totally-reflective:jar:15
+
 s3://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar:1142
 s3://repo.bodar.com/com.googlecode.funclate:funclate:jar:109
 s3://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar:710

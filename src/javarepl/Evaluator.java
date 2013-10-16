@@ -165,6 +165,14 @@ public class Evaluator {
         return expressionType;
     }
 
+    public final Option<Class> classFrom(String expression) {
+        try {
+            return some(detectClass(expression));
+        } catch (Throwable e) {
+            return none();
+        }
+    }
+
     public void clearOutputDirectory() {
         deleteFiles(outputDirectory);
         delete(outputDirectory);
@@ -232,6 +240,20 @@ public class Evaluator {
         Class<?> expressionClass = classLoader.loadClass(className);
 
         return expressionClass.getDeclaredMethods()[0];
+    }
+
+    private Class detectClass(String expression) throws Exception {
+        final String className = randomIdentifier("Class");
+        final File outputJavaFile = file(outputDirectory, className + ".java");
+
+        final String sources = renderMethodSignatureDetection(context, className, "public " + expression + " detectClass(){return null;}");
+        Files.write(sources.getBytes(), outputJavaFile);
+
+        compile(outputJavaFile);
+
+        Class expressionClass = classLoader.loadClass(className);
+
+        return expressionClass.getDeclaredMethods()[0].getReturnType();
     }
 
     private Either<? extends Throwable, Evaluation> evaluateExpression(final Expression expression) {
