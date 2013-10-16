@@ -1,19 +1,17 @@
 package javarepl.completion;
 
-import javarepl.console.Console;
-import javarepl.console.SimpleConsole;
+import javarepl.Evaluator;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Functions.returns;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static javarepl.completion.CompleterTestHelper.*;
-import static javarepl.console.ConsoleConfig.consoleConfig;
 import static org.junit.Assert.assertThat;
 
 public class ConsoleCompleterTest {
 
     private TypeResolver typeResolver = new TypeResolver(returns(empty(ResolvedPackage.class)));
-    private Console console;
+    private Evaluator evaluator;
 
     @Test
     public void completesResults() {
@@ -50,14 +48,14 @@ public class ConsoleCompleterTest {
     }
 
     private CompletionResult completing(String expression) {
-        return new ConsoleCompleter(console, typeResolver).apply(expression);
+        return new ConsoleCompleter(evaluator, typeResolver).apply(expression);
     }
 
     private void givenConsoleThatExecuted(String... expressions) {
-        console = new SimpleConsole(consoleConfig());
+        evaluator = new Evaluator();
 
         for (String expression : expressions) {
-            console.execute(expression);
+            evaluator.evaluate(expression);
         }
     }
 }

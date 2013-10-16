@@ -3,7 +3,6 @@ package javarepl.completion;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.Evaluator;
 import javarepl.Result;
-import javarepl.console.Console;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
@@ -19,39 +18,38 @@ import static javarepl.expressions.Import.functions.typePackage;
 import static javarepl.expressions.Method.functions.methodName;
 
 public class ConsoleCompleter extends Completer {
-    private final Console console;
+    private final Evaluator evaluator;
     private final TypeResolver typeResolver;
 
-    public ConsoleCompleter(Console console, TypeResolver typeResolver) {
-        this.console = console;
+    public ConsoleCompleter(Evaluator evaluator, TypeResolver typeResolver) {
+        this.evaluator = evaluator;
         this.typeResolver = typeResolver;
     }
 
     public CompletionResult call(String expression) throws Exception {
         int lastSpace = expression.lastIndexOf(" ") + 1;
-        Evaluator evaluator = console.context().get(Evaluator.class);
-        Sequence<String> candidates = results(evaluator)
-                .join(methods(evaluator))
-                .join(types(evaluator))
-                .join(imports(evaluator))
+        Sequence<String> candidates = results()
+                .join(methods())
+                .join(types())
+                .join(imports())
                 .filter(startsWith(expression.substring(lastSpace)));
 
         return new CompletionResult(expression, lastSpace, candidates);
     }
 
-    private Sequence<String> results(Evaluator evaluator) {
+    private Sequence<String> results() {
         return evaluator.results().map(Result.functions.key());
     }
 
-    private Sequence<String> methods(Evaluator evaluator) {
+    private Sequence<String> methods() {
         return evaluator.expressionsOfType(Method.class).map(methodName()).unique().map(format("%s("));
     }
 
-    private Sequence<String> types(Evaluator evaluator) {
+    private Sequence<String> types() {
         return evaluator.expressionsOfType(Type.class).map(key());
     }
 
-    private Sequence<String> imports(Evaluator evaluator) {
+    private Sequence<String> imports() {
         Sequence<String> importedPackages = evaluator
                 .expressionsOfType(Import.class)
                 .map(typePackage().then(replace(".*", "")).then(replace(" ", "")));

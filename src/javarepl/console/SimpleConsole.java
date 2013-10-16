@@ -38,7 +38,7 @@ public final class SimpleConsole implements Console {
         context.add(Commands.class);
         context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(completer()).filter(notNullValue())
                 .append(javaKeywordCompleter())
-                .append(new ConsoleCompleter(this, context.get(TypeResolver.class)))
+                .append(new ConsoleCompleter(context.get(Evaluator.class), context.get(TypeResolver.class)))
                 .append(new TypeCompleter(context.get(TypeResolver.class)))
                 .append(new StaticMemberCompleter(context.get(Evaluator.class)))
 
