@@ -1,10 +1,10 @@
 package javarepl.completion;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import javarepl.Evaluator;
-import totallyreflective.ClassReflection;
-import totallyreflective.MemberReflection;
-import totallyreflective.MethodReflection;
 
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
@@ -12,9 +12,10 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static com.googlecode.totallylazy.numbers.Numbers.maximum;
-import static totallyreflective.ClassReflections.reflectionOf;
-import static totallyreflective.MemberReflections.*;
+import static javarepl.completion.Completions.candidateName;
+import static javarepl.completion.Completions.lastIndexOfSeparator;
+import static javarepl.reflection.ClassReflections.reflectionOf;
+import static javarepl.reflection.MemberReflections.*;
 
 public class StaticMemberCompleter extends Completer {
 
@@ -24,16 +25,8 @@ public class StaticMemberCompleter extends Completer {
         this.evaluator = evaluator;
     }
 
-    private Mapper<Character, Integer> lastIndexOf(final String string) {
-        return new Mapper<Character, Integer>() {
-            public Integer call(Character character) throws Exception {
-                return string.lastIndexOf(character);
-            }
-        };
-    }
-
     public CompletionResult call(String expression) throws Exception {
-        final int lastSeparator = lastIndexOfSeparator(expression) + 1;
+        final int lastSeparator = lastIndexOfSeparator(characters("({[,+-\\*>=<&%;!~ "), expression) + 1;
         final String packagePart = expression.substring(lastSeparator);
 
         Option<Pair<Class<?>, String>> completion = completionFor(packagePart);
@@ -51,33 +44,6 @@ public class StaticMemberCompleter extends Completer {
         } else {
             return new CompletionResult(expression, 0, Sequences.empty(String.class));
         }
-    }
-
-    private Mapper<MemberReflection, String> candidateName() {
-        return new Mapper<MemberReflection, String>() {
-            public String call(MemberReflection memberReflection) throws Exception {
-                return new match<MemberReflection, String>() {
-                    String value(MethodReflection expr) {
-                        return expr.name() + "(";
-                    }
-
-                    String value(ClassReflection expr) {
-                        return expr.member().getSimpleName();
-                    }
-
-                    String value(MemberReflection expr) {
-                        return expr.name();
-                    }
-                }.apply(memberReflection).get();
-            }
-        };
-    }
-
-    private int lastIndexOfSeparator(String expression) {
-        return characters("({[,+-\\*>=<&%;!~ ")
-                .map(lastIndexOf(expression))
-                .reduce(maximum())
-                .intValue();
     }
 
 

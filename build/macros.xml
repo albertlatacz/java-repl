@@ -11,7 +11,7 @@
                 <zipfileset src="${release.jar.path}"/>
                 <zipgroupfileset dir="${packaged.dependencies.dir}"
                                  includes="totallylazy-*.jar, jline-*.jar, antlr-*.jar, cglib-*.jar, funclate-*.jar,
-                                 objenesis-*.jar, utterlyidle-*.jar, yadic-*.jar, stringtemplate-*.jar, totally-reflective-*.jar"/>
+                                 objenesis-*.jar, utterlyidle-*.jar, yadic-*.jar, stringtemplate-*.jar"/>
                 <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.@1"/>
                 <rule pattern="com.googlecode.totallylazy.**.*" result="javarepl.internal.totallylazy.@1.@2"/>
 
@@ -29,9 +29,6 @@
 
                 <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.@2"/>
                 <rule pattern="jline.*" result="javarepl.internal.jline.@1"/>
-
-                <rule pattern="totallyreflective.**.*" result="javarepl.internal.totallyreflective.@1.@2"/>
-                <rule pattern="totallyreflective.*" result="javarepl.internal.totallyreflective.@1"/>
 
                 <rule pattern="org.fusesource.**.*" result="org.fusesource.@1.@2"/>
                 <rule pattern="org.fusesource.*" result="org.fusesource.@1"/>

@@ -41,6 +41,7 @@ public final class SimpleConsole implements Console {
                 .append(new ConsoleCompleter(context.get(Evaluator.class), context.get(TypeResolver.class)))
                 .append(new TypeCompleter(context.get(TypeResolver.class)))
                 .append(new StaticMemberCompleter(context.get(Evaluator.class)))
+                .append(new InstanceMemberCompleter(context.get(Evaluator.class)))
 
         ));
 
