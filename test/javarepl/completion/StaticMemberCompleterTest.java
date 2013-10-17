@@ -1,6 +1,5 @@
 package javarepl.completion;
 
-import javarepl.completion.StaticMemberCompleterTest.TestOuterClass.TestInnerClass;
 import org.junit.Test;
 
 import static javarepl.completion.CompleterTestHelper.*;
@@ -9,24 +8,46 @@ import static org.junit.Assert.assertThat;
 public class StaticMemberCompleterTest {
 
     @Test
-    public void shouldCompleteStaticMethodsFromImports() {
+    public void shouldCompleteStaticMembers() {
+        StaticMemberCompleter completer = new StaticMemberCompleter(evaluator());
+        String expression = TestOuterClass.class.getCanonicalName() + ".";
+
+        assertThat(completer.apply(expression),
+                completesTo(candidates(TestOuterClass.StaticInnerClass.class.getSimpleName(), "staticField", "staticMethod("), position(expression.length())));
+    }
+
+    @Test
+    public void shouldCompleteStaticMembersFromImports() {
         StaticMemberCompleter completer = new StaticMemberCompleter(evaluator(importMembersOf(TestOuterClass.class)));
-        String expression = TestInnerClass.class.getSimpleName() + ".";
+        String expression = TestOuterClass.StaticInnerClass.class.getSimpleName() + ".";
 
         assertThat(completer.apply(expression), completesTo(candidates("innerStaticMethod("), position(expression.length())));
     }
 
     @SuppressWarnings("unused")
     public static class TestOuterClass {
-        public static class TestInnerClass {
+
+        public static class StaticInnerClass {
             public static void innerStaticMethod() {
             }
         }
 
-        public static void outerStaticMethod1() {
+        public static Integer staticField;
+
+        public static void staticMethod() {
         }
 
-        public static void outerStaticMethod2() {
+        private static Integer privateStaticMember;
+        protected static Integer protectedStaticMember;
+
+        public class InstanceClass {
         }
+
+        public Integer instanceField;
+
+        public void instanceMethod() {
+        }
+
+
     }
 }

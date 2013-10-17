@@ -2,12 +2,15 @@ package javarepl.completion;
 
 import com.googlecode.totallylazy.*;
 import javarepl.Evaluator;
+import totallyreflective.ClassReflection;
+import totallyreflective.MemberReflection;
+import totallyreflective.MethodReflection;
 
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Pair.pair;
-import static com.googlecode.totallylazy.Strings.format;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.numbers.Numbers.maximum;
 import static totallyreflective.ClassReflections.reflectionOf;
@@ -38,8 +41,8 @@ public class StaticMemberCompleter extends Completer {
         if (!completion.isEmpty()) {
             Sequence<String> candidates = reflectionOf(completion.get().first())
                     .declaredMembers()
-                    .filter(isStatic().and(isMethod()))
-                    .map(memberName().then(format("%s(")))
+                    .filter(isStatic().and(isPublic()).and(not(isSynthetic())))
+                    .map(candidateName())
                     .unique()
                     .filter(startsWith(completion.get().second()));
 
@@ -48,6 +51,26 @@ public class StaticMemberCompleter extends Completer {
         } else {
             return new CompletionResult(expression, 0, Sequences.empty(String.class));
         }
+    }
+
+    private Mapper<MemberReflection, String> candidateName() {
+        return new Mapper<MemberReflection, String>() {
+            public String call(MemberReflection memberReflection) throws Exception {
+                return new match<MemberReflection, String>() {
+                    String value(MethodReflection expr) {
+                        return expr.name() + "(";
+                    }
+
+                    String value(ClassReflection expr) {
+                        return expr.member().getSimpleName();
+                    }
+
+                    String value(MemberReflection expr) {
+                        return expr.name();
+                    }
+                }.apply(memberReflection).get();
+            }
+        };
     }
 
     private int lastIndexOfSeparator(String expression) {
