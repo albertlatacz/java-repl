@@ -63,9 +63,7 @@ public class Repl {
         if (sandboxed)
             sandboxApplication();
 
-        for (String expression : consoleConfig.expressions) {
-            console.execute(expression);
-        }
+        console.start();
 
         do {
             console.execute(reader.readExpression().getOrNull());

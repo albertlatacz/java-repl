@@ -67,7 +67,7 @@ public class Main {
     private static JavaREPLClient connectToRemoteInstance(String hostname, Integer port) {
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
 
-        if (!replClient.isAlive()) {
+        if (!replClient.status().isRunning()) {
             console.printError("ERROR: Could not connect to remote REPL instance at http://" + hostname + ":" + port);
             System.exit(0);
         } else {
@@ -112,9 +112,9 @@ public class Main {
     }
 
     private static boolean waitUntilInstanceStarted(JavaREPLClient client) throws Exception {
-        for (int i = 0; i < 50; i++) {
-            Thread.sleep(100);
-            if (client.isAlive())
+        for (int i = 0; i < 500; i++) {
+            Thread.sleep(10);
+            if (client.status().isRunning())
                 return true;
         }
 

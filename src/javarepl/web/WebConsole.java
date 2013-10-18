@@ -31,8 +31,8 @@ public class WebConsole {
         };
     }
 
-    public synchronized Option<WebConsoleClientHandler> createClient() {
-        WebConsoleClientHandler clientHandler = new WebConsoleClientHandler();
+    public synchronized Option<WebConsoleClientHandler> createClient(Option<String> command) {
+        WebConsoleClientHandler clientHandler = new WebConsoleClientHandler(command);
         clients = clients.insert(clientHandler.id(), clientHandler);
         return some(clientHandler);
     }

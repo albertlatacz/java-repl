@@ -70,8 +70,8 @@ import com.intellij.util.ui.AbstractLayoutManager;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.update.MergingUpdateQueue;
 import com.intellij.util.ui.update.Update;
-import javarepl.client.ExpressionTemplate;
 import javarepl.client.JavaREPLClient;
+import javarepl.rendering.ExpressionTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

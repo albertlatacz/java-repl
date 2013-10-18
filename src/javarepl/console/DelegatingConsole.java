@@ -1,6 +1,7 @@
 package javarepl.console;
 
-import com.googlecode.yadic.Container;
+import javarepl.completion.CompletionResult;
+import javarepl.rendering.ExpressionTemplate;
 
 public abstract class DelegatingConsole implements Console {
     private final Console delegate;
@@ -13,11 +14,27 @@ public abstract class DelegatingConsole implements Console {
         return delegate.execute(expression);
     }
 
-    public Container context() {
-        return delegate.context();
+    public CompletionResult completion(String expression) {
+        return delegate.completion(expression);
+    }
+
+    public ExpressionTemplate template(String expression) {
+        return delegate.template(expression);
+    }
+
+    public ConsoleStatus status() {
+        return delegate.status();
+    }
+
+    public ConsoleHistory history() {
+        return delegate.history();
     }
 
     public void shutdown() {
         delegate.shutdown();
+    }
+
+    public void start() {
+        delegate.start();
     }
 }

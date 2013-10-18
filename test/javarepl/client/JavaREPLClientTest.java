@@ -4,6 +4,7 @@ import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleConfig;
 import javarepl.console.SimpleConsole;
 import javarepl.console.rest.RestConsole;
+import javarepl.rendering.ExpressionTemplate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.client.EvaluationLog.Type.SUCCESS;
+import static javarepl.console.ConsoleStatus.Running;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -27,6 +29,8 @@ public class JavaREPLClientTest {
     public void setUp() throws Exception {
         int port = randomServerPort();
         console = new RestConsole(new SimpleConsole(ConsoleConfig.consoleConfig()), port);
+        console.start();
+
         client = new JavaREPLClient("localhost", port);
     }
 
@@ -78,6 +82,6 @@ public class JavaREPLClientTest {
 
     @Test
     public void checksIfEndpointIsAlive() throws Exception {
-        assertThat(client.isAlive(), is(true));
+        assertThat(client.status(), is(Running));
     }
 }

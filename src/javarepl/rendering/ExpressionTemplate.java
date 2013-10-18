@@ -1,10 +1,10 @@
-package javarepl.client;
+package javarepl.rendering;
 
 public final class ExpressionTemplate {
     private final String template;
     private final String token;
 
-    ExpressionTemplate(String template, String token) {
+    public ExpressionTemplate(String template, String token) {
         this.template = template;
         this.token = token;
     }

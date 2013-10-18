@@ -17,6 +17,7 @@ import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static java.util.Arrays.asList;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
+import static javarepl.console.ConsoleStatus.Running;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -29,6 +30,8 @@ public class RestConsoleTest {
     @Before
     public void setUp() throws Exception {
         console = new RestConsole(new SimpleConsole(ConsoleConfig.consoleConfig()), randomServerPort());
+        console.start();
+
         client = new ClientHttpHandler();
         prefixUrl = "http://localhost:" + console.port();
     }
@@ -91,7 +94,7 @@ public class RestConsoleTest {
 
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response), is(model()
-                .add("isAlive", true)));
+                .add("status", Running.toString())));
 
     }
 

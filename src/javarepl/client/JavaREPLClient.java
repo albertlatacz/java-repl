@@ -7,6 +7,8 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.completion.CompletionResult;
+import javarepl.console.ConsoleStatus;
+import javarepl.rendering.ExpressionTemplate;
 
 import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.totallylazy.Option.none;
@@ -15,6 +17,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static javarepl.client.EvaluationLog.Type;
+import static javarepl.console.ConsoleStatus.Idle;
 
 public final class JavaREPLClient {
     private final String hostname;
@@ -53,11 +56,11 @@ public final class JavaREPLClient {
                 sequence(model.getValues("candidates", String.class)));
     }
 
-    public synchronized boolean isAlive() {
+    public synchronized ConsoleStatus status() {
         try {
-            return parse(client.handle(get(url("status")).build()).entity().toString()).get("isAlive", Boolean.class);
+            return ConsoleStatus.valueOf(parse(client.handle(get(url("status")).build()).entity().toString()).get("status", String.class));
         } catch (Exception e) {
-            return false;
+            return Idle;
         }
     }
 

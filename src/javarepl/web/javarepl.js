@@ -1,5 +1,20 @@
 document.write('<div id="console" class="console"></div>')
 
+// return a parameter value from the current URL
+function getParam(sname) {
+    var params = location.search.substr(location.search.indexOf("?") + 1);
+    var sval = "";
+    params = params.split("&");
+    // split param and value into individual pieces
+    for (var i = 0; i < params.length; i++) {
+        temp = params[i].split("=");
+        if ([temp[0]] == sname) {
+            sval = temp[1];
+        }
+    }
+    return sval;
+}
+
 function removeClient(clientId) {
     $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
 }
@@ -25,9 +40,10 @@ $(window).bind('beforeunload', function () {
 
 $(document).ready(function () {
     var console = $('<div>');
+    var command = getParam("command");
     $('#console').append(console);
 
-    $.ajax({type: 'POST', async: false, url: '/create'})
+    $.ajax({type: 'POST', async: false, url: '/create', data: (command ? "command=" + command : "")})
         .done(function (data) {
             clientId = data.id;
             welcomeMessage = data.welcomeMessage

@@ -5,19 +5,13 @@ import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.*;
-import javarepl.Evaluator;
-import javarepl.completion.Completer;
 import javarepl.completion.CompletionResult;
-import javarepl.console.ConsoleHistory;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
-import javarepl.expressions.Expression;
+import javarepl.rendering.ExpressionTemplate;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static javarepl.Utils.applicationVersion;
-import static javarepl.Utils.randomIdentifier;
-import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
-import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
 public class RestConsoleResource {
     private final RestConsole console;
@@ -42,7 +36,7 @@ public class RestConsoleResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Model status() {
         return model()
-                .add("isAlive", true);
+                .add("status", console.status());
     }
 
     @POST
@@ -72,19 +66,17 @@ public class RestConsoleResource {
     @Path("template")
     @Produces(MediaType.APPLICATION_JSON)
     public Model template(@QueryParam("expression") String expr) {
-        Evaluator evaluator = console.context().get(Evaluator.class);
-        Expression expression = evaluator.parseExpression(expr);
-
+        ExpressionTemplate template = console.template(expr);
         return model()
-                .add("template", renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), expression))
-                .add("token", EXPRESSION_TOKEN);
+                .add("template", template.template())
+                .add("token", template.token());
     }
 
     @GET
     @Path("completions")
     @Produces(MediaType.APPLICATION_JSON)
     public Model completions(@QueryParam("expression") String expr) {
-        CompletionResult result = console.context().get(Completer.class).apply(expr);
+        CompletionResult result = console.completion(expr);
         return model()
                 .add("expression", result.expression())
                 .add("position", result.position().toString())
@@ -95,7 +87,7 @@ public class RestConsoleResource {
     @Path("history")
     @Produces(MediaType.APPLICATION_JSON)
     public Model history() {
-        return model().add("history", console.context().get(ConsoleHistory.class).items().toList());
+        return model().add("history", console.history().items().toList());
     }
 
     private static Mapper<ConsoleLog, Model> commandResultToModel() {

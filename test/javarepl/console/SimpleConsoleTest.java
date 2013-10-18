@@ -197,6 +197,7 @@ public class SimpleConsoleTest {
     private static ConsoleResult executing(String... items) {
         ConsoleConfig config = consoleConfig();
         SimpleConsole console = new SimpleConsole(config);
+        console.start();
 
         System.setOut(new ConsoleLoggerPrintStream(SUCCESS, Predicates.<String>never(), config.logger));
         System.setErr(new ConsoleLoggerPrintStream(ERROR, Predicates.<String>never(), config.logger));

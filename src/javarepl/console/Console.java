@@ -1,11 +1,22 @@
 package javarepl.console;
 
-import com.googlecode.yadic.Container;
+import javarepl.completion.CompletionResult;
+import javarepl.rendering.ExpressionTemplate;
 
 public interface Console {
+
     ConsoleResult execute(String expression);
 
-    Container context();
+    CompletionResult completion(String expression);
+
+    ExpressionTemplate template(String expression);
+
+    ConsoleStatus status();
+
+    ConsoleHistory history();
+
+    void start();
 
     void shutdown();
+
 }

@@ -2,11 +2,13 @@ package javarepl.web;
 
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.Repl;
+import javarepl.console.ConsoleStatus;
 
 import java.util.UUID;
 
@@ -18,14 +20,19 @@ import static com.googlecode.utterlyidle.Responses.response;
 import static com.googlecode.utterlyidle.Status.GATEWAY_TIMEOUT;
 import static com.googlecode.utterlyidle.Status.INTERNAL_SERVER_ERROR;
 import static javarepl.Utils.randomServerPort;
+import static javarepl.console.ConsoleStatus.Idle;
 import static javarepl.console.TimingOutConsole.EXPRESSION_TIMEOUT;
 import static javarepl.console.TimingOutConsole.INACTIVITY_TIMEOUT;
 
 public final class WebConsoleClientHandler {
     private final String id = UUID.randomUUID().toString();
+    private final Option<String> commands;
     private Option<Integer> port = none();
     private Option<Process> process = none();
 
+    public WebConsoleClientHandler(Option<String> commands) {
+        this.commands = commands;
+    }
 
     public String id() {
         return id;
@@ -40,32 +47,31 @@ public final class WebConsoleClientHandler {
             try {
                 port = some(randomServerPort());
                 ProcessBuilder builder = new ProcessBuilder("java", "-Xmx128M", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(),
-                        "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300");
+                        "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300", commands.map(Strings.format("--expression=%s")).getOrElse(""));
                 builder.redirectErrorStream(true);
                 process = some(builder.start());
 
                 waitUntilProcessStarted();
-
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private boolean isAlive() {
+    private ConsoleStatus status() {
         try {
-            return parse(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
-                    .get("isAlive", Boolean.class);
+            return ConsoleStatus.valueOf(parse(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
+                    .get("status", String.class));
 
         } catch (Exception e) {
-            return false;
+            return Idle;
         }
     }
 
     private boolean waitUntilProcessStarted() throws Exception {
-        for (int i = 0; i < 50; i++) {
-            Thread.sleep(100);
-            if (isAlive())
+        for (int i = 0; i < 500; i++) {
+            Thread.sleep(10);
+            if (status().isRunning())
                 return true;
         }
 

@@ -10,19 +10,28 @@ import javarepl.Evaluator;
 import javarepl.completion.*;
 import javarepl.console.commands.Command;
 import javarepl.console.commands.Commands;
+import javarepl.expressions.Expression;
+import javarepl.rendering.ExpressionTemplate;
 
 import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.Utils.randomIdentifier;
 import static javarepl.completion.Completers.javaKeywordCompleter;
 import static javarepl.completion.TypeResolver.functions.defaultPackageResolver;
 import static javarepl.console.ConsoleHistory.historyFromFile;
+import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleResult.emptyResult;
+import static javarepl.console.ConsoleStatus.*;
 import static javarepl.console.commands.Command.functions.completer;
+import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
+import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
 public final class SimpleConsole implements Console {
     private final Container context;
+    private ConsoleStatus status = Idle;
 
     public SimpleConsole(ConsoleConfig config) {
         registerShutdownHook();
@@ -45,10 +54,29 @@ public final class SimpleConsole implements Console {
 
         ));
 
-        evaluator().addResults(config.results);
+        context.get(Evaluator.class).addResults(config.results);
     }
 
     public ConsoleResult execute(String expression) {
+        if (status == Running) {
+            return executeExpression(expression);
+        } else {
+            return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Console is not running (" + status + ")")));
+        }
+    }
+
+    public CompletionResult completion(String expression) {
+        return context.get(Completer.class).apply(expression);
+    }
+
+    public ExpressionTemplate template(String expression) {
+        Evaluator evaluator = context.get(Evaluator.class);
+        Expression parsedExpression = evaluator.parseExpression(expression);
+
+        return new ExpressionTemplate(renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), parsedExpression), EXPRESSION_TOKEN);
+    }
+
+    private ConsoleResult executeExpression(String expression) {
         context.get(ConsoleHistory.class).add(expression);
         ConsoleResult result = evaluationRules().apply(expression);
         return result;
@@ -58,8 +86,24 @@ public final class SimpleConsole implements Console {
         return context;
     }
 
-    public Evaluator evaluator() {
-        return context.get(Evaluator.class);
+    public ConsoleStatus status() {
+        return status;
+    }
+
+    public ConsoleHistory history() {
+        return context.get(ConsoleHistory.class);
+    }
+
+    public void start() {
+        if (status() == Idle) {
+            status = Starting;
+
+            for (String expression : context.get(ConsoleConfig.class).expressions) {
+                execute(expression);
+            }
+
+            status = Running;
+        }
     }
 
     private void registerShutdownHook() {
@@ -71,8 +115,10 @@ public final class SimpleConsole implements Console {
     }
 
     public void shutdown() {
+        status = Terminating;
         context.get(ConsoleHistory.class).save();
         context.get(Evaluator.class).clearOutputDirectory();
+        status = Terminated;
     }
 
     private Rules<String, ConsoleResult> evaluationRules() {
