@@ -99,7 +99,7 @@ public final class SimpleConsole implements Console {
             status = Starting;
 
             for (String expression : context.get(ConsoleConfig.class).expressions) {
-                execute(expression);
+                executeExpression(expression);
             }
 
             status = Running;
