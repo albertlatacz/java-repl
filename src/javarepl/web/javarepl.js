@@ -40,10 +40,10 @@ $(window).bind('beforeunload', function () {
 
 $(document).ready(function () {
     var console = $('<div>');
-    var command = getParam("command");
+    var expression = getParam("expression");
     $('#console').append(console);
 
-    $.ajax({type: 'POST', async: false, url: '/create', data: (command ? "command=" + command : "")})
+    $.ajax({type: 'POST', async: false, url: '/create', data: (expression ? "expression=" + expression : "")})
         .done(function (data) {
             clientId = data.id;
             welcomeMessage = data.welcomeMessage

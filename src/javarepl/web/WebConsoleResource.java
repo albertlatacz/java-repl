@@ -28,9 +28,9 @@ public class WebConsoleResource {
     @Hidden
     @Path("create")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model create(@FormParam("command") Option<String> command) {
+    public Model create(@FormParam("expression") Option<String> expression) {
 
-        Option<WebConsoleClientHandler> clientHandler = agent.createClient(command);
+        Option<WebConsoleClientHandler> clientHandler = agent.createClient(expression);
 
         return clientHandler.map(clientHandlerToModel()).get()
                 .add("welcomeMessage", welcomeMessage() + "\n\n");

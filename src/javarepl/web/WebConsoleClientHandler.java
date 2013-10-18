@@ -26,12 +26,12 @@ import static javarepl.console.TimingOutConsole.INACTIVITY_TIMEOUT;
 
 public final class WebConsoleClientHandler {
     private final String id = UUID.randomUUID().toString();
-    private final Option<String> command;
+    private final Option<String> expression;
     private Option<Integer> port = none();
     private Option<Process> process = none();
 
-    public WebConsoleClientHandler(Option<String> command) {
-        this.command = command;
+    public WebConsoleClientHandler(Option<String> expression) {
+        this.expression = expression;
     }
 
     public String id() {
@@ -47,7 +47,7 @@ public final class WebConsoleClientHandler {
             try {
                 port = some(randomServerPort());
                 ProcessBuilder builder = new ProcessBuilder("java", "-Xmx128M", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(),
-                        "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300", command.map(Strings.format("--expression=%s")).getOrElse(""));
+                        "--sandboxed", "--ignoreConsole", "--port=" + port.get(), "--expressionTimeout=5", "--inactivityTimeout=300", expression.map(Strings.format("--expression=%s")).getOrElse(""));
                 builder.redirectErrorStream(true);
                 process = some(builder.start());
 
