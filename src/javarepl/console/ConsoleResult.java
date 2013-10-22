@@ -24,4 +24,9 @@ public class ConsoleResult {
     public static ConsoleResult emptyResult() {
         return new ConsoleResult("", empty(ConsoleLog.class));
     }
+
+    @Override
+    public String toString() {
+        return expression + " => " + logs.toString("(", ", ", ")");
+    }
 }

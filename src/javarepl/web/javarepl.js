@@ -15,8 +15,24 @@ function getParam(sname) {
     return sval;
 }
 
+function getBaseURL() {
+    return location.protocol + "//" + location.hostname +
+        (location.port && ":" + location.port) + location.pathname;
+}
+
 function removeClient(clientId) {
     $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
+}
+
+
+function makeSnap(clientId) {
+    var snapUrl = null;
+    $.ajax({type: 'POST', async: false, url: '/snap', data: 'id=' + clientId})
+        .done(function (data) {
+            snapUrl = getBaseURL() + '?snap=' + data.snap;
+        });
+
+    return snapUrl;
 }
 
 function readExpressionLine(clientId, line) {
@@ -41,10 +57,15 @@ $(window).bind('beforeunload', function () {
 $(document).ready(function () {
     var console = $('<div>');
     var expression = getParam("expression");
-    $('#console').append(console);
+    var snap = getParam("snap");
+    $('#console').prepend(console);
 
-    $.ajax({type: 'POST', async: false, url: '/create', data: (expression ? "expression=" + expression : "")})
-        .done(function (data) {
+    $.ajax({type: 'POST',
+            async: false,
+            url: '/create',
+            data: (expression ? "expression=" + expression : "") + "&" +
+                (snap ? "snap=" + snap : "")}
+    ).done(function (data) {
             clientId = data.id;
             welcomeMessage = data.welcomeMessage
         });
@@ -55,6 +76,13 @@ $(document).ready(function () {
             return !requesting;
         },
         commandHandle: function (line, report) {
+            if (line == ":snap") {
+                var snapUri = makeSnap(clientId);
+                $(".jquery-console-inner").append('<div class="jquery-console-message jquery-console-link">' +
+                    '<a href="' + snapUri + '" target="_blank">' + snapUri + '</a></div>')
+                report([]);
+                return [];
+            }
             var expression = readExpressionLine(clientId, line);
 
             if (expression) {

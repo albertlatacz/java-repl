@@ -103,6 +103,13 @@ body {
     padding: 0.1em;
 }
 
+#console div.jquery-console-link a {
+    color: #77B767;
+    font-family: monospace;
+    font-weight: bold;
+    padding: 0.1em;
+}
+
 #console div.jquery-console-message-success {
     color: #77B767;
     font-family: monospace;

@@ -1,17 +1,24 @@
 package javarepl.web;
 
 import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.Files;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.utterlyidle.MediaType;
-import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.Responses;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.utterlyidle.*;
 import com.googlecode.utterlyidle.annotations.*;
 
+import java.io.File;
+import java.net.URI;
+import java.util.UUID;
+
 import static com.googlecode.funclate.Model.persistent.model;
+import static com.googlecode.totallylazy.Files.directory;
+import static com.googlecode.totallylazy.Files.workingDirectory;
+import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.URLs.uri;
 import static com.googlecode.utterlyidle.Responses.response;
-import static com.googlecode.utterlyidle.Status.BAD_REQUEST;
-import static com.googlecode.utterlyidle.Status.OK;
+import static com.googlecode.utterlyidle.Status.*;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
@@ -19,18 +26,27 @@ import static javarepl.Utils.applicationVersion;
 @Hidden
 public class WebConsoleResource {
     private final WebConsole agent;
+    private final BaseUri baseUri;
 
-    public WebConsoleResource(WebConsole agent) {
+    public WebConsoleResource(WebConsole agent, BaseUri baseUri) {
         this.agent = agent;
+        this.baseUri = baseUri;
     }
+
 
     @POST
     @Hidden
     @Path("create")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model create(@FormParam("expression") Option<String> expression) {
+    public Model create(@FormParam("expression") Option<String> expression,
+                        @FormParam("snap") Option<String> snap) throws Exception {
 
-        Option<WebConsoleClientHandler> clientHandler = agent.createClient(expression);
+
+        Option<String> initial = snap.isDefined()
+                ? some(format(":eval %s", snapUri(snap.get())))
+                : expression;
+
+        Option<WebConsoleClientHandler> clientHandler = agent.createClient(initial);
 
         return clientHandler.map(clientHandlerToModel()).get()
                 .add("welcomeMessage", welcomeMessage() + "\n\n");
@@ -83,6 +99,43 @@ public class WebConsoleResource {
 
     @POST
     @Hidden
+    @Path("snap")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response snap(@FormParam("id") String id) {
+        Option<WebConsoleClientHandler> clientHandler = agent.client(id);
+
+        if (!clientHandler.isEmpty()) {
+            String snapId = UUID.randomUUID().toString();
+
+            Files.write(clientHandler.get().history().toString("\n").getBytes(), snapFile(snapId));
+
+            return ResponseBuilder
+                    .response()
+                    .entity(model()
+                            .add("snap", snapId)
+                            .add("uri", snapUri(snapId).toString())
+                    ).build();
+
+        } else {
+            return response(BAD_REQUEST);
+        }
+    }
+
+    @GET
+    @Hidden
+    @Path("snap/{id}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getSnap(@PathParam("id") String id) {
+        File snap = snapFile(id);
+        if (snap.exists()) {
+            return ResponseBuilder.response().entity(Strings.lines(snap).toString("\n")).build();
+        } else {
+            return ResponseBuilder.response(NOT_FOUND).build();
+        }
+    }
+
+    @POST
+    @Hidden
     @Path("remove")
     @Produces(MediaType.APPLICATION_JSON)
     public Response remove(@FormParam("id") String id) {
@@ -126,5 +179,13 @@ public class WebConsoleResource {
                 getProperty("os.name"),
                 getProperty("os.version"),
                 applicationVersion());
+    }
+
+    private URI snapUri(String snapId) {
+        return uri(baseUri + "snap/" + snapId);
+    }
+
+    private File snapFile(String id) {
+        return new File(directory(workingDirectory(), "snapped"), id + ".repl");
     }
 }

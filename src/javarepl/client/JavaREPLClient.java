@@ -27,7 +27,7 @@ public final class JavaREPLClient {
     public JavaREPLClient(String hostname, Integer port) {
         this.hostname = hostname;
         this.port = port;
-        this.client = new ClientHttpHandler(5000);
+        this.client = new ClientHttpHandler();
     }
 
     public synchronized ExpressionTemplate template(String expression) throws Exception {

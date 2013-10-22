@@ -1,13 +1,12 @@
 package javarepl.web;
 
-import com.googlecode.totallylazy.Mapper;
-import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.*;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.Repl;
+import javarepl.client.JavaREPLClient;
 import javarepl.console.ConsoleStatus;
 
 import java.util.UUID;
@@ -115,6 +114,17 @@ public final class WebConsoleClientHandler {
         } catch (Exception e) {
             e.printStackTrace();
             return response(INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public Sequence<String> history() {
+        createProcess();
+
+        try {
+            return new JavaREPLClient("localhost", port.get()).history();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Sequences.empty();
         }
     }
 

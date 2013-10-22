@@ -15,14 +15,12 @@ import javarepl.rendering.ExpressionTemplate;
 
 import static com.googlecode.totallylazy.Predicates.always;
 import static com.googlecode.totallylazy.Predicates.notNullValue;
-import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.completion.Completers.javaKeywordCompleter;
 import static javarepl.completion.TypeResolver.functions.defaultPackageResolver;
 import static javarepl.console.ConsoleHistory.historyFromFile;
-import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleResult.emptyResult;
 import static javarepl.console.ConsoleStatus.*;
 import static javarepl.console.commands.Command.functions.completer;
@@ -58,11 +56,8 @@ public final class SimpleConsole implements Console {
     }
 
     public ConsoleResult execute(String expression) {
-        if (status == Running) {
-            return executeExpression(expression);
-        } else {
-            return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Console is not running (" + status + ")")));
-        }
+        context.get(ConsoleHistory.class).add(expression);
+        return executeExpression(expression);
     }
 
     public CompletionResult completion(String expression) {
@@ -77,9 +72,7 @@ public final class SimpleConsole implements Console {
     }
 
     private ConsoleResult executeExpression(String expression) {
-        context.get(ConsoleHistory.class).add(expression);
-        ConsoleResult result = evaluationRules().apply(expression);
-        return result;
+        return evaluationRules().apply(expression);
     }
 
     public Container context() {
