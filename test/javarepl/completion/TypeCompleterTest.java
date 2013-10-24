@@ -11,8 +11,8 @@ public class TypeCompleterTest {
     public void completesTypes() {
         TypeCompleter completer = new TypeCompleter(new TypeResolver(defaultPackageResolver()));
 
-        assertThat(completer.apply("java.lang.Obj"), completesTo(candidates("Object"), position(10)));
-        assertThat(completer.apply("java.lang.Object"), completesTo(candidates("Object"), position(10)));
+        assertThat(completer.apply("java.lang.Obj"), completesTo(candidatesValues("Object"), position(10)));
+        assertThat(completer.apply("java.lang.Object"), completesTo(candidatesValues("Object"), position(10)));
 
     }
 }

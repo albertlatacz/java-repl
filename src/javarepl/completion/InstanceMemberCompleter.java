@@ -10,9 +10,10 @@ import javarepl.reflection.MemberReflection;
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.Completions.candidateName;
-import static javarepl.completion.Completions.lastIndexOfSeparator;
+import static javarepl.completion.CompletionCandidate.functions.candidateValue;
+import static javarepl.completion.Completions.*;
 import static javarepl.reflection.ClassReflections.reflectionOf;
 import static javarepl.reflection.MemberReflections.isPublic;
 import static javarepl.reflection.MemberReflections.isStatic;
@@ -26,9 +27,9 @@ public class InstanceMemberCompleter extends Completer {
     }
 
     public CompletionResult call(String expression) throws Exception {
-        final int lastSeparator = lastIndexOfSeparator(characters("({[,+-\\*>=<&%;!~ "), expression) + 1;
+        final int lastSeparator = lastIndexOfSeparator(characters(" "), expression) + 1;
         final String packagePart = expression.substring(lastSeparator);
-        final Boolean canComplete = packagePart.matches("[a-zA-Z0-9\\$_\\\\.]*") && packagePart.contains(".");
+        final Boolean canComplete = packagePart.matches("[a-zA-Z0-9\\$_\\\\.\\(\\[\\]]*") && packagePart.contains(".");
 
         final int beginIndex = packagePart.lastIndexOf('.') + 1;
         Option<Class> aClass = canComplete
@@ -42,15 +43,15 @@ public class InstanceMemberCompleter extends Completer {
                     .join(classReflection.declaredFields())
                     .join(classReflection.declaredMethods());
 
-            Sequence<String> candidates = join
+            Sequence<CompletionCandidate> candidates = join
                     .filter(isPublic().and(not(isStatic())))
-                    .map(candidateName())
-                    .unique()
-                    .filter(startsWith(packagePart.substring(beginIndex)));
+                    .groupBy(candidateName())
+                    .map(candidate())
+                    .filter(where(candidateValue(), startsWith(packagePart.substring(beginIndex))));
 
             return new CompletionResult(expression, lastSeparator + beginIndex, candidates);
         } else {
-            return new CompletionResult(expression, 0, Sequences.empty(String.class));
+            return new CompletionResult(expression, 0, Sequences.empty(CompletionCandidate.class));
         }
     }
 }

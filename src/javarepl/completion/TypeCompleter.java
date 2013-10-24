@@ -9,6 +9,7 @@ import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.comparators.Comparators.ascending;
+import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
 import static javarepl.completion.ResolvedClass.functions.canonicalClassName;
 import static javarepl.completion.ResolvedPackage.functions.classes;
 import static javarepl.completion.ResolvedPackage.functions.packageName;
@@ -34,11 +35,12 @@ public final class TypeCompleter extends Completer {
                 .filter(startsWith(packagePart))
                 : empty(String.class);
 
-        Sequence<String> candidates = resolvedPackages.map(packageName()).join(classesInPackage)
+        Sequence<CompletionCandidate> candidates = resolvedPackages.map(packageName()).join(classesInPackage)
                 .map(candidatePackagePrefix(beginIndex))
                 .filter(not(Strings.empty()))
                 .unique()
-                .sort(ascending(String.class));
+                .sort(ascending(String.class))
+                .map(asCompletionCandidate());
 
         return new CompletionResult(expression, lastSpace + beginIndex, candidates);
     }

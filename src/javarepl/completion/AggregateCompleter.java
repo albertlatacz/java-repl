@@ -21,7 +21,7 @@ public class AggregateCompleter extends Completer {
         Option<Group<Integer, CompletionResult>> group = completeGroup(expression);
 
         if (group.isEmpty())
-            return new CompletionResult(expression, 0, empty(String.class));
+            return new CompletionResult(expression, 0, empty(CompletionCandidate.class));
 
         return new CompletionResult(expression, group.get().key(), group.get().flatMap(candidates()));
     }

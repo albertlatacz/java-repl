@@ -16,7 +16,7 @@ public class InstanceMemberCompleterTest {
 //        assertThat(result,
 //                completesTo(candidates("staticField", "staticMethod("), position(expression.length())));
 
-        assertThat(completer.apply("invalid"), completesTo(candidates(), position(0)));
+        assertThat(completer.apply("invalid"), completesTo(candidatesValues(), position(0)));
     }
 
     @SuppressWarnings("unused")

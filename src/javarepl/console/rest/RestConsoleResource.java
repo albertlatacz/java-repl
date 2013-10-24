@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.*;
+import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
@@ -80,7 +81,7 @@ public class RestConsoleResource {
         return model()
                 .add("expression", result.expression())
                 .add("position", result.position().toString())
-                .add("candidates", result.candidates().toList());
+                .add("candidates", result.candidates().map(completionCandidateToModel()).toList());
     }
 
     @GET
@@ -95,6 +96,16 @@ public class RestConsoleResource {
             public Model call(ConsoleLog consoleLog) throws Exception {
                 return model().add("type", consoleLog.type())
                         .add("message", consoleLog.message());
+            }
+        };
+    }
+
+    private Mapper<CompletionCandidate, Model> completionCandidateToModel() {
+        return new Mapper<CompletionCandidate, Model>() {
+            public Model call(CompletionCandidate completionCandidate) throws Exception {
+                return model()
+                        .add("value", completionCandidate.value())
+                        .add("forms", completionCandidate.forms().toList());
             }
         };
     }

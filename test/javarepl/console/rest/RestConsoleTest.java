@@ -73,7 +73,12 @@ public class RestConsoleTest {
         assertThat(body(response), is(model()
                 .add("expression", "prefix res")
                 .add("position", "7")
-                .add("candidates", asList("res0", "res1", "res2"))));
+                .add("candidates",
+                        asList(
+                                model().add("value", "res0").add("forms", asList("res0")),
+                                model().add("value", "res1").add("forms", asList("res1")),
+                                model().add("value", "res2").add("forms", asList("res2")))
+                )));
     }
 
     @Test

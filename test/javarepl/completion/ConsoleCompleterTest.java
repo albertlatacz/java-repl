@@ -17,34 +17,34 @@ public class ConsoleCompleterTest {
     public void completesResults() {
         givenConsoleThatExecuted("42", "42", "roo=12");
 
-        assertThat(completing("res1"), completesTo(candidates("res1"), position(0)));
-        assertThat(completing("re"), completesTo(candidates("res0", "res1"), position(0)));
-        assertThat(completing("some prefix r"), completesTo(candidates("res0", "res1", "roo"), position(12)));
+        assertThat(completing("res1"), completesTo(candidatesValues("res1"), position(0)));
+        assertThat(completing("re"), completesTo(candidatesValues("res0", "res1"), position(0)));
+        assertThat(completing("some prefix r"), completesTo(candidatesValues("res0", "res1", "roo"), position(12)));
     }
 
     @Test
     public void completesMethods() {
         givenConsoleThatExecuted("void method1(){}", "int method2(){return 42;}", "void myMethod(){}");
 
-        assertThat(completing("method1"), completesTo(candidates("method1("), position(0)));
-        assertThat(completing("me"), completesTo(candidates("method1(", "method2("), position(0)));
-        assertThat(completing("some prefix m"), completesTo(candidates("method1(", "method2(", "myMethod("), position(12)));
+        assertThat(completing("method1"), completesTo(candidatesValues("method1("), position(0)));
+        assertThat(completing("me"), completesTo(candidatesValues("method1(", "method2("), position(0)));
+        assertThat(completing("some prefix m"), completesTo(candidatesValues("method1(", "method2(", "myMethod("), position(12)));
     }
 
     @Test
     public void completesTypes() {
         givenConsoleThatExecuted("class Type1{}", "class Type2{}", "interface TheType{}");
 
-        assertThat(completing("Type1"), completesTo(candidates("Type1"), position(0)));
-        assertThat(completing("Ty"), completesTo(candidates("Type1", "Type2"), position(0)));
-        assertThat(completing("some prefix T"), completesTo(candidates("Type1", "Type2", "TheType"), position(12)));
+        assertThat(completing("Type1"), completesTo(candidatesValues("Type1"), position(0)));
+        assertThat(completing("Ty"), completesTo(candidatesValues("Type1", "Type2"), position(0)));
+        assertThat(completing("some prefix T"), completesTo(candidatesValues("Type1", "Type2", "TheType"), position(12)));
     }
 
     @Test
     public void combinesAllCompletions() {
         givenConsoleThatExecuted("class myType{}", "void myMethod(){}", "myRes=42");
 
-        assertThat(completing("some prefix my"), completesTo(candidates("myRes", "myMethod(", "myType"), position(12)));
+        assertThat(completing("some prefix my"), completesTo(candidatesValues("myRes", "myMethod(", "myType"), position(12)));
     }
 
     private CompletionResult completing(String expression) {

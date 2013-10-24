@@ -11,9 +11,10 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Pair.pair;
 import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.Completions.candidateName;
-import static javarepl.completion.Completions.lastIndexOfSeparator;
+import static javarepl.completion.CompletionCandidate.functions.candidateValue;
+import static javarepl.completion.Completions.*;
 import static javarepl.reflection.ClassReflections.reflectionOf;
 import static javarepl.reflection.MemberReflections.*;
 
@@ -26,23 +27,23 @@ public class StaticMemberCompleter extends Completer {
     }
 
     public CompletionResult call(String expression) throws Exception {
-        final int lastSeparator = lastIndexOfSeparator(characters("({[,+-\\*>=<&%;!~ "), expression) + 1;
+        final int lastSeparator = lastIndexOfSeparator(characters(" "), expression) + 1;
         final String packagePart = expression.substring(lastSeparator);
 
         Option<Pair<Class<?>, String>> completion = completionFor(packagePart);
 
         if (!completion.isEmpty()) {
-            Sequence<String> candidates = reflectionOf(completion.get().first())
+            Sequence<CompletionCandidate> candidates = reflectionOf(completion.get().first())
                     .declaredMembers()
                     .filter(isStatic().and(isPublic()).and(not(isSynthetic())))
-                    .map(candidateName())
-                    .unique()
-                    .filter(startsWith(completion.get().second()));
+                    .groupBy(candidateName())
+                    .map(candidate())
+                    .filter(where(candidateValue(), startsWith(completion.get().second())));
 
             final int beginIndex = packagePart.lastIndexOf('.') + 1;
             return new CompletionResult(expression, lastSeparator + beginIndex, candidates);
         } else {
-            return new CompletionResult(expression, 0, Sequences.empty(String.class));
+            return new CompletionResult(expression, 0, Sequences.empty(CompletionCandidate.class));
         }
     }
 

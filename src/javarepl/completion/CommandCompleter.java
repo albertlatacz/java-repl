@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Sequence;
 
 import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
 
 public class CommandCompleter extends Completer {
     private final String command;
@@ -22,18 +23,18 @@ public class CommandCompleter extends Completer {
         Sequence<String> parts = sequence(expression.split(" "));
 
         if (parts.isEmpty()) {
-            return new CompletionResult(expression, 0, empty(String.class));
+            return new CompletionResult(expression, 0, empty(CompletionCandidate.class));
         }
 
         if (command.equals(parts.head())) {
             String nextCommandPart = parts.tail().headOption().getOrElse("");
-            return new CompletionResult(expression, candidates.isEmpty() ? 0 : command.length() + 1, candidates.filter(startsWith(nextCommandPart)));
+            return new CompletionResult(expression, candidates.isEmpty() ? 0 : command.length() + 1, candidates.filter(startsWith(nextCommandPart)).map(asCompletionCandidate()));
         }
 
         if (command.startsWith(parts.head())) {
-            return new CompletionResult(expression, 0, one(command));
+            return new CompletionResult(expression, 0, one(asCompletionCandidate().apply(command)));
         }
 
-        return new CompletionResult(expression, 0, empty(String.class));
+        return new CompletionResult(expression, 0, empty(CompletionCandidate.class));
     }
 }

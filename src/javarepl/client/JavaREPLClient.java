@@ -6,6 +6,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
+import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleStatus;
 import javarepl.rendering.ExpressionTemplate;
@@ -53,7 +54,12 @@ public final class JavaREPLClient {
         Model model = parse(client.handle(get(url("completions")).query("expression", expr).build()).entity().toString());
         return new CompletionResult(model.get("expression", String.class),
                 Integer.valueOf(model.get("position", String.class)),
-                sequence(model.getValues("candidates", String.class)));
+                sequence(model.getValues("candidates", Model.class))
+                        .map(new Mapper<Model, CompletionCandidate>() {
+                            public CompletionCandidate call(Model model) throws Exception {
+                                return new CompletionCandidate(model.get("value", String.class), sequence(model.getValues("forms", String.class)));
+                            }
+                        }));
     }
 
     public synchronized ConsoleStatus status() {

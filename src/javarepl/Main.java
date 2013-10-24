@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
+import static javarepl.completion.CompletionCandidate.functions.candidateValue;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -163,7 +164,7 @@ public class Main {
                     public int complete(String expression, int cursor, List<CharSequence> candidates) {
                         try {
                             CompletionResult result = client.completions(expression);
-                            candidates.addAll(result.candidates().toList());
+                            candidates.addAll(result.candidates().map(candidateValue()).toList());
                             return result.candidates().isEmpty() ? -1 : result.position();
                         } catch (Exception e) {
                             return -1;

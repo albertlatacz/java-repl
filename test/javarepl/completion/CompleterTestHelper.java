@@ -7,9 +7,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
 
 public class CompleterTestHelper {
-    public static Matcher<CompletionResult> completesTo(final Sequence<String> candidates, final int position) {
+
+    public static Matcher<CompletionResult> completesTo(final Sequence<CompletionCandidate> candidates, final int position) {
         return new TypeSafeMatcher<CompletionResult>() {
             private CompletionResult result;
 
@@ -24,7 +26,11 @@ public class CompleterTestHelper {
         };
     }
 
-    public static Sequence<String> candidates(String... candidates) {
+    public static Sequence<CompletionCandidate> candidatesValues(String... candidates) {
+        return sequence(candidates).map(asCompletionCandidate());
+    }
+
+    public static Sequence<CompletionCandidate> candidates(CompletionCandidate... candidates) {
         return sequence(candidates);
     }
 

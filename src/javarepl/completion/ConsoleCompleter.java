@@ -10,6 +10,7 @@ import javarepl.expressions.Type;
 import static com.googlecode.totallylazy.Predicates.in;
 import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.*;
+import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
 import static javarepl.completion.ResolvedClass.functions.className;
 import static javarepl.completion.ResolvedPackage.functions.classes;
 import static javarepl.completion.ResolvedPackage.functions.packageName;
@@ -28,11 +29,12 @@ public class ConsoleCompleter extends Completer {
 
     public CompletionResult call(String expression) throws Exception {
         int lastSpace = expression.lastIndexOf(" ") + 1;
-        Sequence<String> candidates = results()
+        Sequence<CompletionCandidate> candidates = results()
                 .join(methods())
                 .join(types())
                 .join(imports())
-                .filter(startsWith(expression.substring(lastSpace)));
+                .filter(startsWith(expression.substring(lastSpace)))
+                .map(asCompletionCandidate());
 
         return new CompletionResult(expression, lastSpace, candidates);
     }

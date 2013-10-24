@@ -46,6 +46,30 @@ function readExpressionLine(clientId, line) {
     return expression;
 }
 
+
+function layoutCompletions(candidates) {
+    var max = 0;
+    for (var i = 0; i < candidates.length; i++) {
+        max = Math.max(max, candidates[i].length);
+    }
+    max += 2;
+    var n = Math.floor(85 / max);
+    var buffer = "";
+    var col = 0;
+    for (i = 0; i < candidates.length; i++) {
+        var completion = candidates[i];
+        buffer += candidates[i];
+        for (var j = completion.length; j < max; j++) {
+            buffer += " ";
+        }
+        if (++col >= n) {
+            buffer += "\n";
+            col = 0;
+        }
+    }
+    return buffer;
+}
+
 var requesting = false;
 var clientId = null;
 var welcomeMessage = null;
@@ -135,7 +159,13 @@ $(document).ready(function () {
                     completionResult = data;
                 });
 
-            var candidates = completionResult.candidates;
+
+            var candidates = _.map(completionResult.candidates, function (cand) {
+                return cand.value;
+            });
+            var candidatesForms = _.map(completionResult.candidates, function (cand) {
+                return cand.forms;
+            });
             var promptText = controller.promptText();
 
             if (candidates.length == 0) {
@@ -143,32 +173,21 @@ $(document).ready(function () {
             }
 
             if (candidates.length == 1) {
-                controller.promptText(controller.promptText().substr(0, parseInt(completionResult.position)) + completionResult.candidates[0]);
+                var uniqueForms = _.filter(_.unique(candidatesForms[0]), function (form) {
+                    return form != candidates[0]
+                });
+                var text = controller.promptText().substr(0, parseInt(completionResult.position)) + candidates[0];
+
+                if (uniqueForms.length > 0) {
+                    controller.commandResult(layoutCompletions(candidatesForms[0]), "jquery-console-message-completion");
+                }
+                controller.promptText(text);
                 return [];
             }
 
-            var max = 0;
-            for (var i = 0; i < candidates.length; i++) {
-                max = Math.max(max, candidates[i].length);
-            }
-            max += 2;
-            var n = Math.floor(85 / max);
-            var buffer = "";
-            var col = 0;
-            for (i = 0; i < candidates.length; i++) {
-                var completion = candidates[i];
-                buffer += candidates[i];
-                for (var j = completion.length; j < max; j++) {
-                    buffer += " ";
-                }
-                if (++col >= n) {
-                    buffer += "\n";
-                    col = 0;
-                }
-            }
-            controller.commandResult(buffer, "jquery-console-message-completion");
+            controller.commandResult(layoutCompletions(candidates), "jquery-console-message-completion");
 
-            for (i = candidates[0].length; i > 0; --i) {
+            for (var i = candidates[0].length; i > 0; --i) {
                 var prefixedCandidatesCount = _.filter(candidates,function (cand) {
                     return i > cand.length ? false : cand.substr(0, i) == candidates[0].substr(0, i)
                 }).length;

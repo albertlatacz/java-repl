@@ -6,9 +6,9 @@ import com.googlecode.totallylazy.Sequence;
 public class CompletionResult {
     private final String expression;
     private final Integer position;
-    private final Sequence<String> candidates;
+    private final Sequence<CompletionCandidate> candidates;
 
-    public CompletionResult(String expression, Integer position, Sequence<String> candidates) {
+    public CompletionResult(String expression, Integer position, Sequence<CompletionCandidate> candidates) {
         this.expression = expression;
         this.position = position;
         this.candidates = candidates;
@@ -22,7 +22,7 @@ public class CompletionResult {
         return expression;
     }
 
-    public Sequence<String> candidates() {
+    public Sequence<CompletionCandidate> candidates() {
         return candidates;
     }
 
@@ -56,9 +56,9 @@ public class CompletionResult {
             };
         }
 
-        public static Mapper<CompletionResult, Sequence<String>> candidates() {
-            return new Mapper<CompletionResult, Sequence<String>>() {
-                public Sequence<String> call(CompletionResult result) throws Exception {
+        public static Mapper<CompletionResult, Sequence<CompletionCandidate>> candidates() {
+            return new Mapper<CompletionResult, Sequence<CompletionCandidate>>() {
+                public Sequence<CompletionCandidate> call(CompletionResult result) throws Exception {
                     return result.candidates();
                 }
             };
