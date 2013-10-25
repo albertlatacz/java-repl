@@ -60,9 +60,6 @@ public class WebConsoleResource {
         Option<WebConsoleClientHandler> clientHandler = agent.client(id);
 
         if (!clientHandler.isEmpty()) {
-            if (expression.trim().startsWith(":quit"))
-                return remove(id);
-
             return clientHandler.get().execute(expression);
         } else {
             return response(BAD_REQUEST);

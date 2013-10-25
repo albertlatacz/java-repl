@@ -1,5 +1,27 @@
 document.write('<div id="console" class="console"></div>')
 
+var session = [];
+
+function createNewSession(expression, snap) {
+    var newSession = [];
+    newSession.expression = expression;
+    newSession.snap = snap;
+
+    $.ajax({type: 'POST',
+            async: false,
+            url: '/create',
+            data: (expression ? "expression=" + expression : "") + "&" + (snap ? "snap=" + snap : "")}
+    ).done(function (data) {
+            newSession.clientId = data.id;
+            newSession.welcomeMessage = data.welcomeMessage
+        });
+
+    newSession.requesting = false;
+
+    session = newSession;
+}
+
+
 // return a parameter value from the current URL
 function getParam(sname) {
     var params = location.search.substr(location.search.indexOf("?") + 1);
@@ -20,27 +42,37 @@ function getBaseURL() {
         (location.port && ":" + location.port) + location.pathname;
 }
 
-function removeClient(clientId) {
-    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + clientId});
+function closeSession() {
+    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + session.clientId});
 }
 
 
-function makeSnap(clientId) {
+function restartSession() {
+    closeSession();
+    createNewSession(session.expression, session.snap)
+}
+
+function makeSnap() {
     var snapUrl = null;
-    $.ajax({type: 'POST', async: false, url: '/snap', data: 'id=' + clientId})
+    $.ajax({type: 'POST', async: false, url: '/snap', data: 'id=' + session.clientId})
         .done(function (data) {
             snapUrl = getBaseURL() + '?snap=' + data.snap;
+        }).fail(function (xhr, textStatus, errorThrown) {
+            restartSession()
         });
 
     return snapUrl;
 }
 
-function readExpressionLine(clientId, line) {
+function readExpressionLine(line) {
     var expression = null;
 
-    $.ajax({type: 'POST', async: false, url: '/readExpression', data: {id: clientId, line: line}})
+    $.ajax({type: 'POST', async: false, url: '/readExpression', data: {id: session.clientId, line: line}})
         .done(function (data) {
             expression = data.expression;
+        })
+        .fail(function (xhr, textStatus, errorThrown) {
+            restartSession()
         });
 
     return expression;
@@ -70,47 +102,34 @@ function layoutCompletions(candidates) {
     return buffer;
 }
 
-var requesting = false;
-var clientId = null;
-var welcomeMessage = null;
 
 $(window).bind('beforeunload', function () {
-    removeClient(clientId);
+    closeSession();
 });
 
 $(document).ready(function () {
     var console = $('<div>');
-    var expression = getParam("expression");
-    var snap = getParam("snap");
     $('#console').prepend(console);
 
-    $.ajax({type: 'POST',
-            async: false,
-            url: '/create',
-            data: (expression ? "expression=" + expression : "") + "&" +
-                (snap ? "snap=" + snap : "")}
-    ).done(function (data) {
-            clientId = data.id;
-            welcomeMessage = data.welcomeMessage
-        });
+    createNewSession(getParam("expression"), getParam("snap"))
 
     var controller = console.console({
         promptLabel: 'java> ',
         commandValidate: function (line) {
-            return !requesting;
+            return !session.requesting;
         },
         commandHandle: function (line, report) {
             if (line == ":snap") {
-                var snapUri = makeSnap(clientId);
+                var snapUri = makeSnap();
                 $(".jquery-console-inner").append('<div class="jquery-console-message jquery-console-link">' +
                     '<a href="' + snapUri + '" target="_blank">' + snapUri + '</a></div>')
                 report([]);
                 return [];
             }
-            var expression = readExpressionLine(clientId, line);
+            var expression = readExpressionLine(line);
 
             if (expression) {
-                $.post('/execute', {id: clientId, expression: expression})
+                $.post('/execute', {id: session.clientId, expression: expression})
                     .done(function (data) {
                         var messages = [];
                         var hadError = false;
@@ -131,22 +150,17 @@ $(document).ready(function () {
                         }
 
                         report(messages);
-                        requesting = false;
+                        session.requesting = false;
                     })
                     .fail(function (xhr, textStatus, errorThrown) {
                         report([
-                            {msg: "Service timeout. Starting new session...", className: "jquery-console-message-service-error"}
+                            {msg: "Session terminated. Starting new session...", className: "jquery-console-message-service-error"}
                         ]);
-
-                        removeClient(clientId);
-                        $.post('/create', function (data) {
-                            clientId = data.id;
-                            requesting = false;
-                        });
+                        restartSession()
                     });
             } else {
                 report([]);
-                requesting = false;
+                session.requesting = false;
             }
 
             return [];
@@ -154,7 +168,7 @@ $(document).ready(function () {
         },
         completeHandle: function (prefix) {
             var completionResult;
-            $.ajax({type: 'GET', async: false, cache: false, url: '/completions', data: {id: clientId, expression: prefix}})
+            $.ajax({type: 'GET', async: false, cache: false, url: '/completions', data: {id: session.clientId, expression: prefix}})
                 .done(function (data) {
                     completionResult = data;
                 });
@@ -201,7 +215,7 @@ $(document).ready(function () {
             controller.promptText(promptText);
             return [];
         },
-        welcomeMessage: welcomeMessage,
+        welcomeMessage: session.welcomeMessage,
         autofocus: true,
         animateScroll: true,
         promptHistory: true,

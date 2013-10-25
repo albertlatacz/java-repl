@@ -6,14 +6,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-import static java.util.concurrent.Executors.newScheduledThreadPool;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class TimingOutConsole extends DelegatingConsole {
     public static final int EXPRESSION_TIMEOUT = 125;
     public static final int INACTIVITY_TIMEOUT = 126;
 
-    private final ScheduledExecutorService scheduler = newScheduledThreadPool(1);
+    private final ScheduledExecutorService scheduler = newSingleThreadScheduledExecutor();
     private final Option<Integer> expressionTimeout;
     private final Option<Integer> inactivityTimeout;
     private ScheduledFuture<Object> inactivityFuture;
