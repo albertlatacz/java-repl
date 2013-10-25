@@ -31,7 +31,8 @@ import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Result.functions.value;
 import static javarepl.Result.noResult;
-import static javarepl.Utils.*;
+import static javarepl.Utils.randomIdentifier;
+import static javarepl.Utils.urlAsFilePath;
 import static javarepl.expressions.Patterns.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.EvaluationClassRenderer.renderMethodSignatureDetection;
@@ -43,8 +44,6 @@ public class Evaluator {
 
     private EvaluationClassLoader classLoader;
     private EvaluationContext context;
-
-    private File outputDirectory;
 
     public Evaluator() {
         initializeEvaluator(evaluationContext());
@@ -145,8 +144,7 @@ public class Evaluator {
 
     private void initializeEvaluator(EvaluationContext evaluationContext) {
         context = evaluationContext;
-        outputDirectory = randomOutputDirectory();
-        classLoader = evaluationClassLoader(outputDirectory);
+        classLoader = evaluationClassLoader(context.outputDirectory());
     }
 
     public final Option<Class> typeOfExpression(String expression) {
@@ -161,7 +159,6 @@ public class Evaluator {
             }
         }
 
-        localEvaluator.clearOutputDirectory();
         return expressionType;
     }
 
@@ -174,8 +171,8 @@ public class Evaluator {
     }
 
     public void clearOutputDirectory() {
-        deleteFiles(outputDirectory);
-        delete(outputDirectory);
+        deleteFiles(context.outputDirectory());
+        delete(context.outputDirectory());
     }
 
     public void addClasspathUrl(URL classpathUrl) {
@@ -183,7 +180,7 @@ public class Evaluator {
     }
 
     public File outputDirectory() {
-        return outputDirectory;
+        return context.outputDirectory();
     }
 
     @multimethod
@@ -200,7 +197,7 @@ public class Evaluator {
         }
 
         try {
-            File outputPath = directory(outputDirectory, expression.typePackage().getOrElse("").replace('.', File.separatorChar));
+            File outputPath = directory(context.outputDirectory(), expression.typePackage().getOrElse("").replace('.', File.separatorChar));
             File outputJavaFile = file(outputPath, expression.type() + ".java");
 
             String sources = renderExpressionClass(context, expression.type(), expression)
@@ -230,7 +227,7 @@ public class Evaluator {
 
     private java.lang.reflect.Method detectMethod(String expression) throws Exception {
         final String className = randomIdentifier("Method");
-        final File outputJavaFile = file(outputDirectory, className + ".java");
+        final File outputJavaFile = file(context.outputDirectory(), className + ".java");
 
         final String sources = renderMethodSignatureDetection(context, className, expression);
         Files.write(sources.getBytes(), outputJavaFile);
@@ -244,7 +241,7 @@ public class Evaluator {
 
     private Class detectClass(String expression) throws Exception {
         final String className = randomIdentifier("Class");
-        final File outputJavaFile = file(outputDirectory, className + ".java");
+        final File outputJavaFile = file(context.outputDirectory(), className + ".java");
 
         final String sources = renderMethodSignatureDetection(context, className, "public " + expression + " detectClass(){return null;}");
         Files.write(sources.getBytes(), outputJavaFile);
@@ -262,7 +259,7 @@ public class Evaluator {
         try {
             EvaluationContext newContext = context.removeExpressionWithKey(expression.key());
 
-            File outputJavaFile = file(outputDirectory, className + ".java");
+            File outputJavaFile = file(context.outputDirectory(), className + ".java");
             final String sources = renderExpressionClass(newContext, className, expression)
                     .replace(EXPRESSION_TOKEN, renderExpressionSource(expression));
 
