@@ -6,7 +6,6 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
-import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleStatus;
 import javarepl.rendering.ExpressionTemplate;
@@ -18,6 +17,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static javarepl.client.EvaluationLog.Type;
+import static javarepl.completion.CompletionResult.methods.fromJson;
 import static javarepl.console.ConsoleStatus.Idle;
 
 public final class JavaREPLClient {
@@ -51,15 +51,7 @@ public final class JavaREPLClient {
     }
 
     public synchronized CompletionResult completions(String expr) throws Exception {
-        Model model = parse(client.handle(get(url("completions")).query("expression", expr).build()).entity().toString());
-        return new CompletionResult(model.get("expression", String.class),
-                Integer.valueOf(model.get("position", String.class)),
-                sequence(model.getValues("candidates", Model.class))
-                        .map(new Mapper<Model, CompletionCandidate>() {
-                            public CompletionCandidate call(Model model) throws Exception {
-                                return new CompletionCandidate(model.get("value", String.class), sequence(model.getValues("forms", String.class)));
-                            }
-                        }));
+        return fromJson(client.handle(get(url("completions")).query("expression", expr).build()).entity().toString());
     }
 
     public synchronized ConsoleStatus status() {

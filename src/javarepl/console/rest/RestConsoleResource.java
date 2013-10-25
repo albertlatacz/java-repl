@@ -5,14 +5,13 @@ import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.annotations.*;
-import javarepl.completion.CompletionCandidate;
-import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
 import javarepl.rendering.ExpressionTemplate;
 
 import static com.googlecode.funclate.Model.persistent.model;
 import static javarepl.Utils.applicationVersion;
+import static javarepl.completion.CompletionResult.methods.toJson;
 
 public class RestConsoleResource {
     private final RestConsole console;
@@ -76,12 +75,8 @@ public class RestConsoleResource {
     @GET
     @Path("completions")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model completions(@QueryParam("expression") String expr) {
-        CompletionResult result = console.completion(expr);
-        return model()
-                .add("expression", result.expression())
-                .add("position", result.position().toString())
-                .add("candidates", result.candidates().map(completionCandidateToModel()).toList());
+    public String completions(@QueryParam("expression") String expr) {
+        return toJson(console.completion(expr));
     }
 
     @GET
@@ -99,15 +94,4 @@ public class RestConsoleResource {
             }
         };
     }
-
-    private Mapper<CompletionCandidate, Model> completionCandidateToModel() {
-        return new Mapper<CompletionCandidate, Model>() {
-            public Model call(CompletionCandidate completionCandidate) throws Exception {
-                return model()
-                        .add("value", completionCandidate.value())
-                        .add("forms", completionCandidate.forms().toList());
-            }
-        };
-    }
-
 }

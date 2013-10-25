@@ -1,7 +1,12 @@
 package javarepl.completion;
 
+import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
+
+import static com.googlecode.funclate.Model.persistent.model;
+import static com.googlecode.funclate.Model.persistent.parse;
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public class CompletionResult {
     private final String expression;
@@ -62,6 +67,49 @@ public class CompletionResult {
                     return result.candidates();
                 }
             };
+        }
+
+        public static Mapper<CompletionResult, String> completionResultToJson() {
+            return new Mapper<CompletionResult, String>() {
+                public String call(CompletionResult result) throws Exception {
+                    return methods.toJson(result);
+                }
+            };
+        }
+
+        public static Mapper<String, CompletionResult> completionResultFromJson() {
+            return new Mapper<String, CompletionResult>() {
+                public CompletionResult call(String result) throws Exception {
+                    return methods.fromJson(result);
+                }
+            };
+        }
+    }
+
+    public static final class methods {
+        public static String toJson(CompletionResult result) {
+            return model()
+                    .add("expression", result.expression())
+                    .add("position", result.position().toString())
+                    .add("candidates", result.candidates().map(new Mapper<CompletionCandidate, Model>() {
+                        public Model call(CompletionCandidate completionCandidate) throws Exception {
+                            return model()
+                                    .add("value", completionCandidate.value())
+                                    .add("forms", completionCandidate.forms().toList());
+                        }
+                    }).toList()).toString();
+        }
+
+        public static CompletionResult fromJson(String json) {
+            Model model = parse(json);
+            return new CompletionResult(model.get("expression", String.class),
+                    Integer.valueOf(model.get("position", String.class)),
+                    sequence(model.getValues("candidates", Model.class))
+                            .map(new Mapper<Model, CompletionCandidate>() {
+                                public CompletionCandidate call(Model model) throws Exception {
+                                    return new CompletionCandidate(model.get("value", String.class), sequence(model.getValues("forms", String.class)));
+                                }
+                            }));
         }
     }
 }

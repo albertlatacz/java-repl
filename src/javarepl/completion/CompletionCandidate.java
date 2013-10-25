@@ -39,7 +39,7 @@ public class CompletionCandidate {
             };
         }
 
-        public static Mapper<CompletionCandidate, Sequence<String>> candidateForm() {
+        public static Mapper<CompletionCandidate, Sequence<String>> candidateForms() {
             return new Mapper<CompletionCandidate, Sequence<String>>() {
                 public Sequence<String> call(CompletionCandidate completionCandidate) throws Exception {
                     return completionCandidate.forms;
