@@ -68,22 +68,6 @@ public class CompletionResult {
                 }
             };
         }
-
-        public static Mapper<CompletionResult, String> completionResultToJson() {
-            return new Mapper<CompletionResult, String>() {
-                public String call(CompletionResult result) throws Exception {
-                    return methods.toJson(result);
-                }
-            };
-        }
-
-        public static Mapper<String, CompletionResult> completionResultFromJson() {
-            return new Mapper<String, CompletionResult>() {
-                public CompletionResult call(String result) throws Exception {
-                    return methods.fromJson(result);
-                }
-            };
-        }
     }
 
     public static final class methods {
