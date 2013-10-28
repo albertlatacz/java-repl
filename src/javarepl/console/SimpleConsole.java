@@ -66,7 +66,7 @@ public final class SimpleConsole implements Console {
 
     public ExpressionTemplate template(String expression) {
         Evaluator evaluator = context.get(Evaluator.class);
-        Expression parsedExpression = evaluator.parseExpression(expression);
+        Expression parsedExpression = evaluator.parseExpression(expression).right();
 
         return new ExpressionTemplate(renderExpressionClass(evaluator.context(), randomIdentifier("Evaluation"), parsedExpression), EXPRESSION_TOKEN);
     }

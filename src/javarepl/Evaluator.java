@@ -53,20 +53,25 @@ public class Evaluator {
         initializeEvaluator(context);
     }
 
-    public Either<? extends Throwable, Evaluation> evaluate(String expr) {
-        Expression expression = parseExpression(expr);
-        Either<? extends Throwable, Evaluation> result = evaluate(expression);
-        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
-            Either<? extends Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
-            return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
-                    ? result
-                    : resultForStatement;
-        }
+    public Either<Throwable, Evaluation> evaluate(final String expr) {
+        return parseExpression(expr).flatMap(
+                new Mapper<Expression, Either<Throwable, Evaluation>>() {
+                    public Either<Throwable, Evaluation> call(Expression expression) throws Exception {
 
-        return result;
+                        Either<Throwable, Evaluation> result = evaluate(expression);
+                        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
+                            Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
+                            return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
+                                    ? result
+                                    : resultForStatement;
+                        }
+
+                        return result;
+                    }
+                });
     }
 
-    public Expression parseExpression(String expression) {
+    public Either<Throwable, Expression> parseExpression(String expression) {
         if (isValidImport(expression))
             return createImport(expression);
 
@@ -82,35 +87,39 @@ public class Evaluator {
         if (isValidAssignment(expression))
             return createAssignmentExpression(expression);
 
-        return new Value(expression);
+        return createValueExpression(expression);
     }
 
     public void addResults(Sequence<Result> result) {
         context = context.addResults(result);
     }
 
-    private Import createImport(String expression) {
-        return new Import(expression, importPattern.match(expression).group(1));
+    private Either<Throwable, Expression> createImport(String expression) {
+        return right((Expression) new Import(expression, importPattern.match(expression).group(1)));
     }
 
-    private AssignmentWithType createAssignmentWithType(String expression) {
+    private Either<Throwable, Expression> createAssignmentWithType(String expression) {
         try {
             MatchResult match = Patterns.assignmentWithTypeNamePattern.match(expression);
             java.lang.reflect.Method declaredMethod = detectMethod(match.group(1) + " " + randomIdentifier("method") + "(){}");
-            return new AssignmentWithType(expression, declaredMethod.getReturnType(), match.group(2), match.group(3));
+            return right((Expression) new AssignmentWithType(expression, declaredMethod.getReturnType(), match.group(2), match.group(3)));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return left(Utils.unwrapException(e));
         }
     }
 
-    private Assignment createAssignmentExpression(String expression) {
+    private Either<Throwable, Expression> createAssignmentExpression(String expression) {
         MatchResult match = Patterns.assignmentPattern.match(expression);
-        return new Assignment(expression, match.group(1), match.group(2));
+        return right((Expression) new Assignment(expression, match.group(1), match.group(2)));
     }
 
-    private Type createTypeExpression(String expression) {
+    private Either<Throwable, Expression> createTypeExpression(String expression) {
         MatchResult match = typePattern.match(expression);
-        return new Type(expression, option(match.group(1)), match.group(2));
+        return right((Expression) new Type(expression, option(match.group(1)), match.group(2)));
+    }
+
+    private Either<Throwable, Expression> createValueExpression(String expression) {
+        return right((Expression) new Value(expression));
     }
 
     public Option<String> lastSource() {
@@ -184,15 +193,15 @@ public class Evaluator {
     }
 
     @multimethod
-    private Either<? extends Throwable, Evaluation> evaluate(Expression expression) {
+    private Either<Throwable, Evaluation> evaluate(Expression expression) {
         return new multi() {
-        }.<Either<? extends Throwable, Evaluation>>methodOption(expression).getOrElse(evaluateExpression(expression));
+        }.<Either<Throwable, Evaluation>>methodOption(expression).getOrElse(evaluateExpression(expression));
     }
 
     @multimethod
-    private Either<? extends Throwable, Evaluation> evaluate(Type expression) {
+    private Either<Throwable, Evaluation> evaluate(Type expression) {
         if (getSystemJavaCompiler() == null) {
-            return left(new FileNotFoundException("Java compiler not found." +
+            return left((Throwable) new FileNotFoundException("Java compiler not found." +
                     "This can occur when JavaREPL was run with JRE instead of JDK or JDK is not configured correctly."));
         }
 
@@ -216,12 +225,12 @@ public class Evaluator {
         }
     }
 
-    private Method createMethodExpression(String expression) {
+    private Either<Throwable, Expression> createMethodExpression(String expression) {
         try {
             java.lang.reflect.Method declaredMethod = detectMethod(expression);
-            return new Method(expression, declaredMethod.getReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes()));
+            return right((Expression) new Method(expression, declaredMethod.getReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes())));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return left(Utils.unwrapException(e));
         }
     }
 
@@ -253,7 +262,7 @@ public class Evaluator {
         return expressionClass.getDeclaredMethods()[0].getReturnType();
     }
 
-    private Either<? extends Throwable, Evaluation> evaluateExpression(final Expression expression) {
+    private Either<Throwable, Evaluation> evaluateExpression(final Expression expression) {
         final String className = randomIdentifier("Evaluation");
 
         try {
