@@ -58,15 +58,15 @@ public class Evaluator {
                 new Mapper<Expression, Either<Throwable, Evaluation>>() {
                     public Either<Throwable, Evaluation> call(Expression expression) throws Exception {
 
-                        Either<Throwable, Evaluation> result = evaluate(expression);
-                        if (result.isLeft() && result.left() instanceof ExpressionCompilationException && expression instanceof Value) {
+                        Either<Throwable, Evaluation> resultForValue = evaluate(expression);
+                        if (resultForValue.isLeft() && resultForValue.left() instanceof ExpressionCompilationException && expression instanceof Value) {
                             Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
                             return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
-                                    ? result
+                                    ? Left.<Throwable, Evaluation>left(new ExpressionCompilationException(resultForStatement.left().getMessage() + "\n" + resultForValue.left().getMessage()))
                                     : resultForStatement;
                         }
 
-                        return result;
+                        return resultForValue;
                     }
                 });
     }

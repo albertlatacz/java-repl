@@ -14,8 +14,12 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class ExpressionCompilationException extends Exception {
 
-    ExpressionCompilationException(File file, Iterable<? extends Diagnostic> diagnostics) {
-        super(diagnosticsAsMessage(file, diagnostics));
+    public ExpressionCompilationException(File file, Iterable<? extends Diagnostic> diagnostics) {
+        this(diagnosticsAsMessage(file, diagnostics));
+    }
+
+    public ExpressionCompilationException(String message) {
+        super(message);
     }
 
     private static String diagnosticsAsMessage(final File file, final Iterable<? extends Diagnostic> diagnostics) {
