@@ -57,7 +57,6 @@ public class Evaluator {
         return parseExpression(expr).flatMap(
                 new Mapper<Expression, Either<Throwable, Evaluation>>() {
                     public Either<Throwable, Evaluation> call(Expression expression) throws Exception {
-
                         Either<Throwable, Evaluation> resultForValue = evaluate(expression);
                         if (resultForValue.isLeft() && resultForValue.left() instanceof ExpressionCompilationException && expression instanceof Value) {
                             Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
