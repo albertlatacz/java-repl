@@ -7,6 +7,8 @@ import javarepl.Evaluator;
 import javarepl.reflection.ClassReflection;
 import javarepl.reflection.MemberReflection;
 
+import java.lang.reflect.Type;
+
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Predicates.not;
@@ -32,9 +34,9 @@ public class InstanceMemberCompleter extends Completer {
         final Boolean canComplete = packagePart.matches("[a-zA-Z0-9\\$_\\\\.\\(\\[\\]]*") && packagePart.contains(".");
 
         final int beginIndex = packagePart.lastIndexOf('.') + 1;
-        Option<Class> aClass = canComplete
+        Option<Type> aClass = canComplete
                 ? evaluator.typeOfExpression(packagePart.substring(0, beginIndex - 1))
-                : none(Class.class);
+                : none(Type.class);
 
         if (aClass.isDefined()) {
             ClassReflection classReflection = reflectionOf(aClass.get());

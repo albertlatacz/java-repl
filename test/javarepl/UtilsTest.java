@@ -1,9 +1,11 @@
 package javarepl;
 
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 
-import java.util.AbstractList;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import static com.googlecode.totallylazy.Sequences.empty;
@@ -17,10 +19,10 @@ import static org.hamcrest.Matchers.*;
 public class UtilsTest {
     @Test
     public void extractsTypeFromClass() {
-        assertThat(extractType("".getClass()), equalToClass(String.class));
-        assertThat(extractType(asList(1, 2, 3).getClass()), equalToClass(AbstractList.class));
-        assertThat(extractType(anonymousInnerRunnable().getClass()), equalToClass(Runnable.class));
-        assertThat(extractType(anonymousInnerArrayList().getClass()), equalToClass(ArrayList.class));
+        assertThat(extractType("".getClass()), hasFormOf("class java.lang.String"));
+        assertThat(extractType(asList(1, 2, 3).getClass()), hasFormOf("java.util.AbstractList<E>"));
+        assertThat(extractType(anonymousInnerRunnable().getClass()), hasFormOf("interface java.lang.Runnable"));
+        assertThat(extractType(anonymousInnerArrayList().getClass()), hasFormOf("java.util.ArrayList<java.lang.Object>"));
     }
 
     @Test
@@ -51,8 +53,16 @@ public class UtilsTest {
         assertThat(isWebUrl(url("file:/some/file")), is(false));
     }
 
-    private Matcher<? super Class<?>> equalToClass(Class clazz) {
-        return equalTo(clazz);
+    private Matcher<? super Type> hasFormOf(final String form) {
+        return new TypeSafeMatcher<Type>() {
+            protected boolean matchesSafely(Type type) {
+                return form.equals(type.toString());
+            }
+
+            public void describeTo(Description description) {
+                description.appendText(form);
+            }
+        };
     }
 
     private Object anonymousInnerArrayList() {

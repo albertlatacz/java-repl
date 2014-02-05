@@ -53,7 +53,7 @@ public class JavaREPLClientTest {
         EvaluationResult result = client.execute("life = 42").get();
 
         assertThat(result.expression(), is("life = 42"));
-        assertThat(result.logs().get(0).message(), is("Integer life = 42"));
+        assertThat(result.logs().get(0).message(), is("java.lang.Integer life = 42"));
         assertThat(result.logs().get(0).type(), is(SUCCESS));
     }
 

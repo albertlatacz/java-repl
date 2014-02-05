@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
@@ -31,27 +32,24 @@ public class Utils {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
 
-    public static Class<?> extractType(Object object) {
-        if (object == null) {
-            return Object.class;
-        } else {
-            return extractType(object.getClass());
-        }
-    }
-
-    public static Class<?> extractType(Class<?> clazz) {
-        if (clazz.isAnonymousClass()) {
-            if (clazz.getSuperclass().equals(Object.class)) {
-                return extractType(clazz.getInterfaces()[0]);
-            } else {
-                return extractType(clazz.getSuperclass());
+    public static Type extractType(Type type) {
+        if (type instanceof Class) {
+            Class clazz = (Class) type;
+            if (clazz.isAnonymousClass()) {
+                if (clazz.getGenericSuperclass().equals(Object.class)) {
+                    return extractType(clazz.getGenericInterfaces()[0]);
+                } else {
+                    return extractType(clazz.getGenericSuperclass());
+                }
             }
+
+            if (isPrivate(clazz.getModifiers()))
+                return extractType(clazz.getGenericSuperclass());
+
+            return clazz;
         }
 
-        if (isPrivate(clazz.getModifiers()))
-            return extractType(clazz.getSuperclass());
-
-        return clazz;
+        return type;
     }
 
     public static Throwable unwrapException(Throwable e) {

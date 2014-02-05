@@ -5,7 +5,10 @@ import javarepl.Evaluator;
 import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
+import java.lang.reflect.Type;
+
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static javarepl.rendering.TypeRenderer.renderType;
 
 public final class ShowTypeOfExpression extends Command {
     private static final String COMMAND = ":type";
@@ -20,10 +23,10 @@ public final class ShowTypeOfExpression extends Command {
     }
 
     public void execute(String expression) {
-        Option<Class> expressionType = evaluator.typeOfExpression(parseStringCommand(expression).second().getOrElse(""));
+        Option<Type> expressionType = evaluator.typeOfExpression(parseStringCommand(expression).second().getOrElse(""));
 
         if (!expressionType.isEmpty()) {
-            logger.success(expressionType.get().getCanonicalName());
+            logger.success(renderType(expressionType.get()));
         } else {
             logger.error("Cannot determine the type of this expression.");
         }

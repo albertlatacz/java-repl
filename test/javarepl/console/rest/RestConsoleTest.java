@@ -49,7 +49,7 @@ public class RestConsoleTest {
         assertThat(body(response),
                 is(model()
                         .add("expression", "life = 42")
-                        .add("logs", asList(model().add("message", "Integer life = 42").add("type", "SUCCESS")))));
+                        .add("logs", asList(model().add("message", "java.lang.Integer life = 42").add("type", "SUCCESS")))));
     }
 
     @Test
@@ -63,21 +63,21 @@ public class RestConsoleTest {
 
     @Test
     public void shouldReturnCompletions() throws Exception {
-        client.handle(post(url("execute")).form("expression", "42").build());
-        client.handle(post(url("execute")).form("expression", "21").build());
-        client.handle(post(url("execute")).form("expression", "7").build());
+        client.handle(post(url("execute")).form("expression", "expr_1 = 42").build());
+        client.handle(post(url("execute")).form("expression", "expr_2 = 21").build());
+        client.handle(post(url("execute")).form("expression", "expr_3 = 7").build());
 
-        Response response = client.handle(get(url("completions")).query("expression", "prefix res").build());
+        Response response = client.handle(get(url("completions")).query("expression", "prefix expr_").build());
 
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response), is(model()
-                .add("expression", "prefix res")
+                .add("expression", "prefix expr_")
                 .add("position", "7")
                 .add("candidates",
                         asList(
-                                model().add("value", "res0").add("forms", asList("res0")),
-                                model().add("value", "res1").add("forms", asList("res1")),
-                                model().add("value", "res2").add("forms", asList("res2")))
+                                model().add("value", "expr_1").add("forms", asList("expr_1")),
+                                model().add("value", "expr_2").add("forms", asList("expr_2")),
+                                model().add("value", "expr_3").add("forms", asList("expr_3")))
                 )));
     }
 

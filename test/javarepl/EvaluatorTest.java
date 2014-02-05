@@ -63,9 +63,9 @@ public class EvaluatorTest {
 
     @Test
     public void shouldReturnTypeOfExpression() {
-        assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<Class>some(String.class)));
-        assertThat(new Evaluator().typeOfExpression("12"), is(Option.<Class>some(Integer.class)));
-        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(Class.class)));
+        assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<java.lang.reflect.Type>some(String.class)));
+        assertThat(new Evaluator().typeOfExpression("12"), is(Option.<java.lang.reflect.Type>some(Integer.class)));
+        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(java.lang.reflect.Type.class)));
     }
 
     @Test

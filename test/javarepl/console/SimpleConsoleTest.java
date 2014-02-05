@@ -49,8 +49,8 @@ public class SimpleConsoleTest {
         assertThat(
                 executing("import java.io.*", "42", "\"test\"", ":list results"),
                 hasLogged(info("Results:\n" +
-                        "    Integer res0 = 42\n" +
-                        "    String res1 = \"test\"\n")));
+                        "    java.lang.Integer res0 = 42\n" +
+                        "    java.lang.String res1 = \"test\"\n")));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SimpleConsoleTest {
     public void supportsListingOfAllValues() {
         Matcher<ConsoleResult> hasListedAllValues = hasLogged(
                 info("Results:\n" +
-                        "    String res0 = \"test\"\n"),
+                        "    java.lang.String res0 = \"test\"\n"),
                 info("Types:\n" +
                         "    AClass\n"),
                 info("Imports:\n" +

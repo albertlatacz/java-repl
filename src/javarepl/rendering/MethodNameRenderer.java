@@ -9,7 +9,8 @@ import static java.lang.String.format;
 public class MethodNameRenderer {
     @multimethod
     public static String renderMethodName(Expression expression) {
-        return new multi() {}.<String>methodOption(expression)
+        return new multi() {
+        }.<String>methodOption(expression)
                 .getOrThrow(new IllegalArgumentException(expression + " not mapped"));
     }
 
@@ -43,7 +44,7 @@ public class MethodNameRenderer {
         return methodNameWithType(Object.class);
     }
 
-    private static String methodNameWithType(Class<?> returnType) {
-        return format("  public %s evaluate() throws Exception {", returnType.getCanonicalName());
+    private static String methodNameWithType(java.lang.reflect.Type returnType) {
+        return format("  public %s evaluate() throws Exception {", TypeRenderer.renderType(returnType));
     }
 }

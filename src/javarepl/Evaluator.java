@@ -61,7 +61,7 @@ public class Evaluator {
                         if (resultForValue.isLeft() && resultForValue.left() instanceof ExpressionCompilationException && expression instanceof Value) {
                             Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
                             return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
-                                    ? Left.<Throwable, Evaluation>left(new ExpressionCompilationException(resultForStatement.left().getMessage() + "\n" + resultForValue.left().getMessage()))
+                                    ? Left.<Throwable, Evaluation>left(new ExpressionCompilationException(sequence(resultForStatement.left().getMessage(), resultForValue.left().getMessage()).unique().toString("\n\n")))
                                     : resultForStatement;
                         }
 
@@ -101,7 +101,7 @@ public class Evaluator {
         try {
             MatchResult match = Patterns.assignmentWithTypeNamePattern.match(expression);
             java.lang.reflect.Method declaredMethod = detectMethod(match.group(1) + " " + randomIdentifier("method") + "(){}");
-            return right((Expression) new AssignmentWithType(expression, declaredMethod.getReturnType(), match.group(2), match.group(3)));
+            return right((Expression) new AssignmentWithType(expression, declaredMethod.getGenericReturnType(), match.group(2), match.group(3)));
         } catch (Exception e) {
             return left(Utils.unwrapException(e));
         }
@@ -155,15 +155,15 @@ public class Evaluator {
         classLoader = evaluationClassLoader(context.outputDirectory());
     }
 
-    public final Option<Class> typeOfExpression(String expression) {
+    public final Option<java.lang.reflect.Type> typeOfExpression(String expression) {
         Evaluator localEvaluator = new Evaluator(context);
         Either<? extends Throwable, Evaluation> evaluation = localEvaluator.evaluate(expression);
 
-        Option<Class> expressionType = none();
+        Option<java.lang.reflect.Type> expressionType = none();
         if (evaluation.isRight()) {
             Option<Result> result = evaluation.right().result();
             if (!result.isEmpty()) {
-                expressionType = some((Class) result.get().type());
+                expressionType = some(result.get().type());
             }
         }
 
@@ -323,10 +323,10 @@ public class Evaluator {
                 : expression.key();
     }
 
-    private Option<Class<?>> typeFor(Expression expression) {
+    private Option<java.lang.reflect.Type> typeFor(Expression expression) {
         return (expression instanceof AssignmentWithType)
-                ? Option.<Class<?>>some(((AssignmentWithType) expression).type())
-                : Option.<Class<?>>none();
+                ? Option.some(((AssignmentWithType) expression).type())
+                : Option.<java.lang.reflect.Type>none();
     }
 
     private void compile(File file) throws Exception {

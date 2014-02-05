@@ -14,11 +14,11 @@ import java.io.PrintStream;
 
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static java.lang.String.format;
-import static javarepl.Utils.extractType;
 import static javarepl.expressions.Expression.functions.source;
 import static javarepl.expressions.Patterns.methodPattern;
 import static javarepl.rendering.ExpressionTokenRenderer.renderExpressionToken;
 import static javarepl.rendering.MethodNameRenderer.renderMethodName;
+import static javarepl.rendering.TypeRenderer.renderType;
 
 public class EvaluationClassRenderer {
 
@@ -140,7 +140,7 @@ public class EvaluationClassRenderer {
     private static String renderPreviousEvaluations(EvaluationContext context) {
         return context.results().map(new Mapper<Result, String>() {
             public String call(Result result) throws Exception {
-                return format("  public %s %s = valueOf(\"%s\");", result.type().getCanonicalName(), result.key(), result.key());
+                return format("  public %s %s = valueOf(\"%s\");", renderType(result.type()), result.key(), result.key());
             }
         }).toString("\n");
     }

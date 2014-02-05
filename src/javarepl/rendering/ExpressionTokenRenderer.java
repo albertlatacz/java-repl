@@ -51,7 +51,11 @@ public class ExpressionTokenRenderer {
         return expressionWithValue(value, Object.class);
     }
 
-    private static String expressionWithValue(String value, Class<?> returnType) {
-        return format("    %s %s =\n\n    %s;\n\n    return %s;", returnType.getCanonicalName(), EXPRESSION_VALUE, EXPRESSION_TOKEN, EXPRESSION_VALUE);
+    private static String expressionWithValue(String value, java.lang.reflect.Type returnType) {
+        return expressionWithValue(value, TypeRenderer.renderType(returnType));
+    }
+
+    private static String expressionWithValue(String value, String returnType) {
+        return format("    %s %s =\n\n    %s;\n\n    return %s;", returnType, EXPRESSION_VALUE, EXPRESSION_TOKEN, EXPRESSION_VALUE);
     }
 }

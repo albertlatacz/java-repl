@@ -5,11 +5,13 @@ import com.googlecode.totallylazy.Predicate;
 
 import javax.tools.Diagnostic;
 import java.io.File;
+import java.util.Locale;
 
 import static com.googlecode.totallylazy.Sequences.repeat;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.lines;
 import static java.lang.String.format;
+import static java.util.regex.Pattern.quote;
 import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class ExpressionCompilationException extends Exception {
@@ -34,8 +36,10 @@ public class ExpressionCompilationException extends Exception {
             public String call(Diagnostic diagnostic) throws Exception {
                 String line = lines(file).drop((int) diagnostic.getLineNumber() - 1).head();
                 String marker = repeat(' ').take((int) diagnostic.getColumnNumber() - 1).toString("", "", "^");
-                String message = sequence(diagnostic.toString().split("\n")[0].split(":")).drop(2).toString(":").trim();
-                return format("%s: %s\n%s\n%s", diagnostic.getKind(), message, line, marker);
+                String message = diagnostic.getMessage(Locale.getDefault());
+                String evaluationClass = file.getName().replaceAll("\\.java", "");
+                return format("%s: %s\n%s\n%s", diagnostic.getKind(), message, line, marker)
+                        .replaceAll(quote(evaluationClass), "Evaluation");
             }
         };
     }
