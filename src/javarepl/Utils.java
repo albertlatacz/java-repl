@@ -37,7 +37,9 @@ public class Utils {
             Class clazz = (Class) type;
             if (clazz.isAnonymousClass()) {
                 if (clazz.getGenericSuperclass().equals(Object.class)) {
-                    return extractType(clazz.getGenericInterfaces()[0]);
+                    return extractType(sequence(clazz.getGenericInterfaces())
+                            .headOption()
+                            .getOrElse(Object.class));
                 } else {
                     return extractType(clazz.getGenericSuperclass());
                 }
