@@ -2,13 +2,16 @@ package javarepl.examples;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
-import javarepl.console.*;
+import javarepl.console.Console;
+import javarepl.console.ConsoleResult;
+import javarepl.console.DelegatingConsole;
+import javarepl.console.SimpleConsole;
 import javarepl.console.rest.RestConsole;
 
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.one;
 import static javarepl.console.ConsoleConfig.consoleConfig;
-import static javarepl.console.ConsoleLog.Type.ERROR;
-import static javarepl.console.ConsoleLog.Type.SUCCESS;
+import static javarepl.console.ConsoleLog.error;
+import static javarepl.console.ConsoleLog.success;
 import static javarepl.console.commands.Command.parseStringCommand;
 
 /**
@@ -38,20 +41,20 @@ public class ConsoleWithAuthentication {
                     if (!command.second().isEmpty()) {
                         if (command.second().get().equals(password)) {
                             authenticated = true;
-                            return new ConsoleResult(expression, sequence(new ConsoleLog(SUCCESS, "Logged in")));
+                            return new ConsoleResult(expression, one(success("Logged in")));
                         } else {
-                            return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Invalid password")));
+                            return new ConsoleResult(expression, one(error("Invalid password")));
                         }
                     } else {
-                        return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Please specify password")));
+                        return new ConsoleResult(expression, one(error("Please specify password")));
                     }
                 } else {
-                    return new ConsoleResult(expression, sequence(new ConsoleLog(ERROR, "Please authenticate first.\n    :login <password> to authenticate.\n    :logout at the end of the session to finish.")));
+                    return new ConsoleResult(expression, one(error("Please authenticate first.\n    :login <password> to authenticate.\n    :logout at the end of the session to finish.")));
                 }
             } else {
                 if (expression.startsWith(":logout")) {
                     authenticated = false;
-                    return new ConsoleResult(expression, sequence(new ConsoleLog(SUCCESS, "Logged out")));
+                    return new ConsoleResult(expression, one(error("Logged out")));
                 } else {
                     return super.execute(expression);
                 }

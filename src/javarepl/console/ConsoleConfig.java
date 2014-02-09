@@ -80,7 +80,8 @@ public final class ConsoleConfig {
                 .append(LoadSourceFile.class)
                 .append(ListValues.class)
                 .append(ShowLastSource.class)
-                .append(ShowTypeOfExpression.class);
+                .append(ShowTypeOfExpression.class)
+                .append(CheckExpression.class);
     }
 
 }

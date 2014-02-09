@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.Locale;
 
 import static com.googlecode.totallylazy.Predicates.not;
+import static javarepl.console.ConsoleLog.consoleLog;
 
 public class ConsoleLoggerPrintStream extends PrintStream {
     private final ConsoleLog.Type type;
@@ -168,6 +169,6 @@ public class ConsoleLoggerPrintStream extends PrintStream {
 
     private void logMessage(String message) {
         if (not(ignore).matches(message))
-            logger.log(new ConsoleLog(type, message));
+            logger.log(consoleLog(type, message));
     }
 }

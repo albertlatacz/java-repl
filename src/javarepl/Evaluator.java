@@ -155,9 +155,13 @@ public class Evaluator {
         classLoader = evaluationClassLoader(context.outputDirectory());
     }
 
-    public final Option<java.lang.reflect.Type> typeOfExpression(String expression) {
+    public final Either<Throwable, Evaluation> tryEvaluate(String expression) {
         Evaluator localEvaluator = new Evaluator(context);
-        Either<? extends Throwable, Evaluation> evaluation = localEvaluator.evaluate(expression);
+        return localEvaluator.evaluate(expression);
+    }
+
+    public final Option<java.lang.reflect.Type> typeOfExpression(String expression) {
+        Either<? extends Throwable, Evaluation> evaluation = tryEvaluate(expression);
 
         Option<java.lang.reflect.Type> expressionType = none();
         if (evaluation.isRight()) {
