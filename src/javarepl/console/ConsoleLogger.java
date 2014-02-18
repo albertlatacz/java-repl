@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import static javarepl.console.ConsoleLog.Type.*;
-
 public final class ConsoleLogger {
     private Sequence<ConsoleLog> logs = Sequences.empty();
     private final PrintStream infoStream;
@@ -27,19 +25,19 @@ public final class ConsoleLogger {
         colored = false;
     }
 
-    public final void info(String message) {
-        log(new ConsoleLog(INFO, message));
+    public void info(String message) {
+        log(ConsoleLog.info(message));
     }
 
-    public final void success(String message) {
-        log(new ConsoleLog(SUCCESS, message));
+    public void success(String message) {
+        log(ConsoleLog.success(message));
     }
 
-    public final void error(String message) {
-        log(new ConsoleLog(ERROR, message));
+    public void error(String message) {
+        log(ConsoleLog.error(message));
     }
 
-    public final void log(ConsoleLog log) {
+    public void log(ConsoleLog log) {
         switch (log.type()) {
             case INFO:
                 printColored(infoStream, log.message(), "\u001B[0m");
@@ -65,11 +63,11 @@ public final class ConsoleLogger {
             stream.print("\u001B[0m");
     }
 
-    public final Sequence<ConsoleLog> logs() {
+    public Sequence<ConsoleLog> logs() {
         return logs;
     }
 
-    public final void reset() {
+    public void reset() {
         logs = Sequences.empty();
     }
 

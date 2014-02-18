@@ -8,9 +8,10 @@ import org.junit.Test;
 
 import static com.googlecode.totallylazy.URLs.packageUrl;
 import static javarepl.console.ConsoleConfig.consoleConfig;
-import static javarepl.console.ConsoleLog.Type;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;
+import static javarepl.console.ConsoleLog.error;
+import static javarepl.console.ConsoleLog.success;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 
@@ -18,37 +19,37 @@ import static org.hamcrest.Matchers.hasItems;
 public class SimpleConsoleTest {
     @Test
     public void supportsPrintingToSystemStreams() {
-        assertThat(executing("System.out.println(\"test\")"), hasLogged(info("test")));
+        assertThat(executing("System.out.println(\"test\")"), hasLogged(success("test")));
         assertThat(executing("System.err.println(\"test\")"), hasLogged(error("test")));
     }
 
     @Test
     public void providesFeedbackAfterEvaluation() {
-        assertThat(executing("import java.net.*;"), hasLogged(info("Imported java.net.*")));
-        assertThat(executing("int method(Integer i){return i;}"), hasLogged(info("Created method int method(java.lang.Integer)")));
-        assertThat(executing("class SomeClass{}"), hasLogged(info("Created type SomeClass")));
-        assertThat(executing("int i = 42"), hasLogged(info("int i = 42")));
+        assertThat(executing("import java.net.*;"), hasLogged(success("Imported java.net.*")));
+        assertThat(executing("int method(Integer i){return i;}"), hasLogged(success("Created method int method(java.lang.Integer)")));
+        assertThat(executing("class SomeClass{}"), hasLogged(success("Created type SomeClass")));
+        assertThat(executing("int i = 42"), hasLogged(success("int i = 42")));
     }
 
     @Test
     public void supportsDisplayingSingleResult() {
         assertThat(
                 executing("42", "\"test\"", "res1"),
-                hasLogged(info("java.lang.String res1 = \"test\"")));
+                hasLogged(success("java.lang.String res1 = \"test\"")));
     }
 
     @Test
     public void supportsDisplayingTypeOfExpression() {
         assertThat(
                 executing(":type new Date()"),
-                hasLogged(info("java.util.Date")));
+                hasLogged(success("java.util.Date")));
     }
 
     @Test
     public void supportsListingOfResults() {
         assertThat(
                 executing("import java.io.*", "42", "\"test\"", ":list results"),
-                hasLogged(info("Results:\n" +
+                hasLogged(success("Results:\n" +
                         "    java.lang.Integer res0 = 42\n" +
                         "    java.lang.String res1 = \"test\"\n")));
     }
@@ -57,7 +58,7 @@ public class SimpleConsoleTest {
     public void supportsListingOfImports() {
         assertThat(
                 executing("import java.io.*;", "\"test\"", "import java.net.*", ":list imports"),
-                hasLogged(info("Imports:\n" +
+                hasLogged(success("Imports:\n" +
                         "    java.lang.*\n" +
                         "    java.util.*\n" +
                         "    java.math.*\n" +
@@ -70,16 +71,35 @@ public class SimpleConsoleTest {
     public void supportsListingOfTypes() {
         assertThat(
                 executing("class AClass{}", "\"test\"", "interface AnInterface{}", ":list types"),
-                hasLogged(info("Types:\n" +
+                hasLogged(success("Types:\n" +
                         "    AClass\n" +
                         "    AnInterface\n")));
+    }
+
+    @Test
+    public void supportsCheckingOfSyntax() {
+        assertThat(executing(":check 12 + 22"), hasLogged(
+                success("Parsing:  Value(12 + 22)"),
+                success("Evaluation:  Value(12 + 22) => java.lang.Integer res0 = 34")));
+
+        assertThat(executing(":check foo"), hasLogged(
+                success("Parsing:  Value(foo)"),
+                error("Evaluation:  javarepl.ExpressionCompilationException: ERROR: not a statement\n" +
+                        "    foo;\n" +
+                        "    ^\n" +
+                        "\n" +
+                        "ERROR: cannot find symbol\n" +
+                        "  symbol:   variable foo\n" +
+                        "  location: class Evaluation\n" +
+                        "    foo;\n" +
+                        "    ^")));
     }
 
     @Test
     public void supportsListingOfMethods() {
         assertThat(
                 executing("void method1(){}", "\"test\"", "Integer method2(int p1, String p2){return p1;}", ":list methods"),
-                hasLogged(info("Methods:\n" +
+                hasLogged(success("Methods:\n" +
                         "    void method1()\n" +
                         "    java.lang.Integer method2(int, java.lang.String)\n")));
     }
@@ -87,17 +107,17 @@ public class SimpleConsoleTest {
     @Test
     public void supportsListingOfAllValues() {
         Matcher<ConsoleResult> hasListedAllValues = hasLogged(
-                info("Results:\n" +
+                success("Results:\n" +
                         "    java.lang.String res0 = \"test\"\n"),
-                info("Types:\n" +
+                success("Types:\n" +
                         "    AClass\n"),
-                info("Imports:\n" +
+                success("Imports:\n" +
                         "    java.lang.*\n" +
                         "    java.util.*\n" +
                         "    java.math.*\n" +
                         "    java.lang.Math.*\n" +
                         "    java.net.*\n"),
-                info("Methods:\n" +
+                success("Methods:\n" +
                         "    void method1()\n"));
 
         assertThat(executing("void method1(){}", "\"test\"", "import java.net.*", "class AClass{}", ":list"), hasListedAllValues);
@@ -108,19 +128,19 @@ public class SimpleConsoleTest {
     public void supportsListingHistoryOfEvaluations() {
         assertThat(
                 executing(":hist"),
-                hasLogged(info("History:\n" +
+                hasLogged(success("History:\n" +
                         "    1  :hist\n")));
 
         assertThat(
                 executing("42", "\"test\"", ":hist"),
-                hasLogged(info("History:\n" +
+                hasLogged(success("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n" +
                         "    3  :hist\n")));
 
         assertThat(
                 executing("42", "21", "\"test\"", ":hist 2"),
-                hasLogged(info("History:\n" +
+                hasLogged(success("History:\n" +
                         "    3  \"test\"\n" +
                         "    4  :hist 2\n")));
     }
@@ -130,7 +150,7 @@ public class SimpleConsoleTest {
     public void supportsSearchingHistory() {
         assertThat(
                 executing("42", "\"test 1\"", "\"test 2\"", ":h?"),
-                hasLogged(info("History search for '':\n" +
+                hasLogged(success("History search for '':\n" +
                         "    1  42\n" +
                         "    2  \"test 1\"\n" +
                         "    3  \"test 2\"\n" +
@@ -138,7 +158,7 @@ public class SimpleConsoleTest {
 
         assertThat(
                 executing("42", "\"test 1\"", "\"test 2\"", ":h? test"),
-                hasLogged(info("History search for 'test':\n" +
+                hasLogged(success("History search for 'test':\n" +
                         "    2  \"test 1\"\n" +
                         "    3  \"test 2\"\n" +
                         "    4  :h? test\n")));
@@ -148,7 +168,7 @@ public class SimpleConsoleTest {
     public void supportsEvaluatingFromHistory() {
         assertThat(
                 executing("42", "\"test\"", ":h!", ":hist"),
-                hasLogged(info("History:\n" +
+                hasLogged(success("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n" +
                         "    3  \"test\"\n" +
@@ -156,7 +176,7 @@ public class SimpleConsoleTest {
 
         assertThat(
                 executing("42", "\"test\"", ":h! 1", ":hist"),
-                hasLogged(info("History:\n" +
+                hasLogged(success("History:\n" +
                         "    1  42\n" +
                         "    2  \"test\"\n" +
                         "    3  42\n" +
@@ -167,7 +187,7 @@ public class SimpleConsoleTest {
     public void supportsResettingAllEvaluations() {
         assertThat(
                 executing("42", "\"test\"", ":reset", ":list results"),
-                hasLogged(info("Results:\n    \n")));
+                hasLogged(success("Results:\n    \n")));
     }
 
     @Test
@@ -177,10 +197,10 @@ public class SimpleConsoleTest {
         assertThat(
                 executing(":eval " + path),
                 hasLogged(
-                        info("Created method void method()"),
-                        info("Hello world"),
-                        info("int num = 42"),
-                        info("Finished evaluating " + path)));
+                        success("Created method void method()"),
+                        success("Hello world"),
+                        success("int num = 42"),
+                        success("Finished evaluating " + path)));
     }
 
     public static int reevaluationCounter;
@@ -190,7 +210,7 @@ public class SimpleConsoleTest {
         reevaluationCounter = 0;
         assertThat(
                 executing("++javarepl.console.SimpleConsoleTest.reevaluationCounter", ":replay", "res0"),
-                hasLogged(info("java.lang.Integer res0 = 2")));
+                hasLogged(success("java.lang.Integer res0 = 2")));
     }
 
 
@@ -208,14 +228,6 @@ public class SimpleConsoleTest {
         }
 
         return result;
-    }
-
-    private static ConsoleLog info(String messages) {
-        return new ConsoleLog(Type.SUCCESS, messages);
-    }
-
-    private static ConsoleLog error(String messages) {
-        return new ConsoleLog(Type.ERROR, messages);
     }
 
     private static Matcher<ConsoleResult> hasLogged(final ConsoleLog... logs) {

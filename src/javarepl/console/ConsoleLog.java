@@ -1,5 +1,7 @@
 package javarepl.console;
 
+import static javarepl.console.ConsoleLog.Type.*;
+
 public class ConsoleLog {
     public static enum Type {
         INFO, SUCCESS, ERROR
@@ -8,9 +10,25 @@ public class ConsoleLog {
     private final Type type;
     private final String message;
 
-    public ConsoleLog(Type type, String message) {
+    private ConsoleLog(Type type, String message) {
         this.type = type;
         this.message = message;
+    }
+
+    public static ConsoleLog success(String message) {
+        return consoleLog(SUCCESS, message);
+    }
+
+    public static ConsoleLog error(String message) {
+        return consoleLog(ERROR, message);
+    }
+
+    public static ConsoleLog info(String message) {
+        return consoleLog(INFO, message);
+    }
+
+    public static ConsoleLog consoleLog(ConsoleLog.Type type, String message) {
+        return new ConsoleLog(type, message);
     }
 
     public Type type() {
