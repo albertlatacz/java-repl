@@ -52,7 +52,7 @@ public final class ConsoleLogger {
                 break;
         }
 
-        logs = logs.cons(log);
+        logs = logs.append(log);
     }
 
     private void printColored(PrintStream stream, String message, String color) {
