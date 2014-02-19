@@ -231,7 +231,7 @@ public class Evaluator {
     private Either<Throwable, Expression> createMethodExpression(String expression) {
         try {
             java.lang.reflect.Method declaredMethod = detectMethod(expression);
-            return right((Expression) new Method(expression, declaredMethod.getReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes())));
+            return right((Expression) new Method(expression, declaredMethod.getGenericReturnType(), declaredMethod.getName(), sequence(declaredMethod.getParameterTypes())));
         } catch (Exception e) {
             return left(Utils.unwrapException(e));
         }

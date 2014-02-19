@@ -2,15 +2,18 @@ package javarepl.expressions;
 
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
+import javarepl.rendering.TypeRenderer;
+
+import java.lang.reflect.*;
 
 import static javarepl.Utils.canonicalName;
 
 public final class Method extends Expression {
-    private final Class<?> type;
+    private final java.lang.reflect.Type type;
     private final String name;
     private final Sequence<Class<?>> arguments;
 
-    public Method(String source, Class<?> type, String name, Sequence<Class<?>> arguments) {
+    public Method(String source, java.lang.reflect.Type type, String name, Sequence<Class<?>> arguments) {
         super(source);
 
         this.type = type;
@@ -22,7 +25,7 @@ public final class Method extends Expression {
         return name;
     }
 
-    public Class<?> type() {
+    public java.lang.reflect.Type type() {
         return type;
     }
 
@@ -31,7 +34,7 @@ public final class Method extends Expression {
     }
 
     public String signature() {
-        return type.getCanonicalName() + " " + name + arguments.map(canonicalName()).toString("(", ", ", ")");
+        return TypeRenderer.renderType(type) + " " + name + arguments.map(canonicalName()).toString("(", ", ", ")");
     }
 
     public String key() {
