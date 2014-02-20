@@ -13,10 +13,22 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.util.Arrays.asList;
 import static javarepl.Utils.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 public class UtilsTest {
+    @Test
+    public void checksJavaVersionCorrectly() {
+        System.setProperty("java.version", "1.6.0");
+        assertTrue(javaVersionAtLeast("1.5.0"));
+        assertTrue(javaVersionAtLeast("1.6.0"));
+        assertTrue(javaVersionAtLeast("1.6"));
+        assertFalse(javaVersionAtLeast("1.6.1"));
+        assertFalse(javaVersionAtLeast("1.7.0"));
+        assertFalse(javaVersionAtLeast("1.7"));
+    }
+
     @Test
     public void extractsTypeFromClass() {
         assertThat(extractType("".getClass()), hasFormOf("class java.lang.String"));

@@ -2,6 +2,7 @@ package javarepl;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 
@@ -11,8 +12,10 @@ import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.empty;
+import static com.googlecode.totallylazy.Sequences.join;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Result.functions.key;
+import static javarepl.Utils.javaVersionAtLeast;
 import static javarepl.Utils.randomOutputDirectory;
 
 public class EvaluationContext {
@@ -32,13 +35,23 @@ public class EvaluationContext {
         return new EvaluationContext(randomOutputDirectory(), defaultExpressions(), empty(Result.class), none(String.class));
     }
 
-    public static Sequence<Expression> defaultExpressions() {
+    private static Sequence<Expression> defaultJavaImports() {
         return sequence(
                 new Import("import java.lang.*", "java.lang.*"),
                 new Import("import java.util.*", "java.util.*"),
                 new Import("import java.math.*", "java.math.*"),
                 new Import("import static java.lang.Math.*", "java.lang.Math.*")
         ).safeCast(Expression.class);
+    }
+
+    private static Sequence<Expression> defaultJava8Imports() {
+        return javaVersionAtLeast("1.8.0")
+                ? sequence(new Import("import java.util.function.*", "java.util.function.*")).safeCast(Expression.class)
+                : empty(Expression.class);
+    }
+
+    public static Sequence<Expression> defaultExpressions() {
+        return join(defaultJavaImports(), defaultJava8Imports());
     }
 
     public File outputDirectory() {

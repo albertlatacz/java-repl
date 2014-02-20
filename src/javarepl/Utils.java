@@ -1,6 +1,7 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.numbers.Numbers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +29,10 @@ import static java.lang.reflect.Modifier.isPrivate;
 import static java.net.URLDecoder.decode;
 
 public class Utils {
+    public static Boolean javaVersionAtLeast(String version) {
+        return (System.getProperty("java.version").compareTo(version) >= 0);
+    }
+
     public static String randomIdentifier(String prefix) {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
