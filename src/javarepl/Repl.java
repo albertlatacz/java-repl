@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
@@ -90,7 +91,7 @@ public class Repl {
         return new Function1<File, List<String>>() {
             @Override
             public List<String> call(File f) throws Exception {
-                List<String> l = Files.readAllLines(f.toPath());
+                List<String> l = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
                 System.out.println(l);
                 return l;
             }
