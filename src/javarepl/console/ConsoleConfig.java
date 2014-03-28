@@ -69,6 +69,7 @@ public final class ConsoleConfig {
 
     public static Sequence<Class<? extends Command>> defaultCommands() {
         return Sequences.<Class<? extends Command>>sequence()
+                .append(ClearScreen.class)
                 .append(QuitApplication.class)
                 .append(ShowHistory.class)
                 .append(SearchHistory.class)
