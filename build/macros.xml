@@ -9,9 +9,7 @@
             <property name="release.no.libs.jar" value="${artifacts}/${release.name}-nolibs.jar"/>
             <jarjar jarfile="${release.no.libs.jar}" manifest="@{jar}.mf">
                 <zipfileset src="${release.jar.path}"/>
-                <zipgroupfileset dir="${packaged.dependencies.dir}"
-                                 includes="totallylazy-*.jar, jline-*.jar, antlr-*.jar, cglib-*.jar, funclate-*.jar,
-                                 objenesis-*.jar, utterlyidle-*.jar, yadic-*.jar, stringtemplate-*.jar"/>
+                <zipgroupfileset dir="${packaged.dependencies.dir}" excludes="*-sources.jar" includes="*.jar"/>
                 <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.@1"/>
                 <rule pattern="com.googlecode.totallylazy.**.*" result="javarepl.internal.totallylazy.@1.@2"/>
 
