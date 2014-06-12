@@ -1,5 +1,6 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Function1;
 import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
@@ -14,13 +15,18 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
+import java.util.Collections;
+import java.util.List;
 import java.util.PropertyPermission;
 
 import static com.googlecode.totallylazy.Callables.compose;
+import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
@@ -51,9 +57,13 @@ public class Repl {
                     getProperty("java.version")));
         }
 
+        String[] expressions = sequence(initialExpressions(args))
+                .union(sequence(initialExpressionsFromFile()))
+                .toArray(new String[0]);
+
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(!sandboxed))
-                .expressions(initialExpressions(args))
+                .expressions(expressions)
                 .sandboxed(sandboxed)
                 .logger(logger);
 
@@ -69,6 +79,23 @@ public class Repl {
             console.execute(reader.readExpression().getOrNull());
             logger.info("");
         } while (true);
+    }
+
+    private static List<String> initialExpressionsFromFile() {
+        return fileOption(new File("."), "javarepl.init")
+            .map(readFile())
+            .getOrElse(Collections.EMPTY_LIST);
+    }
+
+    private static Function1<File, List<String>> readFile() {
+        return new Function1<File, List<String>>() {
+            @Override
+            public List<String> call(File f) throws Exception {
+                List<String> l = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+                System.out.println(l);
+                return l;
+            }
+        };
     }
 
     private static boolean ignoreConsole(String[] args) {
