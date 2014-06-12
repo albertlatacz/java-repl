@@ -23,12 +23,10 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
-                .append("\n")
                 .append("  public void evaluate() throws Exception {\n")
                 .append("    $JAVAREPL_EXPRESSION_TOKEN$;\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -41,8 +39,6 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
-                .append("\n")
                 .append("  public java.lang.Object evaluate() throws Exception {\n")
                 .append("    java.lang.Object $JAVAREPL_EXPRESSION_VALUE$ =\n")
                 .append("\n")
@@ -50,7 +46,7 @@ public class EvaluationClassRendererTest {
                 .append("\n")
                 .append("    return $JAVAREPL_EXPRESSION_VALUE$;\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -63,8 +59,6 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
-                .append("\n")
                 .append("  public java.lang.Object evaluate() throws Exception {\n")
                 .append("    java.lang.Object $JAVAREPL_EXPRESSION_VALUE$ =\n")
                 .append("\n")
@@ -72,7 +66,7 @@ public class EvaluationClassRendererTest {
                 .append("\n")
                 .append("    return $JAVAREPL_EXPRESSION_VALUE$;\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -85,8 +79,6 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
-                .append("\n")
                 .append("  public java.lang.Object evaluate() throws Exception {\n")
                 .append("    java.lang.Object $JAVAREPL_EXPRESSION_VALUE$ =\n")
                 .append("\n")
@@ -94,7 +86,7 @@ public class EvaluationClassRendererTest {
                 .append("\n")
                 .append("    return $JAVAREPL_EXPRESSION_VALUE$;\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -108,10 +100,9 @@ public class EvaluationClassRendererTest {
                 .append("$JAVAREPL_EXPRESSION_TOKEN$;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
                 .append("  public void evaluate() throws Exception {\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -124,13 +115,11 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public final class AClass extends javarepl.EvaluationTemplate {\n")
                 .append("  public AClass(javarepl.EvaluationContext context) { super(context); }\n")
-                .append("\n")
-                .append("\n")
                 .append("  $JAVAREPL_EXPRESSION_TOKEN$\n")
                 .append("\n")
                 .append("  public void evaluate() throws Exception {\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -165,7 +154,7 @@ public class EvaluationClassRendererTest {
                 .append("  public void evaluate() throws Exception {\n")
                 .append("    $JAVAREPL_EXPRESSION_TOKEN$;\n")
                 .append("  }\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 
@@ -178,7 +167,7 @@ public class EvaluationClassRendererTest {
                 .append("import static java.lang.Math.*;\n")
                 .append("public interface AClass {\n")
                 .append("  int someMethod(int param1, String param2);\n")
-                .append("}\n")
+                .append("}")
                 .toString()));
     }
 

@@ -103,7 +103,11 @@ public class EvaluatorTest {
     private static Matcher<Either<? extends Throwable, Evaluation>> hasExpressionOfType(Class<?> clazz) {
         return new FeatureMatcher<Either<? extends Throwable, Evaluation>, Expression>(instanceOf(clazz), "result value", "result value") {
             protected Expression featureValueOf(Either<? extends Throwable, Evaluation> evaluation) {
-                return evaluation.right().expression();
+                if (evaluation.isRight()) {
+                    return evaluation.right().expression();
+                } else {
+                    throw new RuntimeException(evaluation.left());
+                }
             }
         };
     }

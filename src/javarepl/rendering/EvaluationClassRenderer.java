@@ -9,9 +9,9 @@ import javarepl.EvaluationTemplate;
 import javarepl.Result;
 import javarepl.expressions.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
+import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static java.lang.String.format;
 import static javarepl.expressions.Expression.functions.source;
@@ -21,7 +21,6 @@ import static javarepl.rendering.MethodNameRenderer.renderMethodName;
 import static javarepl.rendering.TypeRenderer.renderType;
 
 public class EvaluationClassRenderer {
-
     @multimethod
     public static String renderExpressionClass(EvaluationContext context, String className, Expression expression) {
         return new multi() {
@@ -51,62 +50,48 @@ public class EvaluationClassRenderer {
 
     @multimethod
     private static String renderExpressionClass(EvaluationContext context, String className, Import expression) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream writer = new PrintStream(outputStream);
-
-        writer.println(renderPreviousImports(context));
-        writer.println(renderExpressionToken(expression));
-        writer.println(renderClassName(className));
-        writer.println(renderClassConstructor(className));
-        writer.println(renderPreviousEvaluations(context));
-        writer.println(renderMethodName(expression));
-        writer.println(renderEndOfMethod());
-        writer.println(renderEndOfFile());
-
-        return outputStream.toString();
+        return renderFragments(
+                renderPreviousImports(context),
+                renderExpressionToken(expression),
+                renderClassName(className),
+                renderClassConstructor(className),
+                renderPreviousEvaluations(context),
+                renderMethodName(expression),
+                renderEndOfMethod(),
+                renderEndOfFile()
+        );
     }
 
     @multimethod
     private static String renderExpressionClass(EvaluationContext context, String className, Method expression) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream writer = new PrintStream(outputStream);
-
-        writer.println(renderPreviousImports(context));
-        writer.println(renderClassName(className));
-        writer.println(renderClassConstructor(className));
-        writer.println(renderPreviousEvaluations(context));
-        writer.println(renderPreviousMethods(context));
-        writer.println(renderExpressionToken(expression));
-        writer.println(renderMethodName(expression));
-        writer.println(renderEndOfMethod());
-        writer.println(renderEndOfFile());
-
-        return outputStream.toString();
+        return renderFragments(
+                renderPreviousImports(context),
+                renderClassName(className),
+                renderClassConstructor(className),
+                renderPreviousEvaluations(context),
+                renderPreviousMethods(context),
+                renderExpressionToken(expression),
+                renderMethodName(expression),
+                renderEndOfMethod(),
+                renderEndOfFile()
+        );
     }
 
     @multimethod
     private static String renderExpressionClass(EvaluationContext context, String className, Type expression) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream writer = new PrintStream(outputStream);
-
-        if (expression.typePackage().isEmpty()) {
-            writer.println(renderPreviousImports(context));
-        }
-        writer.println(expression.source());
-
-        return outputStream.toString();
+        return renderFragments(
+                expression.typePackage().isEmpty() ? renderPreviousImports(context) : "",
+                expression.source()
+        );
     }
 
     public static String renderMethodSignatureDetection(EvaluationContext context, String className, String expression) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream writer = new PrintStream(outputStream);
-
-        writer.println(renderPreviousImports(context));
-        writer.println(renderInterfaceName(className));
-        writer.println(renderInterfaceMethod(expression));
-        writer.println(renderEndOfFile());
-
-        return outputStream.toString();
+        return renderFragments(
+                renderPreviousImports(context),
+                renderInterfaceName(className),
+                renderInterfaceMethod(expression),
+                renderEndOfFile()
+        );
     }
 
     private static String renderInterfaceName(String className) {
@@ -119,23 +104,20 @@ public class EvaluationClassRenderer {
         return format("  %s;", signature.substring(signature.indexOf(type)));
     }
 
-
     private static String render(EvaluationContext context, String className, Expression expression) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream writer = new PrintStream(outputStream);
-
-        writer.println(renderPreviousImports(context));
-        writer.println(renderClassName(className));
-        writer.println(renderClassConstructor(className));
-        writer.println(renderPreviousEvaluations(context));
-        writer.println(renderPreviousMethods(context));
-        writer.println(renderMethodName(expression));
-        writer.println(renderExpressionToken(expression));
-        writer.println(renderEndOfMethod());
-        writer.println(renderEndOfFile());
-
-        return outputStream.toString();
+        return renderFragments(
+                renderPreviousImports(context),
+                renderClassName(className),
+                renderClassConstructor(className),
+                renderPreviousEvaluations(context),
+                renderPreviousMethods(context),
+                renderMethodName(expression),
+                renderExpressionToken(expression),
+                renderEndOfMethod(),
+                renderEndOfFile()
+        );
     }
+
 
     private static String renderPreviousEvaluations(EvaluationContext context) {
         return context.results().map(new Mapper<Result, String>() {
@@ -171,6 +153,10 @@ public class EvaluationClassRenderer {
 
     private static String renderEndOfFile() {
         return format("}");
+    }
+
+    private static String renderFragments(String... elements) {
+        return sequence(elements).filter(not(blank)).toString("\n");
     }
 
 }
