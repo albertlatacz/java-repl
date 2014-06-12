@@ -27,7 +27,7 @@ public class Patterns {
 
     public static final Regex methodExtensibilityModifiersPattern = oneOf("final +");
     public static final Regex methodPrefixPattern = oneOf(regexPermutations(methodExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
-    public static final Regex methodPattern = join(notStartsWith(oneOf("new +")), captureGroup(join(optional(methodPrefixPattern), typeNamePattern, " +", identifierPattern, " *\\(.*\\)")), " *\\{.*");
+    public static final Regex methodPattern = join(notStartsWith(oneOf("new +")), captureGroup(join(optional(methodPrefixPattern), typeNamePattern, " +", identifierPattern, " *\\(.*?\\)")), " *\\{.*?");
 
     public static boolean isValidImport(String string) {
         return importPattern.matches(string.trim());

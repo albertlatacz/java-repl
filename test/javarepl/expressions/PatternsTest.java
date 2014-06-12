@@ -110,7 +110,8 @@ public class PatternsTest {
         assertFalse(isValidMethod("SomeMethod(){"));
         assertFalse(isValidMethod("new SomeAnonymousClass(){}"));
 
-        MatchResult result = methodPattern.match("public final java.lang.String SomeMethod () { ");
+        MatchResult result = methodPattern.match("public final java.lang.String SomeMethod (String param) {while(true){}}");
+        assertThat(result.group(1), is("public final java.lang.String SomeMethod (String param)"));
         assertThat(result.group(2), is("java.lang.String"));
         assertThat(result.group(3), is("SomeMethod"));
     }
