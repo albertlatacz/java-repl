@@ -1,12 +1,14 @@
 mvn:jline:jline:jar:2.11
 
 mvn:antlr:antlr:jar:2.7.7
-mvn:org.antlr:stringtemplate:jar:3.2.1
+mvn:org.antlr:stringtemplate:jar|sources:3.2.1
 
 mvn:cglib:cglib-nodep:jar:2.2
+mvn:org.ow2.asm:asm-all:jar|sources:4.1
 mvn:org.objenesis:objenesis:jar:1.2
 
+
 mvn://repo.bodar.com/com.googlecode.totallylazy:totallylazy:jar|sources:1193
-mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:109
-mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:710
-mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:167
+mvn://repo.bodar.com/com.googlecode.funclate:funclate:jar|sources:131
+mvn://repo.bodar.com/com.googlecode.utterlyidle:utterlyidle:jar|sources:742
+mvn://repo.bodar.com/com.googlecode.yadic:yadic:jar|sources:171
