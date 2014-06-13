@@ -8,21 +8,37 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://$MODULE_DIR$/lib/build" />
-          <root url="file://$MODULE_DIR$/lib/manual" />
           <root url="file://$MODULE_DIR$/lib/packaged" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
           <root url="file://$MODULE_DIR$/lib/packaged" />
         </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib/build" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/lib/manual" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib/packaged" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib/packaged" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/build" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib/build" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib/manual" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib/manual" recursive="false" />
       </library>
     </orderEntry>
   </component>
