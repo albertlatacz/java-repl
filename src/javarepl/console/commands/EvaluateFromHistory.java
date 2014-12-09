@@ -15,7 +15,7 @@ public final class EvaluateFromHistory extends Command {
     private final ConsoleLogger logger;
 
     public EvaluateFromHistory(Console console, ConsoleHistory history, ConsoleLogger logger) {
-        super(COMMAND + " num - evaluate expression from history)", startsWith(COMMAND), new CommandCompleter(COMMAND));
+        super(COMMAND + " num - evaluate expression from history", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.console = console;
         this.history = history;
         this.logger = logger;
