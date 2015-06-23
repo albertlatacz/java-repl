@@ -9,6 +9,7 @@ import com.intellij.execution.process.*;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.execution.ui.actions.CloseAction;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.*;
@@ -186,6 +187,9 @@ public class JavaREPLConsoleRunner {
         final AnAction closeAction = createCloseAction(defaultExecutor, myDescriptor);
         actionList.add(closeAction);
 
+        final AnAction restartAction = createRestartAction(defaultExecutor, myDescriptor);
+        actionList.add(restartAction);
+
         ArrayList<AnAction> executionActions = createConsoleExecActions(languageConsole,
                 processHandler, consoleHistoryModel);
         runAction = executionActions.get(0);
@@ -236,12 +240,23 @@ public class JavaREPLConsoleRunner {
     }
 
 
+    protected AnAction createStopAction() {
+        return ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM);
+    }
+
     protected AnAction createCloseAction(final Executor defaultExecutor, final RunContentDescriptor myDescriptor) {
         return new CloseAction(defaultExecutor, myDescriptor, project);
     }
 
-    protected AnAction createStopAction() {
-        return ActionManager.getInstance().getAction(IdeActions.ACTION_STOP_PROGRAM);
+    protected AnAction createRestartAction(final Executor defaultExecutor, final RunContentDescriptor myDescriptor) {
+        return new AnAction("Restart", "Restarts the REPL", AllIcons.Actions.Restart) {
+
+            @Override
+            public void actionPerformed(AnActionEvent anActionEvent) {
+                createCloseAction(defaultExecutor, myDescriptor).actionPerformed(anActionEvent);
+                new RunJavaREPLConsoleAction().actionPerformed(anActionEvent);
+            }
+        };
     }
 
     private GeneralCommandLine createCommandLine(Module module, String workingDir) throws CantRunException {
