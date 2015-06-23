@@ -94,6 +94,13 @@
     </target>
 
     <target name="compile">
+        <exec executable="unzip">
+            <arg value="-n"/>
+            <arg value="lib/manual.zip"/>
+            <arg value="-d"/>
+            <arg value="lib"/>
+        </exec>
+
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies"
                          version="${release.version}"/>
 
