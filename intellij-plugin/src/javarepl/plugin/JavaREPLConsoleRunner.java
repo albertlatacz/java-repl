@@ -71,7 +71,7 @@ public class JavaREPLConsoleRunner {
         this.project = module.getProject();
         this.consoleTitle = consoleTitle;
         this.workingDir = workingDir;
-        this.consoleHistoryModel = new ConsoleHistoryModel();
+        this.consoleHistoryModel = new ConsoleHistoryModel(null);
     }
 
     public static void run(@NotNull final Module module,

@@ -45,11 +45,6 @@ public class JavaREPLLanguageConsoleView extends ConsoleViewImpl {
     }
 
     @Override
-    protected EditorEx createRealEditor() {
-        return myConsole.getHistoryViewer();
-    }
-
-    @Override
     protected void disposeEditor() {
     }
 

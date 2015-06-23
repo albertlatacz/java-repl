@@ -1,6 +1,5 @@
 package javarepl.plugin;
 
-import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.lang.FileASTNode;

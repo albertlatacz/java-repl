@@ -19,7 +19,6 @@ package javarepl.plugin;
  */
 
 import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.execution.process.ConsoleHistoryModel;
 import com.intellij.lang.Language;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -264,10 +263,10 @@ public class JavaREPLConsoleHistoryController {
                 command = getModel().getHistoryNext();
                 if (!myMultiline && command == null) return;
             } else {
-                if (!myMultiline && getModel().getHistoryCursor() < 0) return;
+                if (!myMultiline && getModel().getCurrentIndex() < 0) return;
                 command = ObjectUtils.chooseNotNull(getModel().getHistoryPrev(), myMultiline ? "" : StringUtil.notNullize(myHelper.getContent()));
             }
-            setConsoleText(command, myNext && getModel().getHistoryCursor() == 0, true);
+            setConsoleText(command, myNext && getModel().getCurrentIndex() == 0, true);
         }
 
         @Override
@@ -321,7 +320,7 @@ public class JavaREPLConsoleHistoryController {
 
                 @Override
                 protected List<String> getContents() {
-                    return getModel().getHistory();
+                    return getModel().getEntries();
                 }
 
                 @Override
@@ -350,7 +349,7 @@ public class JavaREPLConsoleHistoryController {
             };
             chooser.setContentIcon(null);
             chooser.setSplitterOrientation(false);
-            chooser.setSelectedIndex(Math.max(getModel().getHistoryCursor(), 0));
+            chooser.setSelectedIndex(Math.max(getModel().getCurrentIndex(), 0));
             chooser.show();
             if (chooser.isOK()) {
                 setConsoleText(chooser.getSelectedText(), false, true);
@@ -473,7 +472,7 @@ public class JavaREPLConsoleHistoryController {
             out.startDocument(CharsetToolkit.UTF8, null);
             out.startTag(null, "console-history");
             out.attribute(null, "id", myId);
-            for (String s : getModel().getHistory()) {
+            for (String s : getModel().getEntries()) {
                 out.startTag(null, "history-entry");
                 out.text(s);
                 out.endTag(null, "history-entry");
