@@ -22,6 +22,8 @@ Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
 [![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
 
+The manual dependencies need to be extracted first, by unzipping `lib/manual.zip` into the directory `lib/manual/`.
+
 Building Java REPL requires the [ant build tool](http://ant.apache.org/).
 
 After cloning the git repository, navigate over to it and run:

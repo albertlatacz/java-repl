@@ -577,7 +577,7 @@ public class JavaREPLLanguageConsole implements Disposable, TypeSafeDataProvider
             return;
         } else if (getProject().isInitialized()) {
             FileEditorManager editorManager = FileEditorManager.getInstance(getProject());
-            final Object o = ((FileEditorManagerImpl) editorManager).getData(key.getName(), myConsoleEditor, myVirtualFile);
+            final Object o = ((FileEditorManagerImpl) editorManager).getData(key.getName(), myConsoleEditor, myConsoleEditor.getCaretModel().getCurrentCaret());
             sink.put(key, o);
         }
     }
@@ -597,8 +597,19 @@ public class JavaREPLLanguageConsole implements Disposable, TypeSafeDataProvider
                     }
                     EmptyAction.registerActionShortcuts(editor.getComponent(), myConsoleEditor.getComponent());
                     editor.getCaretModel().addCaretListener(new CaretListener() {
+                        @Override
                         public void caretPositionChanged(CaretEvent e) {
                             queueUiUpdate(false);
+                        }
+
+                        @Override
+                        public void caretAdded(CaretEvent caretEvent) {
+
+                        }
+
+                        @Override
+                        public void caretRemoved(CaretEvent caretEvent) {
+
                         }
                     });
                 }
