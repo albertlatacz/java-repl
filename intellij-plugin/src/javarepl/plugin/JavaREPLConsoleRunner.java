@@ -181,14 +181,14 @@ public class JavaREPLConsoleRunner {
 
         ArrayList<AnAction> actionList = new ArrayList<AnAction>();
 
+        final AnAction restartAction = createRestartAction(defaultExecutor, myDescriptor);
+        actionList.add(restartAction);
+
         final AnAction stopAction = createStopAction();
         actionList.add(stopAction);
 
         final AnAction closeAction = createCloseAction(defaultExecutor, myDescriptor);
         actionList.add(closeAction);
-
-        final AnAction restartAction = createRestartAction(defaultExecutor, myDescriptor);
-        actionList.add(restartAction);
 
         ArrayList<AnAction> executionActions = createConsoleExecActions(languageConsole,
                 processHandler, consoleHistoryModel);
