@@ -31,7 +31,9 @@ public class PatternsTest {
         assertTrue(isValidAssignment("val =42"));
         assertTrue(isValidAssignment("val= 42"));
         assertTrue(isValidAssignment("  val  =   42  42  "));
+
         assertFalse(isValidAssignment("val wrong=   42  42  "));
+        assertFalse(isValidAssignment("a == b"));
 
         MatchResult result = assignmentPattern.match("val = 42");
         assertThat(result.group(1), is("val"));

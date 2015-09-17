@@ -46,7 +46,7 @@ public class Patterns {
     }
 
     public static boolean isValidAssignment(String string) {
-        return assignmentPattern.matches(string.trim());
+        return !string.contains("==") && assignmentPattern.matches(string.trim());
     }
 
     public static boolean isValidAssignmentWithType(String string) {
