@@ -8,10 +8,7 @@ import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import javarepl.console.*;
 import javarepl.console.rest.RestConsole;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FilePermission;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
@@ -30,9 +27,9 @@ import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.replaceAll;
-import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.Strings.*;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -71,7 +68,7 @@ public class Repl {
         ExpressionReader reader = new ExpressionReader(ignoreConsole(args) ? ignoreConsoleInput() : readFromConsole());
 
         if (sandboxed)
-            sandboxApplication();
+            sandboxApplication(logger);
 
         console.start();
 
@@ -165,7 +162,7 @@ public class Repl {
         return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
     }
 
-    private static void sandboxApplication() {
+    private static void sandboxApplication(ConsoleLogger logger) throws UnsupportedEncodingException {
         Policy.setPolicy(new Policy() {
             private final PermissionCollection permissions = new Permissions();
 
@@ -183,7 +180,19 @@ public class Repl {
                 permissions.add(new ReflectPermission("suppressAccessChecks"));
                 permissions.add(new PropertyPermission("*", "read"));
                 permissions.add(new FilePermission(temporaryDirectory("JavaREPL").getAbsolutePath() + "/-", "read, write, delete"));
-                permissions.add(new FilePermission("<<ALL FILES>>", "read"));
+                permissions.add(new FilePermission(sequence(System.getProperty("java.home").split(File.separator)).
+                    reverse().
+                    dropWhile(not(contains("jdk"))).
+                    reverse().
+                    toString(File.separator) + "/-", "read"));
+                permissions.add(new FilePermission("./-", "read"));
+
+                Sequence<String> extensions = sequence(System.getProperty("java.ext.dirs").split(File.pathSeparator));
+                for (String extension : extensions) {
+                    permissions.add(new FilePermission(extension, "read"));
+                    permissions.add(new FilePermission(extension + "/-", "read"));
+                }
+
             }
 
             @Override
