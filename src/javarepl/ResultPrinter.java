@@ -8,7 +8,8 @@ import org.fusesource.jansi.AnsiOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-class ResultPrinter {
+public class ResultPrinter {
+
     private final boolean printColored;
 
     public ResultPrinter(boolean printColored) {

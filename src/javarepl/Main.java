@@ -39,14 +39,14 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
 
-    private static Option<Process> process = none();
-    private static ResultPrinter console;
+    public static Option<Process> process = none();
+    public static ResultPrinter console;
 
     public static void main(String... args) throws Exception {
         console = new ResultPrinter(printColors(args));
 
         JavaREPLClient client = clientFor(hostname(args), port(args));
-        ExpressionReader expressionReader = expressionReaderFor(client);
+        ExpressionReader expressionReader = expressionReaderFor("java", client);
 
         Option<String> expression = none();
         Option<EvaluationResult> result = none();
@@ -61,11 +61,7 @@ public class Main {
         }
     }
 
-    private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
-        console.printInfo(format("Welcome to JavaREPL version %s (%s, Java %s)",
-                applicationVersion(),
-                getProperty("java.vm.name"),
-                getProperty("java.version")));
+    public static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
 
         if (hostname.isEmpty() && port.isEmpty()) {
             return startNewLocalInstance("localhost", randomServerPort());
@@ -74,7 +70,7 @@ public class Main {
         }
     }
 
-    private static JavaREPLClient connectToRemoteInstance(String hostname, Integer port) {
+    public static JavaREPLClient connectToRemoteInstance(String hostname, Integer port) {
         JavaREPLClient replClient = new JavaREPLClient(hostname, port);
 
         if (!replClient.status().isRunning()) {
@@ -131,19 +127,19 @@ public class Main {
         return false;
     }
 
-    private static Option<Integer> port(String[] args) {
+    public static Option<Integer> port(String[] args) {
         return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue)));
     }
 
-    private static Option<String> hostname(String[] args) {
+    public static Option<String> hostname(String[] args) {
         return sequence(args).find(startsWith("--hostname=")).map(replaceAll("--hostname=", ""));
     }
 
-    private static Boolean printColors(String[] args) {
+    public static Boolean printColors(String[] args) {
         return !sequence(args).contains("--noColors");
     }
 
-    private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {
+    public static ExpressionReader expressionReaderFor(final String prompt, final JavaREPLClient client) throws IOException {
         return new ExpressionReader(new Mapper<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
@@ -156,7 +152,7 @@ public class Main {
             }
 
             public String call(Sequence<String> lines) throws Exception {
-                consoleReader.setPrompt(console.ansiColored(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m"));
+                consoleReader.setPrompt(console.ansiColored(lines.isEmpty() ? ("\u001B[1m" + prompt + "> \u001B[0m") : "    \u001B[1m| \u001B[0m"));
                 consoleReader.setHistory(clientHistory());
                 return consoleReader.readLine();
             }
@@ -168,6 +164,7 @@ public class Main {
                 }
                 return history;
             }
+
 
             private jline.console.completer.Completer clientCompleter() {
                 return new jline.console.completer.Completer() {
@@ -307,7 +304,7 @@ public class Main {
          * or null if there are no commonalities. For example, if the list contains
          * <i>foobar</i>, <i>foobaz</i>, <i>foobuz</i>, the method will return <i>foob</i>.
          */
-        private String getUnambiguousCompletions(final Sequence<CompletionCandidate> candidates) {
+        public String getUnambiguousCompletions(final Sequence<CompletionCandidate> candidates) {
             if (candidates == null || candidates.isEmpty()) {
                 return null;
             }
@@ -332,7 +329,7 @@ public class Main {
         /**
          * @return true is all the elements of <i>candidates</i> start with <i>starts</i>
          */
-        private boolean startsWith(final String starts, final String[] candidates) {
+        public boolean startsWith(final String starts, final String[] candidates) {
             for (String candidate : candidates) {
                 if (!candidate.startsWith(starts)) {
                     return false;
@@ -342,7 +339,7 @@ public class Main {
             return true;
         }
 
-        private static enum Messages {
+        public static enum Messages {
             DISPLAY_CANDIDATES,
             DISPLAY_CANDIDATES_YES,
             DISPLAY_CANDIDATES_NO,;

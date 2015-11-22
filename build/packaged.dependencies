@@ -1,8 +1,8 @@
-mvn:jline:jline:jar:2.11
+mvn:jline:jline:jar:2.12
 
-mvn:cglib:cglib-nodep:jar:2.2
-mvn:org.ow2.asm:asm-all:jar|sources:4.1
-mvn:org.objenesis:objenesis:jar:1.2
+mvn:cglib:cglib-nodep:jar:3.1
+mvn:org.ow2.asm:asm-all:jar|sources:5.0.3
+mvn:org.objenesis:objenesis:jar:2.1
 
 mvn:antlr:antlr:jar:2.7.7
 mvn:org.antlr:stringtemplate:jar|sources:3.2.1
