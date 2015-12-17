@@ -118,10 +118,9 @@
         <attribute name="destination"/>
 
         <sequential>
-            <exec executable="s3cmd">
-                <arg value="-c"/>
-                <arg value="@{config}"/>
-                <arg value="put"/>
+            <exec executable="aws">
+                <arg value="s3"/>
+                <arg value="cp"/>
                 <arg value="@{source}"/>
                 <arg value="@{destination}"/>
             </exec>
