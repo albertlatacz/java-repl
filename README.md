@@ -57,13 +57,6 @@ $ <PATH_TO_JDK>/bin/java -jar javarepl.jar
 ```
 
 
-## Donations
-If you like JavaREPL you can tip it via [Gittip](https://www.gittip.com/albertlatacz/)
-
-Donating small amount will help to move the service onto more powerful EC2 machine, which provides faster execution
-and allows more users.
-
-
 ## License
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
