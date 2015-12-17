@@ -12,6 +12,8 @@ import java.io.*;
 import java.lang.management.ManagementPermission;
 import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.CodeSource;
@@ -39,6 +41,7 @@ import static javarepl.Utils.randomServerPort;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;
+import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Repl {
     public static void main(String... args) throws Exception {
@@ -180,19 +183,23 @@ public class Repl {
                 permissions.add(new ReflectPermission("suppressAccessChecks"));
                 permissions.add(new PropertyPermission("*", "read"));
                 permissions.add(new FilePermission(temporaryDirectory("JavaREPL").getAbsolutePath() + "/-", "read, write, delete"));
+
                 permissions.add(new FilePermission(sequence(System.getProperty("java.home").split(File.separator)).
                     reverse().
-                    dropWhile(not(contains("jdk"))).
+                    dropWhile(not(contains("jdk1"))).
                     reverse().
                     toString(File.separator) + "/-", "read"));
                 permissions.add(new FilePermission("./-", "read"));
 
-                Sequence<String> extensions = sequence(System.getProperty("java.ext.dirs").split(File.pathSeparator));
+                Sequence<String> extensions = sequence(((URLClassLoader) getSystemJavaCompiler().getClass().getClassLoader()).getURLs()).map(path()).
+                    join(paths("java.ext.dirs")).
+                    join(paths("java.library.path")).
+                    append(System.getProperty("user.home"));
+
                 for (String extension : extensions) {
                     permissions.add(new FilePermission(extension, "read"));
                     permissions.add(new FilePermission(extension + "/-", "read"));
                 }
-
             }
 
             @Override
@@ -202,5 +209,18 @@ public class Repl {
         });
 
         System.setSecurityManager(new SecurityManager());
+    }
+
+    private static Function1<URL, String> path() {
+        return new Function1<URL, String>() {
+            @Override
+            public String call(URL url) throws Exception {
+                return url.getPath();
+            }
+        };
+    }
+
+    private static Sequence<String> paths(String propertyKey) {
+        return sequence(System.getProperty(propertyKey).split(File.pathSeparator));
     }
 }
