@@ -71,7 +71,7 @@ public class Repl {
         ExpressionReader reader = new ExpressionReader(ignoreConsole(args) ? ignoreConsoleInput() : readFromConsole());
 
         if (sandboxed)
-            sandboxApplication(logger);
+            sandboxApplication();
 
         console.start();
 
@@ -165,7 +165,7 @@ public class Repl {
         return sequence(args).find(startsWith("--inactivityTimeout=")).map(compose(replaceAll("--inactivityTimeout=", ""), compose(valueOf, intValue)));
     }
 
-    private static void sandboxApplication(ConsoleLogger logger) throws UnsupportedEncodingException {
+    private static void sandboxApplication() throws UnsupportedEncodingException {
         Policy.setPolicy(new Policy() {
             private final PermissionCollection permissions = new Permissions();
 
