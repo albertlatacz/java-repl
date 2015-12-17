@@ -32,6 +32,7 @@
     <property name="s3.repo.path"
               value="s3://albertlatacz.published/repo/${ant.project.name}/${ant.project.name}/${release.version}"/>
     <property name="s3.download.path" value="s3://albertlatacz.published/${ant.project.name}"/>
+    <property name="s3.deploy.path" value="s3://albertlatacz.published/tinkerbox/${ant.project.name}"/>
 
     <property name="tests.jar" value="${release.name}-tests.jar"/>
     <property name="tests.src" value="${release.name}-test-sources.jar"/>
@@ -136,49 +137,53 @@
     </target>
 
     <target name="deploy" if="${deploy}">
-        <property name="s3.config" value="~/.s3cfg"/>
-
-        <echo file="${s3.config}">[default]
-            access_key = ${env.AWS_KEY}
-            secret_key = ${env.AWS_SECRET}
-        </echo>
-
         <deploy-to-s3
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.plugin.zip.path}"
                 destination="${s3.download.path}/javarepl-intellij.zip"/>
 
         <deploy-to-s3
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.jar.path}"
                 destination="${s3.download.path}/javarepl.jar"/>
 
         <deploy-to-s3
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.install.script.path}"
                 destination="${s3.download.path}/${release.install.script}"/>
 
         <deploy-to-s3-maven-repository
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.jar.path}"
                 destination="${s3.repo.path}/${release.jar}"/>
 
         <deploy-to-s3-maven-repository
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.src.path}"
                 destination="${s3.repo.path}/${release.src}"/>
 
         <deploy-to-s3-maven-repository
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.pom.path}"
                 destination="${s3.repo.path}/${release.pom}"/>
 
         <deploy-to-s3-maven-repository
-                config="${s3.config}"
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
                 source="${release.plugin.zip.path}"
                 destination="${s3.repo.path}/${release.plugin.zip}"/>
 
-        <delete file="${s3.config}" quiet="true"/>
+        <deploy-to-s3
+                key="${env.AWS_KEY}"
+                secret="${env.AWS_SECRET}"
+                source="${release.jar.path}"
+                destination="${s3.deploy.path}/javarepl.jar"/>
     </target>
 
 

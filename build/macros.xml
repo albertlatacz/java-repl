@@ -113,14 +113,15 @@
 
 
     <macrodef name="deploy-to-s3">
-        <attribute name="config"/>
+        <attribute name="key"/>
+        <attribute name="secret"/>
         <attribute name="source"/>
         <attribute name="destination"/>
 
         <sequential>
             <exec executable="aws">
-                <env key="AWS_ACCESS_KEY_ID" value="${env.AWS_KEY}"/>
-                <env key="AWS_SECRET_ACCESS_KEY" value="${env.AWS_SECRET}"/>
+                <env key="AWS_ACCESS_KEY_ID" value="@{key}"/>
+                <env key="AWS_SECRET_ACCESS_KEY" value="@{secret}"/>
                 <arg value="s3"/>
                 <arg value="cp"/>
                 <arg value="@{source}"/>
@@ -130,18 +131,19 @@
     </macrodef>
 
     <macrodef name="deploy-to-s3-maven-repository">
-        <attribute name="config"/>
+        <attribute name="key"/>
+        <attribute name="secret"/>
         <attribute name="source"/>
         <attribute name="destination"/>
 
         <sequential>
-            <deploy-to-s3 config="@{config}" source="@{source}" destination="@{destination}"/>
+            <deploy-to-s3 key="@{key}" secret="@{secret}" source="@{source}" destination="@{destination}"/>
 
             <checksum file="@{source}" algorithm="sha1"/>
-            <deploy-to-s3 config="@{config}" source="@{source}.sha1" destination="@{destination}.sha1"/>
+            <deploy-to-s3 key="@{key}" secret="@{secret}" source="@{source}.sha1" destination="@{destination}.sha1"/>
 
             <checksum file="@{source}" algorithm="md5"/>
-            <deploy-to-s3 config="@{config}" source="@{source}.md5" destination="@{destination}.md5"/>
+            <deploy-to-s3 key="@{key}" secret="@{secret}" source="@{source}.md5" destination="@{destination}.md5"/>
         </sequential>
     </macrodef>
 
