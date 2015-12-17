@@ -29,9 +29,9 @@ import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.Strings.*;
+import static com.googlecode.totallylazy.Strings.replaceAll;
+import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -186,7 +186,7 @@ public class Repl {
 
                 permissions.add(new FilePermission(sequence(System.getProperty("java.home").split(File.separator)).
                     reverse().
-                    dropWhile(not(contains("jdk1"))).
+                    drop(1).
                     reverse().
                     toString(File.separator) + "/-", "read"));
                 permissions.add(new FilePermission("./-", "read"));
