@@ -119,6 +119,8 @@
 
         <sequential>
             <exec executable="aws">
+                <env key="AWS_ACCESS_KEY_ID" value="${env.AWS_KEY}"/>
+                <env key="AWS_SECRET_ACCESS_KEY" value="${env.AWS_SECRET}"/>
                 <arg value="s3"/>
                 <arg value="cp"/>
                 <arg value="@{source}"/>
