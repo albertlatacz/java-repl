@@ -18,7 +18,7 @@ public final class ShowHistory extends Command {
     private final ConsoleHistory history;
 
     public ShowHistory(ConsoleLogger logger, ConsoleHistory history) {
-        super(COMMAND + " [num] - shows the history (optional 'num' is number of evaluations to show)",
+        super(COMMAND + " <num> - shows the history (optional 'num' is number of evaluations to show)",
                 startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.logger = logger;
         this.history = history;

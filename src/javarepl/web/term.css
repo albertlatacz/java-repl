@@ -1,0 +1,264 @@
+html,body {
+    height:100%;
+    min-height:100%;
+    width:100%;
+    margin:0;
+    background: #000;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.github-fork-ribbon:before, .github-fork-ribbon:after {
+    background-color: black;
+}
+
+.terminal-header, .terminal-footer {
+    flex: 0 0 auto;
+    background: white;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+}
+
+.terminal-footer {
+    text-align: center;
+}
+
+.terminal-content {
+    flex: 1 1 auto;
+    background: black;
+    margin-left: 10px;
+}
+
+
+.terminal-header h1 {
+    height: 72px;
+    margin: 20px 10px 20px;
+    line-height: 72px;
+    background: url(javarepl-icon.png) no-repeat;
+    padding: 0;
+    padding-left: 75px;
+
+    font-size: 48px;
+    color: #333333;
+}
+
+
+
+#terminal-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+
+
+.terminal-message-completion {
+    color: #5d5d5d;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
+.terminal-message-value {
+    color: #CC7832;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
+.terminal-message-service-error {
+    color: #CC7832;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
+.terminal-message-prompt-box {
+    color: #FFFFFF;
+    font-family: monospace;
+}
+
+
+
+.terminal-message-error {
+    color: #BC3F3C;
+    font-weight: bold;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
+
+.terminal-message-success {
+    color: #77B767;
+    font-family: monospace;
+    padding: 0.1em;
+}
+
+
+
+.bottom {
+    background-color: white;
+    color: #333;
+}
+
+.bottom a, a:visited {
+    color: #111;
+}
+
+table.bottom {
+    width: 100%;
+    border: 1px solid black;
+}
+
+#buttons {
+    background: transparent;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#buttons a {
+    /* color: #4881d8;*/
+    color: #3D5B99;
+    padding: .3em 1em;
+    margin-right: .7em;
+    font-family: Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    background: #90b4fe;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+#buttons a.last {
+    margin-right: 0;
+}
+
+#buttons a:hover {
+    color: #5881d8;
+    cursor: pointer;
+}
+
+.changer {
+    margin: 10px;
+    padding: 0.25em 0.5em 0.25em 0.5em;
+    background: #f3f3f3;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #AAAAAA;
+}
+
+.changer h3 {
+    color: #555;
+}
+
+.changer p {
+    background: transparent;
+    line-height: 1.3em;
+    font-family: Arial, serif;
+    font-size: 16px;
+    color: #555;
+}
+
+.changer code {
+    background-color: #eee;
+    border: 1px solid #aaa;
+    color: #555;
+    font-family: courier, monospace;
+    padding: 0.1em 0.25em 0.1em 0.25em;
+}
+
+.changer .code_html {
+    color: #555;
+    font-family: courier, monospace;
+    padding: 0.1em 0.25em 0.1em 0.25em;
+}
+
+div#tuttext {
+}
+
+div.continue {
+    width: 100%;
+    text-align: center;
+    padding-top: 0.5em;
+}
+
+div.footer {
+    text-align: center;
+}
+
+/* Coderay alpha style */
+.code {
+    border-radius: 2px;
+    -moz-border-radius: 1px;
+    color: #000;
+}
+
+.code pre {
+    margin: 0px;
+}
+
+span.code {
+    white-space: pre;
+    border: 0px;
+    padding: 2px;
+}
+
+span.code:hover {
+    cursor: pointer;
+}
+
+table.code {
+    border-collapse: collapse;
+    width: 100%;
+    padding: 2px;
+}
+
+table.code td {
+    padding: 2px 4px;
+    vertical-align: top;
+}
+
+.code .line_numbers, .code .no {
+    background-color: #def;
+    color: gray;
+    text-align: right;
+}
+
+/* keywords */
+#changer .code span.r {
+    color: #0000ff;
+    font-weight: bold;
+}
+
+/* symbols */
+#changer .code span.sy {
+    color: #318495;
+}
+
+/* strings */
+#changer .code span.s {
+    color: #008800;
+}
+
+/* paren */
+#changer .code span.of {
+    color: #222;
+    font-weight: bold;
+}
+
+/* comment */
+#changer .code span.c {
+    color: #ccc;
+}
+
+/* operator */
+#changer .code span.cl {
+
+}
+
+/* number */
+#changer .code span.i {
+    color: #ff0000;
+}

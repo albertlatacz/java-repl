@@ -49,7 +49,7 @@ public class WebConsoleResource {
         Option<WebConsoleClientHandler> clientHandler = agent.createClient(initial);
 
         return clientHandler.map(clientHandlerToModel()).get()
-                .add("welcomeMessage", welcomeMessage() + "\n\n");
+                .add("welcomeMessage", welcomeMessage());
     }
 
     @POST
@@ -156,7 +156,7 @@ public class WebConsoleResource {
     @GET
     @Path("")
     public Response main() {
-        return Responses.seeOther("console.html");
+        return Responses.seeOther("term.html");
     }
 
     private Mapper<WebConsoleClientHandler, Model> clientHandlerToModel() {

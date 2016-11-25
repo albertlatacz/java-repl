@@ -12,11 +12,8 @@
     <property name="src" value="${basedir}/src"/>
     <property name="test" value="${basedir}/test"/>
     <property name="release.version" value="${build.number}"/>
-    <property name="plugin.src" value="${basedir}/intellij-plugin/src"/>
     <property name="release.install.script" value="ec2-install.sh"/>
     <property name="release.install.script.path" value="${basedir}/bin/${release.install.script}"/>
-    <property name="release.plugin.jar" value="${ant.project.name}-${release.version}-intellij.jar"/>
-    <property name="release.plugin.zip" value="${ant.project.name}-${release.version}-intellij.zip"/>
     <property name="release.name" value="${ant.project.name}-${release.version}"/>
     <property name="release.jar" value="${release.name}.jar"/>
     <property name="release.jar.path" value="${artifacts}/${release.jar}"/>
@@ -26,8 +23,6 @@
     <property name="release.src" value="${release.name}-sources.jar"/>
     <property name="release.src.path" value="${artifacts}/${release.src}"/>
     <property name="release.manifest.path" value="${artifacts}/${release.manifest}"/>
-    <property name="release.plugin.jar.path" value="${artifacts}/${release.plugin.jar}"/>
-    <property name="release.plugin.zip.path" value="${artifacts}/${release.plugin.zip}"/>
 
     <property name="s3.repo.path"
               value="s3://albertlatacz.published/repo/${ant.project.name}/${ant.project.name}/${release.version}"/>
@@ -42,7 +37,6 @@
     <property name="runtime.dependencies.dir" value="lib/runtime"/>
     <property name="packaged.dependencies.dir" value="lib/packaged"/>
     <property name="optional.dependencies.dir" value="lib/optional"/>
-    <property name="manual.dependencies.dir" value="lib/manual"/>
 
     <import file="${build}/macros.xml"/>
     <import file="${build}/shavenmaven.xml"/>
@@ -52,7 +46,6 @@
         <fileset dir="${runtime.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${packaged.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${optional.dependencies.dir}" includes="**/*.jar"/>
-        <fileset dir="${manual.dependencies.dir}" includes="**/*.jar"/>
     </path>
 
     <path id="all.jars">
@@ -79,35 +72,11 @@
         <delete dir="${artifacts}"/>
     </target>
 
-    <target name="plugin">
-        <copy file="${plugin.src}/META-INF/plugin.xml" tofile="${artifacts}/plugin.xml.original"/>
-        <replace file="${plugin.src}/META-INF/plugin.xml" token="dev.build" value="${build.number}"/>
-
-        <compile.and.jar src="${plugin.src}" jar="${release.plugin.jar.path}" classpathref="all.jars"
-                         version="${release.version}"/>
-
-        <move file="${artifacts}/plugin.xml.original" tofile="${plugin.src}/META-INF/plugin.xml"/>
-
-        <zip destfile="${release.plugin.zip.path}">
-            <zipfileset file="${release.jar.path}" prefix="java-repl/lib"/>
-            <zipfileset file="${release.plugin.jar.path}" prefix="java-repl/lib"/>
-        </zip>
-    </target>
-
     <target name="compile">
-        <exec executable="unzip">
-            <arg value="-n"/>
-            <arg value="lib/manual.zip"/>
-            <arg value="-d"/>
-            <arg value="lib"/>
-        </exec>
-
         <compile.and.jar src="${src}" jar="${release.jar.path}" classpathref="all.dependancies"
                          version="${release.version}"/>
 
         <compile.and.jar src="${test}" jar="${tests.jar.path}" classpathref="all.jars" version="${release.version}"/>
-
-        <antcall target="plugin"/>
     </target>
 
     <target name="test">
@@ -140,12 +109,6 @@
         <deploy-to-s3
                 key="${env.AWS_KEY}"
                 secret="${env.AWS_SECRET}"
-                source="${release.plugin.zip.path}"
-                destination="${s3.download.path}/javarepl-intellij.zip"/>
-
-        <deploy-to-s3
-                key="${env.AWS_KEY}"
-                secret="${env.AWS_SECRET}"
                 source="${release.jar.path}"
                 destination="${s3.download.path}/javarepl.jar"/>
 
@@ -173,12 +136,6 @@
                 source="${release.pom.path}"
                 destination="${s3.repo.path}/${release.pom}"/>
 
-        <deploy-to-s3-maven-repository
-                key="${env.AWS_KEY}"
-                secret="${env.AWS_SECRET}"
-                source="${release.plugin.zip.path}"
-                destination="${s3.repo.path}/${release.plugin.zip}"/>
-
         <deploy-to-s3
                 key="${env.AWS_KEY}"
                 secret="${env.AWS_SECRET}"
@@ -199,7 +156,6 @@
         </parallel>
 
         <antcall target="embed"/>
-        <antcall target="plugin"/>
         <antcall target="deploy"/>
     </target>
 

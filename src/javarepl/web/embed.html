@@ -5,24 +5,29 @@
     <title>Java REPL</title>
     <meta name="Content-Type" content="text/html; charset=UTF-8">
 
-    <link href="style.css" rel="stylesheet" type="text/css">
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
+    <script type="text/javascript" src="bower_components/underscore/underscore.js"></script>
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="bower_components/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <script type="text/javascript" src="bower_components/jquery.terminal/js/jquery.mousewheel-min.js"></script>
 
-    <script type="text/javascript" src="underscore.js"></script>
-    <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="jquery.console.js"></script>
+    <link href="bower_components/jquery.terminal/css/jquery.terminal.min.css" rel="stylesheet" type="text/css">
+    <link href="bower_components/github-fork-ribbon-css/gh-fork-ribbon.css" rel="stylesheet" type="text/css">
+
+    <!--[if lt IE 9]>
+    <link href="bower_components/github-fork-ribbon-css/gh-fork-ribbon.ie.css" rel="stylesheet" type="text/css">
+    <![endif]-->
+
+
+    <link href="term.css" rel="stylesheet" type="text/css">
+
     <script type="text/javascript">
         (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
             i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date();
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
             a = s.createElement(o),
-                    m = s.getElementsByTagName(o)[0];
+                m = s.getElementsByTagName(o)[0];
             a.async = 1;
             a.src = g;
             m.parentNode.insertBefore(a, m)
@@ -49,7 +54,12 @@
 
     </script>
 </head>
+
+
 <body>
-<script type="text/javascript" src="javarepl.js"></script>
+
+
+<script type="text/javascript" src="term.js"></script>
+
 </body>
 </html>
