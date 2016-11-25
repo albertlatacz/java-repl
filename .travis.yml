@@ -1,12 +1,21 @@
 language: java
 env:
     global:
+        - JAVAREPL_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
         - secure: "bIFU+VgbcIJ5DmsXkoxTaLGI40uIyWdTFnco7FaJLoJLwLJSake4jemFv5SI\nJaSFVINBXA+Xn/qqHmFfWVr2fKsAevwRfkkIuTM1QMlN2TOMkCwOrz6mYA3f\nxjh+oKXUzNutZTHSyoCyZ72uHSJ33TlPWHU+OToS4AYxf8LrTYI="
         - secure: "O0xTkW+WBNWT0a44u7XRpm0vp0q04ZFv/ovmPX6nm3fRokuiHMoRaL1l7r1K\nLF9ow3n+Ncsl64XRJNv2rjKVrxb19GtZQjxnHqi6bW2FSnoTEJsfvIjgMOwh\nrOHL9MUP61idRqN15ki0qYsmZ8t3xN9rw04fJLGZn73Oy0uRSGI="
-        - JAVAREPL_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+        - secure: "C5j0sZWXhfOoaVYyylyM7aJsjUSBbiIkW2GpAhODIrp/E5l297TymomFOCOTZSL1xF5V4RYt6jc7db+Qri5ryeHd0IIYMNWqcmni4rChtKp4b2F4qh+eqwre8RW5hONOcByZTQDvo+m3SCTuoTWcIM/UIhQIGovSPtYmqjQlSwI="
+        - secure: "fpuaeSvHiDRtUGHRuCkaZOglaE8IujaCXjSShYP78kxaZUOkHCY6meGmk2YRB6nKTs80lpiQCGFOmtcdEOsCRt2kQXuzJR6NkcG8JEYbdD36G0zR/GpeZ38o3lZqd7Xy1FEGwTgMi0Wy699ZvSoBP1xtGz8A7f8G9ROV7E81gdw="
+
+
+sudo: required
 
 services:
   - docker
+
+
+before_install:
+  - docker pull albertlatacz/java-repl
 
 install:
   - pip install --user awscli
