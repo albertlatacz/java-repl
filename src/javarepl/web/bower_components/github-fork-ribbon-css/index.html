@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Fork me on GitHub CSS Ribbon</title>
+    <link rel="stylesheet" href="https://oss.maxcdn.com/libs/normalize-css/3.0.0/normalize.min.css">
+    <style>
+        /* This is just the styling for this page. See below for the CSS for the ribbon itself. */
+        html {
+            font: 16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+        h1, h2 {
+            font-weight: 400;
+        }
+        pre {
+            background-color: #222;
+            color: white;
+            padding: 10px;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+        }
+        pre:before {
+            content: "$ ";
+            color: #999;
+        }
+        .content {
+            width: 560px;
+            margin: 0 auto;
+            padding-top: 80px;
+            color: #444;
+        }
+        a, a:visited {
+            color: #c00;
+        }
+        .content p {
+            font-weight: 200;
+        }
+
+        /* The default background color is #c00 */
+        .github-fork-ribbon.right-bottom:before {
+            background-color: #090;
+        }
+
+        .github-fork-ribbon.right-top:before {
+            background-color: #f80;
+        }
+
+        .github-fork-ribbon.left-bottom:before {
+            background-color: #333;
+        }
+    </style>
+
+    <!-- START COPYING HERE -->
+    <link rel="stylesheet" href="gh-fork-ribbon.css">
+    <!--[if lt IE 9]>
+        <link rel="stylesheet" href="gh-fork-ribbon.ie.css">
+    <![endif]-->
+    <!-- END COPYING HERE -->
+</head>
+<body>
+    <!-- TOP RIGHT RIBBON: START COPYING HERE -->
+    <a class="github-fork-ribbon right-top" href="https://github.com/simonwhitaker/github-fork-ribbon-css" title="Fork me on GitHub">Fork me on GitHub</a>
+    <!-- TOP RIGHT RIBBON: END COPYING HERE -->
+
+    <!-- TOP LEFT RIBBON: START COPYING HERE -->
+    <a class="github-fork-ribbon left-top" href="https://github.com/simonwhitaker/github-fork-ribbon-css" title="Fork me on GitHub">Fork me on GitHub</a>
+    <!-- TOP LEFT RIBBON: END COPYING HERE -->
+    <div class="content">
+
+        <h1>Fork me on GitHub &ndash; CSS ribbon</h1>
+        <p>
+            This is a pure CSS implementation of the famous
+            <a href="https://github.com/blog/273-github-ribbons">Fork me on GitHub</a> ribbon.
+        </p>
+        <h2>Usage</h2>
+        <p>
+            To use it on your site, just view source and
+            copy the two marked sections (one the CSS, the
+            other the HTML tag). You'll also need to grab
+            the <a href="https://github.com/simonwhitaker/github-fork-ribbon-css/">CSS files here</a>.
+        </p>
+        <p>
+            Alternatively, <a href="https://github.com/simonwhitaker/github-fork-ribbon-css/fork">fork the project on GitHub</a>!
+        </p>
+        <h2>Using with Bower</h2>
+        <p>
+            You can install the CSS files
+            using <a href="https://github.com/bower/bower">Bower</a>.
+        </p>
+        <pre>bower install github-fork-ribbon-css</pre>
+        <h2>Using with cdnjs</h2>
+        <p>
+            You can use github-fork-ribbon-css without installation via <a href="https://cdnjs.com/libraries/github-fork-ribbon-css">cdnjs.com</a>.<br />
+            Copy the following code into the <strong>&lt;head&gt;</strong> of your page:
+        </p>
+        <code>
+          &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" /&gt;<br/>
+          &lt;!--[if lt IE 9]&gt;<br/>
+              &nbsp;&nbsp;&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.ie.min.css" /&gt;<br/>
+          &lt;![endif]--&gt;
+        </code>
+        <p>
+            And this into the <strong>&lt;body&gt;</strong> of your page:
+        </p>
+        <code>
+          &lt;a class="github-fork-ribbon" href="http://url.to-your.repo" title="Fork me on GitHub"&gt;Fork me on GitHub&lt;/a&gt;
+        </code>
+
+        <h2>About</h2>
+        <p>
+            This project was written by
+            <a href="https://twitter.com/s1mn">Simon Whitaker</a>.
+            It is not endorsed in any way by GitHub.
+        </p>
+    </div>
+    <!-- BOTTOM RIGHT RIBBON: START COPYING HERE -->
+    <a class="github-fork-ribbon right-bottom fixed" href="https://github.com/simonwhitaker/github-fork-ribbon-css" title="Fork me on GitHub">Fork me on GitHub</a>
+    <!-- BOTTOM RIGHT RIBBON: END COPYING HERE -->
+
+    <!-- BOTTOM LEFT RIBBON: START COPYING HERE -->
+    <a class="github-fork-ribbon left-bottom fixed" href="https://github.com/simonwhitaker/github-fork-ribbon-css" title="Fork me on GitHub">Fork me on GitHub</a>
+    <!-- BOTTOM LEFT RIBBON: END COPYING HERE -->
+</body>
+</html>

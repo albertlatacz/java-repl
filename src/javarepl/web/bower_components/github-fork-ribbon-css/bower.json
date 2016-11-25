@@ -1,0 +1,27 @@
+{
+  "name": "github-fork-ribbon-css",
+  "version": "0.2.0",
+  "homepage": "https://simonwhitaker.github.io/github-fork-ribbon-css/",
+  "authors": [
+    "Simon Whitaker"
+  ],
+  "description": "\"Fork me on GitHub\" CSS ribbon",
+  "main": [
+    "gh-fork-ribbon.css",
+    "gh-fork-ribbon.ie.css"
+  ],
+  "keywords": [
+    "css",
+    "fork",
+    "GitHub",
+    "ribbon"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

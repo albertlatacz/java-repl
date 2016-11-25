@@ -1,0 +1,24 @@
+{
+  "name": "github-fork-ribbon-css",
+  "version": "0.2.0",
+  "description": "\"Fork me on GitHub\" CSS ribbon",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simonwhitaker/github-fork-ribbon-css.git"
+  },
+  "keywords": [
+    "css",
+    "fork",
+    "GitHub",
+    "ribbon"
+  ],
+  "author": "Simon Whitaker",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simonwhitaker/github-fork-ribbon-css/issues"
+  },
+  "homepage": "http://simonwhitaker.github.io/github-fork-ribbon-css/"
+}
