@@ -7,4 +7,5 @@ docker push albertlatacz/java-repl
 
 
 docker stop $(docker ps -q --filter ancestor=albertlatacz/java-repl)
+docker pull albertlatacz/java-repl
 docker start $(docker create -p 8090:8090 albertlatacz/java-repl)
