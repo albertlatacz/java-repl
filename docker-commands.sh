@@ -27,12 +27,6 @@ docker rmi $(docker images -q -f dangling=true)
 
 docker rmi $(docker images -q albertlatacz/java-repl)
 
-
-
-
 docker run --restart=always -d -p 8090:8090 albertlatacz/java-repl
 
-
-
-#count tags
-curl 'https://registry.hub.docker.com/v2/repositories/albertlatacz/java-repl/tags/' | jq '.results[].name' | wc -w
+curl 'https://registry.hub.docker.com/v2/repositories/albertlatacz/java-repl/tags/' | jq '.results[].name' | wc -w #count tags
