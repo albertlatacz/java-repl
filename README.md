@@ -36,8 +36,6 @@ After this completes, the jar completed with bundled dependencies will be locate
 
 [Latest version](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar)
 
-[Latest IntelliJ IDEA plugin](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl-intellij.zip)
-
 [Previous releases](http://albertlatacz.published.s3.amazonaws.com/index.html)
 
 
