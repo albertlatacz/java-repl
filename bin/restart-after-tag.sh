@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 DOCKER_HUB_REPOSITORY=$1
+EXPOSED_PORTS=$2
 
 function tagsFile() {
   REPOSITORY=$1
@@ -36,11 +37,11 @@ then
    if [ "${FILES_DIFF}" != "" ];
    then
       getTags ${DOCKER_HUB_REPOSITORY} ${CURRENT_TAGS_FILE}
-      restartContaner ${DOCKER_HUB_REPOSITORY} "8090:8090"
+      restartContaner ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
    fi
 else
    getTags ${DOCKER_HUB_REPOSITORY} ${CURRENT_TAGS_FILE}
-   restartContaner ${DOCKER_HUB_REPOSITORY} "8090:8090"
+   restartContaner ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
 fi
 
 
