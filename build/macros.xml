@@ -130,6 +130,23 @@
         </sequential>
     </macrodef>
 
+
+    <macrodef name="push-to-docker-hub">
+        <attribute name="username"/>
+        <attribute name="password"/>
+        <attribute name="repository"/>
+        <attribute name="version"/>
+
+        <sequential>
+            <exec executable="bin/push-to-docker-hub.sh">
+                <arg value="@{username}"/>
+                <arg value="@{password}"/>
+                <arg value="@{repository}"/>
+                <arg value="@{version}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
     <macrodef name="deploy-to-s3-maven-repository">
         <attribute name="key"/>
         <attribute name="secret"/>
