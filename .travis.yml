@@ -31,4 +31,7 @@ deploy:
         branch: master
         repo: albertlatacz/java-repl
 
+after_success:
+    - sh bin/set_tags.sh
+
 
