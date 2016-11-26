@@ -19,3 +19,16 @@ install:
 
 script:
     - ant -Ddeploy=true
+
+deploy:
+    provider: releases
+    api_key:
+        secure: "Dlvp//L9a/9bHgtTZPWy+tTbsokq5f3fhobmR1tBtEQUiuOl0dl5nzVOq1tBb0AwPBmTudkBIwH1DW64WCnZnGUatiVznfEydGgCzaW8hNeg9S2iatNIjVjqWXrR/Id+Vg8gGoDomLltPL5qb5UBhdpiOT9Te/GH5/hRUw0NpvI="
+    file: "build/artifacts/*.jar"
+    file_glob: "true"
+    skip_cleanup: true
+    on:
+        branch: master
+        repo: albertlatacz/java-repl
+
+
