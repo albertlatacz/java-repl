@@ -33,7 +33,7 @@ deploy:
 
 
 after_deploy:
-    - sh bin/push-to-docker $DOCKER_HUB_USERNAME $DOCKER_HUB_PASSWORD albertlatacz/java-repl $TRAVIS_BUILD_NUMBER
+    - sh bin/push-to-docker.sh $DOCKER_HUB_USERNAME $DOCKER_HUB_PASSWORD albertlatacz/java-repl $TRAVIS_BUILD_NUMBER
 
 
 
