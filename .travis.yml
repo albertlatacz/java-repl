@@ -31,7 +31,9 @@ deploy:
         tags: true
         repo: albertlatacz/java-repl
 
-after_success:
-    - sh bin/set_tags.sh
+
+after_deploy:
+    - sh bin/push-to-docker $DOCKER_HUB_USERNAME $DOCKER_HUB_PASSWORD albertlatacz/java-repl $TRAVIS_BUILD_NUMBER
+
 
 

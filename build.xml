@@ -141,14 +141,6 @@
                 secret="${env.AWS_SECRET}"
                 source="${release.jar.path}"
                 destination="${s3.deploy.path}/javarepl.jar"/>
-
-        <push-to-docker-hub
-            username="${env.DOCKER_HUB_USERNAME}"
-            password="${env.DOCKER_HUB_PASSWORD}"
-            repository="albertlatacz/java-repl"
-            version="${env.JAVAREPL_BUILD_NUMBER}"/>
-
-
     </target>
 
 
