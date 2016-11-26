@@ -20,6 +20,9 @@ install:
 script:
     - ant -Ddeploy=true
 
+after_success:
+    - sh bin/set_tags.sh
+
 deploy:
     provider: releases
     api_key:
