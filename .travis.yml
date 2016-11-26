@@ -28,7 +28,7 @@ deploy:
     file_glob: "true"
     skip_cleanup: true
     on:
-        branch: master
+        tags: true
         repo: albertlatacz/java-repl
 
 after_success:
