@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-DOCKER_HUB_REPOSITORY=$1
-EXPOSED_PORTS=$2
-
 function tagsFile() {
   REPOSITORY=$1
   SUFFIX=$2
@@ -15,7 +12,7 @@ function getTags() {
     curl -s "https://registry.hub.docker.com/v2/repositories/${REPOSITORY}/tags/" | jq ".results[].name" > "${TAGS_FILE}"
 }
 
-function restartContaner() {
+function restartContainer() {
     REPOSITORY=$1
     PORTS=$2
     echo "New version of ${REPOSITORY} available. Deploying..."
@@ -26,23 +23,34 @@ function restartContaner() {
     docker run --restart=always -d -p ${PORTS} ${REPOSITORY}
 }
 
+function checkForNewVersion() {
+    REPOSITORY=$1
+    PORTS=$2
+    CURRENT_TAGS_FILE=`tagsFile ${REPOSITORY} "current"`
+    NEW_TAGS_FILE=`tagsFile ${REPOSITORY} "new"`
+    if [ -f ${CURRENT_TAGS_FILE} ];
+    then
+       getTags ${REPOSITORY} ${NEW_TAGS_FILE}
+       FILES_DIFF=`diff ${CURRENT_TAGS_FILE} ${NEW_TAGS_FILE}`
 
-CURRENT_TAGS_FILE=`tagsFile ${DOCKER_HUB_REPOSITORY} "current"`
-NEW_TAGS_FILE=`tagsFile ${DOCKER_HUB_REPOSITORY} "new"`
-if [ -f ${CURRENT_TAGS_FILE} ];
-then
-   getTags ${DOCKER_HUB_REPOSITORY} ${NEW_TAGS_FILE}
-   FILES_DIFF=`diff ${CURRENT_TAGS_FILE} ${NEW_TAGS_FILE}`
+       if [ "${FILES_DIFF}" != "" ];
+       then
+          getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
+          restartContainer ${REPOSITORY} ${PORTS}
+       fi
+    else
+       getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
+       restartContainer ${REPOSITORY} ${PORTS}
+    fi
+}
 
-   if [ "${FILES_DIFF}" != "" ];
-   then
-      getTags ${DOCKER_HUB_REPOSITORY} ${CURRENT_TAGS_FILE}
-      restartContaner ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
-   fi
-else
-   getTags ${DOCKER_HUB_REPOSITORY} ${CURRENT_TAGS_FILE}
-   restartContaner ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
-fi
+
+DOCKER_HUB_REPOSITORY=$1
+EXPOSED_PORTS=$2
+
+checkForNewVersion ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
+
+
 
 
 
