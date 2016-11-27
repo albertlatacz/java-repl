@@ -1,5 +1,8 @@
 # Java REPL
 
+[![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
+
+
 Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 * Support for most of Java language constructs
@@ -19,9 +22,6 @@ Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
 
 ## Build
-
-[![Build Status](https://travis-ci.org/albertlatacz/java-repl.png?branch=master)](https://travis-ci.org/albertlatacz/java-repl)
-
 Building Java REPL requires the [ant build tool](http://ant.apache.org/).
 
 After cloning the git repository, navigate over to it and run:
