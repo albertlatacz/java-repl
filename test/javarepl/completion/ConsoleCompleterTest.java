@@ -3,8 +3,8 @@ package javarepl.completion;
 import javarepl.Evaluator;
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.Functions.returns;
 import static com.googlecode.totallylazy.Sequences.empty;
+import static com.googlecode.totallylazy.functions.Functions.returns;
 import static javarepl.completion.CompleterTestHelper.*;
 import static org.junit.Assert.assertThat;
 

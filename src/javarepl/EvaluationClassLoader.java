@@ -5,7 +5,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.URLs.toURL;
+import static com.googlecode.totallylazy.io.URLs.toURL;
 
 public class EvaluationClassLoader extends URLClassLoader {
     private EvaluationClassLoader(URL[] urls) {

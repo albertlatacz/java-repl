@@ -38,7 +38,7 @@ public class MemberReflectionsTest {
         return reflectionOf(new ModifiersTestClass()).declaredMembers()
                 .join(reflectionOf(ModifiersTestClass.InterfaceModifiers.class).declaredMembers())
                 .filter(predicate)
-                .map(memberName());
+                .map(MemberReflection::name);
     }
 
     @SuppressWarnings("unused")

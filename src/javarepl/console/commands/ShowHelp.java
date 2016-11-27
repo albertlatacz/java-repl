@@ -3,8 +3,8 @@ package javarepl.console.commands;
 import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
-import static com.googlecode.totallylazy.Callables.asString;
-import static com.googlecode.totallylazy.Predicates.*;
+import static com.googlecode.totallylazy.functions.Callables.asString;
+import static com.googlecode.totallylazy.predicates.Predicates.*;
 import static javarepl.Utils.listValues;
 
 public final class ShowHelp extends Command {

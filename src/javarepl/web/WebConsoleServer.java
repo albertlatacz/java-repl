@@ -4,10 +4,10 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.utterlyidle.ServerConfiguration;
 import com.googlecode.utterlyidle.httpserver.RestServer;
 
-import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.functions.Callables.compose;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static com.googlecode.utterlyidle.BasePath.basePath;

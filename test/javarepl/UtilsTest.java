@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static com.googlecode.totallylazy.URLs.url;
+import static com.googlecode.totallylazy.io.URLs.url;
 import static java.util.Arrays.asList;
 import static javarepl.Utils.*;
 import static javarepl.testclasses.Constructors.*;

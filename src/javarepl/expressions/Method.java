@@ -1,10 +1,7 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import javarepl.rendering.TypeRenderer;
-
-import java.lang.reflect.*;
 
 import static javarepl.Utils.canonicalName;
 
@@ -41,22 +38,4 @@ public final class Method extends Expression {
         return name + arguments.map(canonicalName()).toString(", ");
     }
 
-    public static final class functions {
-        public static Mapper<Method, String> signature() {
-            return new Mapper<Method, String>() {
-                public String call(Method value) throws Exception {
-                    return value.signature();
-                }
-            };
-        }
-
-        public static Mapper<Method, String> methodName() {
-            return new Mapper<Method, String>() {
-                public String call(Method value) throws Exception {
-                    return value.name();
-                }
-            };
-        }
-
-    }
 }

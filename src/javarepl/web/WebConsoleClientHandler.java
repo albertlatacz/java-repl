@@ -1,6 +1,10 @@
 package javarepl.web;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.json.Json;
 import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
@@ -11,11 +15,10 @@ import javarepl.console.ConsoleStatus;
 
 import java.util.UUID;
 
-import static com.googlecode.funclate.Model.persistent.parse;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
-import static com.googlecode.utterlyidle.Responses.response;
+import static com.googlecode.utterlyidle.Response.response;
 import static com.googlecode.utterlyidle.Status.GATEWAY_TIMEOUT;
 import static com.googlecode.utterlyidle.Status.INTERNAL_SERVER_ERROR;
 import static javarepl.Utils.randomServerPort;
@@ -59,8 +62,8 @@ public final class WebConsoleClientHandler {
 
     private ConsoleStatus status() {
         try {
-            return ConsoleStatus.valueOf(parse(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
-                    .get("status", String.class));
+            return ConsoleStatus.valueOf(Json.map(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
+                    .get("status").toString());
 
         } catch (Exception e) {
             return Idle;
@@ -132,17 +135,15 @@ public final class WebConsoleClientHandler {
         if (response.status() == Status.OK)
             return response;
 
-        return exitCode().map(new Mapper<Integer, Response>() {
-            public Response call(Integer code) throws Exception {
-                switch (code) {
-                    case EXPRESSION_TIMEOUT:
-                    case INACTIVITY_TIMEOUT: {
-                        shutdown();
-                        return response(GATEWAY_TIMEOUT);
-                    }
-                    default:
-                        return response;
+        return exitCode().map(code -> {
+            switch (code) {
+                case EXPRESSION_TIMEOUT:
+                case INACTIVITY_TIMEOUT: {
+                    shutdown();
+                    return response(GATEWAY_TIMEOUT);
                 }
+                default:
+                    return response;
             }
         }).getOrElse(response);
     }

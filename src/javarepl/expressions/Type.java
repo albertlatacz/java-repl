@@ -1,7 +1,6 @@
 package javarepl.expressions;
 
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 
 public final class Type extends Expression {
@@ -29,15 +28,5 @@ public final class Type extends Expression {
 
     public String canonicalName() {
         return (!typePackage.isEmpty() ? typePackage.get() + "." : "") + type;
-    }
-
-    public static final class functions {
-        public static Mapper<Type, String> type() {
-            return new Mapper<Type, String>() {
-                public String call(Type value) throws Exception {
-                    return value.type;
-                }
-            };
-        }
     }
 }

@@ -1,9 +1,9 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.functions.Function1;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionCandidate;
@@ -18,12 +18,12 @@ import org.fusesource.jansi.AnsiConsole;
 import java.io.IOException;
 import java.util.*;
 
-import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.functions.Callables.compose;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -31,8 +31,6 @@ import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
-import static javarepl.completion.CompletionCandidate.functions.candidateForms;
-import static javarepl.completion.CompletionCandidate.functions.candidateValue;
 import static javarepl.completion.CompletionResult.methods.fromJson;
 import static javarepl.completion.CompletionResult.methods.toJson;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
@@ -144,7 +142,7 @@ public class Main {
     }
 
     private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {
-        return new ExpressionReader(new Mapper<Sequence<String>, String>() {
+        return new ExpressionReader(new Function1<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
 
             {
@@ -170,15 +168,13 @@ public class Main {
             }
 
             private jline.console.completer.Completer clientCompleter() {
-                return new jline.console.completer.Completer() {
-                    public int complete(String expression, int cursor, List<CharSequence> candidates) {
-                        try {
-                            CompletionResult result = client.completions(expression);
-                            candidates.addAll(asList(toJson(result)));
-                            return result.candidates().isEmpty() ? -1 : result.position();
-                        } catch (Exception e) {
-                            return -1;
-                        }
+                return (expression, cursor, candidates) -> {
+                    try {
+                        CompletionResult result = client.completions(expression);
+                        candidates.addAll(asList(toJson(result)));
+                        return result.candidates().isEmpty() ? -1 : result.position();
+                    } catch (Exception e) {
+                        return -1;
                     }
                 };
             }
@@ -225,11 +221,11 @@ public class Main {
                 }
 
                 setBuffer(reader, value, pos);
-                candidatesToPrint = completionResult.candidates().flatMap(candidateForms());
+                candidatesToPrint = completionResult.candidates().flatMap(CompletionCandidate::forms);
             } else if (completionResult.candidates().size() > 1) {
                 String value = getUnambiguousCompletions(completionResult.candidates());
                 setBuffer(reader, value, pos);
-                candidatesToPrint = completionResult.candidates().map(candidateValue());
+                candidatesToPrint = completionResult.candidates().map(CompletionCandidate::value);
             }
 
             printCandidates(reader, candidatesToPrint.safeCast(CharSequence.class).toList());
@@ -313,7 +309,7 @@ public class Main {
             }
 
             // convert to an array for speed
-            String[] strings = candidates.map(candidateValue()).toArray(new String[candidates.size()]);
+            String[] strings = candidates.map(CompletionCandidate::value).toArray(new String[candidates.size()]);
 
             String first = strings[0];
             StringBuilder candidate = new StringBuilder();

@@ -1,6 +1,5 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 
 import java.lang.reflect.Type;
@@ -62,31 +61,5 @@ public class Result {
         return other instanceof Result &&
                 (key != null && key.equals(((Result) other).key)) &&
                 (value != null && value.equals(((Result) other).value));
-    }
-
-    public static final class functions {
-        public static Mapper<Result, String> key() {
-            return new Mapper<Result, String>() {
-                public String call(Result result) throws Exception {
-                    return result.key();
-                }
-            };
-        }
-
-        public static Mapper<Result, Object> value() {
-            return new Mapper<Result, Object>() {
-                public Object call(Result result) throws Exception {
-                    return result.value();
-                }
-            };
-        }
-
-        public static Mapper<Result, Type> type() {
-            return new Mapper<Result, Type>() {
-                public Type call(Result result) throws Exception {
-                    return result.type();
-                }
-            };
-        }
     }
 }

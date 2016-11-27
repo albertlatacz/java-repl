@@ -1,13 +1,13 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.predicates.Predicate;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
-import static com.googlecode.totallylazy.Predicates.not;
+import static com.googlecode.totallylazy.predicates.Predicates.not;
 import static javarepl.console.ConsoleLog.consoleLog;
 
 public class ConsoleLoggerPrintStream extends PrintStream {

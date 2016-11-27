@@ -1,5 +1,6 @@
 package javarepl.client;
 
+import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleConfig;
 import javarepl.console.SimpleConsole;
@@ -14,7 +15,6 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
 import static javarepl.client.EvaluationLog.Type.SUCCESS;
-import static javarepl.completion.CompletionCandidate.functions.candidateValue;
 import static javarepl.console.ConsoleStatus.Running;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +64,7 @@ public class JavaREPLClientTest {
 
         assertThat(result.expression(), is("li"));
         assertThat(result.position(), is(0));
-        assertThat(result.candidates().map(candidateValue()), is(one("life")));
+        assertThat(result.candidates().map(CompletionCandidate::value), is(one("life")));
     }
 
 

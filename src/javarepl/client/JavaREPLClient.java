@@ -1,19 +1,21 @@
 package javarepl.client;
 
-import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.completion.CompletionResult;
 import javarepl.console.ConsoleStatus;
 import javarepl.rendering.ExpressionTemplate;
 
-import static com.googlecode.funclate.Model.persistent.parse;
+import java.util.List;
+import java.util.Map;
+
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.json.Json.map;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static javarepl.client.EvaluationLog.Type;
@@ -32,8 +34,8 @@ public final class JavaREPLClient {
     }
 
     public synchronized ExpressionTemplate template(String expression) throws Exception {
-        Model model = parse(client.handle(get(url("template")).query("expression", expression).build()).entity().toString());
-        return new ExpressionTemplate(model.get("template", String.class), model.get("token", String.class));
+        Map<String, Object> model = map(client.handle(get(url("template")).query("expression", expression).build()).entity().toString());
+        return new ExpressionTemplate(model.get("template").toString(), model.get("token").toString());
     }
 
 
@@ -43,9 +45,9 @@ public final class JavaREPLClient {
         if (json.isEmpty())
             return none();
 
-        Model model = parse(json);
-        Sequence<Model> logs = sequence(model.getValues("logs", Model.class));
-        String expression = model.get("expression", String.class);
+        Map<String, Object> model = map(json);
+        Sequence<Map<String, Object>> logs = sequence((List<Object>)model.get("logs")).unsafeCast();
+        String expression = model.get("expression").toString();
 
         return some(new EvaluationResult(expression, logs.map(modelToEvaluationLog())));
     }
@@ -56,7 +58,7 @@ public final class JavaREPLClient {
 
     public synchronized ConsoleStatus status() {
         try {
-            return ConsoleStatus.valueOf(parse(client.handle(get(url("status")).build()).entity().toString()).get("status", String.class));
+            return ConsoleStatus.valueOf(map(client.handle(get(url("status")).build()).entity().toString()).get("status").toString());
         } catch (Exception e) {
             return Idle;
         }
@@ -64,7 +66,7 @@ public final class JavaREPLClient {
 
     public synchronized String version() {
         try {
-            return parse(client.handle(get(url("version")).build()).entity().toString()).get("version", String.class);
+            return map(client.handle(get(url("version")).build()).entity().toString()).get("version").toString();
         } catch (Exception e) {
             return "[unknown]";
         }
@@ -72,16 +74,12 @@ public final class JavaREPLClient {
 
     public synchronized Sequence<String> history() throws Exception {
         Response history = client.handle(get(url("history")).build());
-        Model model = parse(history.entity().toString());
-        return sequence(model.getValues("history", String.class));
+        Map<String, Object> model = map(history.entity().toString());
+        return sequence((List<Object>)model.get("history")).safeCast(String.class);
     }
 
-    private Mapper<Model, EvaluationLog> modelToEvaluationLog() {
-        return new Mapper<Model, EvaluationLog>() {
-            public EvaluationLog call(Model model) throws Exception {
-                return new EvaluationLog(Type.valueOf(model.get("type", String.class)), model.get("message", String.class));
-            }
-        };
+    private Function1<Map<String, Object>, EvaluationLog> modelToEvaluationLog() {
+        return model -> new EvaluationLog(Type.valueOf(model.get("type").toString()), model.get("message").toString());
     }
 
     private String url(String path) {

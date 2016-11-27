@@ -1,6 +1,6 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Predicates;
+import com.googlecode.totallylazy.predicates.Predicates;
 import org.junit.Test;
 
 import java.math.BigDecimal;

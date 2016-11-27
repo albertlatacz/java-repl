@@ -1,11 +1,12 @@
 package javarepl.console.commands;
 
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.yadic.Container;
 import javarepl.console.ConsoleConfig;
+
+import static com.googlecode.totallylazy.Sequences.sequence;
 
 public final class Commands {
     private final Container context;
@@ -19,7 +20,7 @@ public final class Commands {
 
     public Sequence<Command> allCommands() {
         return userCommands()
-                .join(commandInstances(Sequences.<Class<? extends Command>>sequence(
+                .join(commandInstances(sequence(
                         NotAValidCommand.class,
                         ShowResult.class,
                         EvaluateExpression.class)));
@@ -30,14 +31,6 @@ public final class Commands {
     }
 
     private Sequence<Command> commandInstances(Sequence<Class<? extends Command>> commands) {
-        return commands.map(createCommandInstance(context));
-    }
-
-    public static final Mapper<Class<? extends Command>, Command> createCommandInstance(final Container context) {
-        return new Mapper<Class<? extends Command>, Command>() {
-            public Command call(Class<? extends Command> aClass) throws Exception {
-                return context.create(aClass);
-            }
-        };
+        return commands.map(context::create);
     }
 }

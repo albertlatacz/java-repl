@@ -1,7 +1,7 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.functions.Function1;
 import javarepl.expressions.Expression;
 
 public class Evaluation {
@@ -45,20 +45,12 @@ public class Evaluation {
     }
 
     public static final class functions {
-        public static Mapper<Evaluation, Option<Result>> result() {
-            return new Mapper<Evaluation, Option<Result>>() {
-                public Option<Result> call(Evaluation value) throws Exception {
-                    return value.result;
-                }
-            };
+        public static Function1<Evaluation, Option<Result>> result() {
+            return value -> value.result;
         }
 
-        public static Mapper<Evaluation, Expression> expression() {
-            return new Mapper<Evaluation, Expression>() {
-                public Expression call(Evaluation value) throws Exception {
-                    return value.expression;
-                }
-            };
+        public static Function1<Evaluation, Expression> expression() {
+            return value -> value.expression;
         }
     }
 }

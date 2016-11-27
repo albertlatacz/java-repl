@@ -1,18 +1,15 @@
 package javarepl.completion;
 
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.functions.Function1;
 
-import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.comparators.Comparators.ascending;
-import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
-import static javarepl.completion.ResolvedClass.functions.canonicalClassName;
-import static javarepl.completion.ResolvedPackage.functions.classes;
-import static javarepl.completion.ResolvedPackage.functions.packageName;
+import static com.googlecode.totallylazy.predicates.Predicates.*;
+import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
 
 public final class TypeCompleter extends Completer {
     private final TypeResolver typeResolver;
@@ -26,16 +23,16 @@ public final class TypeCompleter extends Completer {
         final String packagePart = expression.substring(lastSpace);
         final int beginIndex = packagePart.lastIndexOf('.') + 1;
 
-        Sequence<ResolvedPackage> resolvedPackages = typeResolver.packages().filter(where(packageName(), startsWith(packagePart)));
+        Sequence<ResolvedPackage> resolvedPackages = typeResolver.packages().filter(where(ResolvedPackage::packageName, startsWith(packagePart)));
 
         Sequence<String> classesInPackage = beginIndex > 0
-                ? typeResolver.packages().filter(where(packageName(), equalTo(packagePart.substring(0, beginIndex - 1))))
-                .flatMap(classes())
-                .map(canonicalClassName())
+                ? typeResolver.packages().filter(where(ResolvedPackage::packageName, equalTo(packagePart.substring(0, beginIndex - 1))))
+                .flatMap(ResolvedPackage::classes)
+                .map(ResolvedClass::canonicalClassName)
                 .filter(startsWith(packagePart))
                 : empty(String.class);
 
-        Sequence<CompletionCandidate> candidates = resolvedPackages.map(packageName()).join(classesInPackage)
+        Sequence<CompletionCandidate> candidates = resolvedPackages.map(ResolvedPackage::packageName).join(classesInPackage)
                 .map(candidatePackagePrefix(beginIndex))
                 .filter(not(Strings.empty()))
                 .unique()
@@ -45,16 +42,14 @@ public final class TypeCompleter extends Completer {
         return new CompletionResult(expression, lastSpace + beginIndex, candidates);
     }
 
-    private Mapper<String, String> candidatePackagePrefix(final int fromIndex) {
-        return new Mapper<String, String>() {
-            public String call(String item) throws Exception {
-                int toIndex = item.indexOf('.', fromIndex);
+    private Function1<String, String> candidatePackagePrefix(final int fromIndex) {
+        return item -> {
+            int toIndex = item.indexOf('.', fromIndex);
 
-                if (toIndex < fromIndex)
-                    toIndex = item.length();
+            if (toIndex < fromIndex)
+                toIndex = item.length();
 
-                return item.substring(fromIndex, toIndex);
-            }
+            return item.substring(fromIndex, toIndex);
         };
     }
 }

@@ -1,9 +1,9 @@
 package javarepl.completion;
 
 import com.googlecode.totallylazy.Group;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.comparators.Comparators;
+import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.totallylazy.match;
 import javarepl.reflection.ClassReflection;
 import javarepl.reflection.MemberReflection;
@@ -16,70 +16,50 @@ import static com.googlecode.totallylazy.numbers.Numbers.maximum;
 
 public class Completions {
 
-    public static Mapper<Character, Integer> lastIndexOf(final String string) {
-        return new Mapper<Character, Integer>() {
-            public Integer call(Character character) throws Exception {
-                return string.lastIndexOf(character);
-            }
-        };
+    public static Function1<Character, Integer> lastIndexOf(final String string) {
+        return character -> string.lastIndexOf(character);
     }
 
-    public static Mapper<MemberReflection, String> candidateName() {
-        return new Mapper<MemberReflection, String>() {
-            public String call(MemberReflection memberReflection) throws Exception {
-                return new match<MemberReflection, String>() {
-                    String value(MethodReflection expr) {
-                        return expr.name() + "(";
-                    }
-
-                    String value(ClassReflection expr) {
-                        return expr.member().getSimpleName();
-                    }
-
-                    String value(MemberReflection expr) {
-                        return expr.name();
-                    }
-                }.apply(memberReflection).get();
+    public static Function1<MemberReflection, String> candidateName() {
+        return memberReflection -> new match<MemberReflection, String>() {
+            String value(MethodReflection expr) {
+                return expr.name() + "(";
             }
-        };
+
+            String value(ClassReflection expr) {
+                return expr.member().getSimpleName();
+            }
+
+            String value(MemberReflection expr) {
+                return expr.name();
+            }
+        }.apply(memberReflection).get();
     }
 
 
-    public static Mapper<MemberReflection, String> candidateForm() {
-        return new Mapper<MemberReflection, String>() {
-            public String call(MemberReflection memberReflection) throws Exception {
-                return new match<MemberReflection, String>() {
-                    String value(MethodReflection expr) {
-                        return genericMethodSignature(expr.member());
-                    }
-
-                    String value(ClassReflection expr) {
-                        return expr.member().getSimpleName();
-                    }
-
-                    String value(MemberReflection expr) {
-                        return expr.name();
-                    }
-                }.apply(memberReflection).get();
+    public static Function1<MemberReflection, String> candidateForm() {
+        return memberReflection -> new match<MemberReflection, String>() {
+            String value(MethodReflection expr) {
+                return genericMethodSignature(expr.member());
             }
-        };
+
+            String value(ClassReflection expr) {
+                return expr.member().getSimpleName();
+            }
+
+            String value(MemberReflection expr) {
+                return expr.name();
+            }
+        }.apply(memberReflection).get();
     }
 
 
-    public static Mapper<Group<String, MemberReflection>, CompletionCandidate> candidate() {
-        return new Mapper<Group<String, MemberReflection>, CompletionCandidate>() {
-            public CompletionCandidate call(final Group<String, MemberReflection> group) throws Exception {
-                return new CompletionCandidate(group.key(), group.map(candidateForm()).sort(Comparators.ascending(String.class)));
-            }
-        };
+    public static Function1<Group<String, MemberReflection>, CompletionCandidate> candidate() {
+        return group -> new CompletionCandidate(group.key(), group.map(candidateForm()).sort(Comparators.ascending(String.class)));
     }
 
-    private static Mapper<Type, String> asSimpleGenericTypeSignature() {
-        return new Mapper<Type, String>() {
-            public String call(Type type) throws Exception {
-                return renderSimpleGenericType(type);
-            }
-        };
+    private static Function1<Type, String> asSimpleGenericTypeSignature() {
+        return type -> renderSimpleGenericType(type);
     }
 
 

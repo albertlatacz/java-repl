@@ -1,6 +1,10 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Files;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Strings;
+import com.googlecode.totallylazy.predicates.Predicate;
 
 import java.io.File;
 

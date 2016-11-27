@@ -1,18 +1,16 @@
 package javarepl.rendering;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 import javarepl.EvaluationContext;
 import javarepl.EvaluationTemplate;
-import javarepl.Result;
 import javarepl.expressions.*;
 
-import static com.googlecode.totallylazy.Predicates.not;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.replaceAll;
+import static com.googlecode.totallylazy.predicates.Predicates.not;
 import static java.lang.String.format;
 import static javarepl.expressions.Expression.functions.source;
 import static javarepl.expressions.Patterns.methodPattern;
@@ -120,11 +118,10 @@ public class EvaluationClassRenderer {
 
 
     private static String renderPreviousEvaluations(EvaluationContext context) {
-        return context.results().map(new Mapper<Result, String>() {
-            public String call(Result result) throws Exception {
-                return format("  public %s %s = valueOf(\"%s\");", renderType(result.type()), result.key(), result.key());
-            }
-        }).toString("\n");
+        return context
+                .results()
+                .map(result -> format("  public %s %s = valueOf(\"%s\");", renderType(result.type()), result.key(), result.key()))
+                .toString("\n");
     }
 
     private static String renderPreviousMethods(EvaluationContext context) {

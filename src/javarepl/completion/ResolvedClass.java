@@ -1,6 +1,5 @@
 package javarepl.completion;
 
-import com.googlecode.totallylazy.Mapper;
 
 public final class ResolvedClass {
     private final ResolvedPackage resolvedPackage;
@@ -39,24 +38,6 @@ public final class ResolvedClass {
         return other instanceof CompletionResult &&
                 other.getClass().equals(getClass()) &&
                 other.toString().equals(toString());
-    }
-
-    public static class functions {
-        public static Mapper<ResolvedClass, String> className() {
-            return new Mapper<ResolvedClass, String>() {
-                public String call(ResolvedClass resolvedClass) throws Exception {
-                    return resolvedClass.className();
-                }
-            };
-        }
-
-        public static Mapper<ResolvedClass, String> canonicalClassName() {
-            return new Mapper<ResolvedClass, String>() {
-                public String call(ResolvedClass resolvedClass) throws Exception {
-                    return resolvedClass.canonicalClassName();
-                }
-            };
-        }
     }
 
 }

@@ -1,6 +1,6 @@
 package javarepl.console.commands;
 
-import com.googlecode.totallylazy.Predicate;
+import com.googlecode.totallylazy.predicates.Predicate;
 import javarepl.Evaluator;
 import javarepl.console.ConsoleLogger;
 
@@ -19,10 +19,6 @@ public final class ShowResult extends Command {
     }
 
     private static Predicate<String> containsResult(final Evaluator evaluator) {
-        return new Predicate<String>() {
-            public boolean matches(String expression) {
-                return !evaluator.result(expression).isEmpty();
-            }
-        };
+        return expression -> !evaluator.result(expression).isEmpty();
     }
 }

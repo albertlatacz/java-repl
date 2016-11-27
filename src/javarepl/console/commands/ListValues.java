@@ -10,9 +10,6 @@ import javarepl.expressions.Type;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static javarepl.Utils.listValues;
-import static javarepl.expressions.Import.functions.typePackage;
-import static javarepl.expressions.Method.functions.signature;
-import static javarepl.expressions.Type.functions.type;
 
 public final class ListValues extends Command {
     private static final String COMMAND = ":list";
@@ -48,15 +45,15 @@ public final class ListValues extends Command {
     }
 
     private void listMethods() {
-        logger.success(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).map(signature())));
+        logger.success(listValues("Methods", sequence(evaluator.expressionsOfType(Method.class)).map(Method::signature)));
     }
 
     private void listImports() {
-        logger.success(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(typePackage())));
+        logger.success(listValues("Imports", sequence(evaluator.expressionsOfType(Import.class)).map(Import::typePackage)));
     }
 
     private void listTypes() {
-        logger.success(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).map(type())));
+        logger.success(listValues("Types", sequence(evaluator.expressionsOfType(Type.class)).map(Type::type)));
     }
 
     private void listResults() {

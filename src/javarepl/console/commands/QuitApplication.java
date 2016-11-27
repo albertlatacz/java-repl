@@ -4,7 +4,7 @@ import javarepl.Evaluator;
 import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
-import static com.googlecode.totallylazy.Predicates.equalTo;
+import static com.googlecode.totallylazy.predicates.Predicates.equalTo;
 
 public final class QuitApplication extends Command {
     private static final String COMMAND = ":quit";

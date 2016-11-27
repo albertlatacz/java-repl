@@ -1,9 +1,8 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Functions;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Rule;
 import com.googlecode.totallylazy.Rules;
+import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.SimpleContainer;
 import javarepl.Evaluator;
@@ -13,17 +12,18 @@ import javarepl.console.commands.Commands;
 import javarepl.expressions.Expression;
 import javarepl.rendering.ExpressionTemplate;
 
-import static com.googlecode.totallylazy.Predicates.always;
-import static com.googlecode.totallylazy.Predicates.notNullValue;
 import static com.googlecode.totallylazy.Strings.blank;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.functions.Callables.returns1;
+import static com.googlecode.totallylazy.predicates.Predicates.always;
+import static com.googlecode.totallylazy.predicates.Predicates.notNullValue;
+import static java.lang.Runtime.getRuntime;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.completion.Completers.javaKeywordCompleter;
 import static javarepl.completion.TypeResolver.functions.defaultPackageResolver;
 import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
 import static javarepl.console.ConsoleStatus.*;
-import static javarepl.console.commands.Command.functions.completer;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
@@ -43,7 +43,7 @@ public final class SimpleConsole implements Console {
         context.addInstance(ConsoleLogger.class, config.logger);
         context.addInstance(TypeResolver.class, new TypeResolver(defaultPackageResolver()));
         context.add(Commands.class);
-        context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(completer()).filter(notNullValue())
+        context.addInstance(Completer.class, new AggregateCompleter(context.get(Commands.class).allCommands().map(Command::completer).filter(notNullValue())
                 .append(javaKeywordCompleter())
                 .append(new ConsoleCompleter(context.get(Evaluator.class), context.get(TypeResolver.class)))
                 .append(new TypeCompleter(context.get(TypeResolver.class)))
@@ -100,11 +100,7 @@ public final class SimpleConsole implements Console {
     }
 
     private void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                shutdown();
-            }
-        });
+        getRuntime().addShutdownHook(new Thread(this::shutdown));
     }
 
     public void shutdown() {
@@ -119,17 +115,15 @@ public final class SimpleConsole implements Console {
         for (Command command : context.get(Commands.class).allCommands()) {
             rules.addLast(Rule.rule(command.predicate(), asFunction(command)));
         }
-        return rules.addLast(Rule.rule(always(), Functions.<String, ConsoleResult>returns1(emptyResult())));
+        return rules.addLast(Rule.rule(always(), returns1(emptyResult())));
     }
 
-    private Mapper<String, ConsoleResult> asFunction(final Command command) {
-        return new Mapper<String, ConsoleResult>() {
-            public ConsoleResult call(String expression) throws Exception {
-                context.get(ConsoleLogger.class).reset();
-                command.execute(expression);
-                ConsoleResult result = new ConsoleResult(expression, context.get(ConsoleLogger.class).logs());
-                return result;
-            }
+    private Function1<String, ConsoleResult> asFunction(final Command command) {
+        return expression -> {
+            context.get(ConsoleLogger.class).reset();
+            command.execute(expression);
+            ConsoleResult result = new ConsoleResult(expression, context.get(ConsoleLogger.class).logs());
+            return result;
         };
     }
 }

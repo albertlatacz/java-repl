@@ -1,9 +1,8 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Function1;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 import javarepl.console.*;
 import javarepl.console.rest.RestConsole;
@@ -20,11 +19,9 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
-import java.util.Collections;
 import java.util.List;
 import java.util.PropertyPermission;
 
-import static com.googlecode.totallylazy.Callables.compose;
 import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
@@ -32,6 +29,8 @@ import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
+import static com.googlecode.totallylazy.collections.PersistentList.constructors.empty;
+import static com.googlecode.totallylazy.functions.Callables.compose;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static java.lang.String.format;
@@ -84,17 +83,14 @@ public class Repl {
     private static List<String> initialExpressionsFromFile() {
         return fileOption(new File("."), "javarepl.init")
             .map(readFile())
-            .getOrElse(Collections.EMPTY_LIST);
+            .getOrElse(empty(String.class));
     }
 
     private static Function1<File, List<String>> readFile() {
-        return new Function1<File, List<String>>() {
-            @Override
-            public List<String> call(File f) throws Exception {
-                List<String> l = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-                System.out.println(l);
-                return l;
-            }
+        return f -> {
+            List<String> l = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
+            System.out.println(l);
+            return l;
         };
     }
 
@@ -102,18 +98,16 @@ public class Repl {
         return sequence(args).contains("--ignoreConsole");
     }
 
-    private static Mapper<Sequence<String>, String> ignoreConsoleInput() {
-        return new Mapper<Sequence<String>, String>() {
-            public String call(Sequence<String> strings) throws Exception {
-                while (true) {
-                    Thread.sleep(100);
-                }
+    private static Function1<Sequence<String>, String> ignoreConsoleInput() {
+        return strings -> {
+            while (true) {
+                Thread.sleep(100);
             }
         };
     }
 
-    private static Mapper<Sequence<String>, String> readFromConsole() {
-        return new Mapper<Sequence<String>, String>() {
+    private static Function1<Sequence<String>, String> readFromConsole() {
+        return new Function1<Sequence<String>, String>() {
             private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
             public String call(Sequence<String> lines) throws Exception {
@@ -191,7 +185,7 @@ public class Repl {
                     toString(File.separator) + "/-", "read"));
                 permissions.add(new FilePermission("./-", "read"));
 
-                Sequence<String> extensions = sequence(((URLClassLoader) getSystemJavaCompiler().getClass().getClassLoader()).getURLs()).map(path()).
+                Sequence<String> extensions = sequence(((URLClassLoader) getSystemJavaCompiler().getClass().getClassLoader()).getURLs()).map(URL::getPath).
                     join(paths("java.ext.dirs")).
                     join(paths("java.library.path")).
                     append(System.getProperty("user.home"));
@@ -209,15 +203,6 @@ public class Repl {
         });
 
         System.setSecurityManager(new SecurityManager());
-    }
-
-    private static Function1<URL, String> path() {
-        return new Function1<URL, String>() {
-            @Override
-            public String call(URL url) throws Exception {
-                return url.getPath();
-            }
-        };
     }
 
     private static Sequence<String> paths(String propertyKey) {

@@ -1,12 +1,16 @@
 package javarepl.completion;
 
-import com.googlecode.funclate.Model;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.json.Json;
 
-import static com.googlecode.funclate.Model.persistent.model;
-import static com.googlecode.funclate.Model.persistent.parse;
+import java.util.List;
+import java.util.Map;
+
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
+import static com.googlecode.totallylazy.collections.PersistentMap.constructors.map;
+import static com.googlecode.totallylazy.json.Json.json;
+
 
 public class CompletionResult {
     private final String expression;
@@ -52,48 +56,23 @@ public class CompletionResult {
                 (position != null && position.equals(((CompletionResult) other).position));
     }
 
-    public static final class functions {
-        public static Mapper<CompletionResult, Integer> position() {
-            return new Mapper<CompletionResult, Integer>() {
-                public Integer call(CompletionResult result) throws Exception {
-                    return result.position();
-                }
-            };
-        }
-
-        public static Mapper<CompletionResult, Sequence<CompletionCandidate>> candidates() {
-            return new Mapper<CompletionResult, Sequence<CompletionCandidate>>() {
-                public Sequence<CompletionCandidate> call(CompletionResult result) throws Exception {
-                    return result.candidates();
-                }
-            };
-        }
-    }
 
     public static final class methods {
         public static String toJson(CompletionResult result) {
-            return model()
-                    .add("expression", result.expression())
-                    .add("position", result.position().toString())
-                    .add("candidates", result.candidates().map(new Mapper<CompletionCandidate, Model>() {
-                        public Model call(CompletionCandidate completionCandidate) throws Exception {
-                            return model()
-                                    .add("value", completionCandidate.value())
-                                    .add("forms", completionCandidate.forms().toList());
-                        }
-                    }).toList()).toString();
+            return json(emptyMap(String.class, Object.class)
+                    .insert("expression", result.expression())
+                    .insert("position", result.position().toString())
+                    .insert("candidates", result.candidates().map(completionCandidate -> emptyMap(String.class, Object.class)
+                            .insert("value", completionCandidate.value())
+                            .insert("forms", completionCandidate.forms().toList())).toList()));
         }
 
         public static CompletionResult fromJson(String json) {
-            Model model = parse(json);
-            return new CompletionResult(model.get("expression", String.class),
-                    Integer.valueOf(model.get("position", String.class)),
-                    sequence(model.getValues("candidates", Model.class))
-                            .map(new Mapper<Model, CompletionCandidate>() {
-                                public CompletionCandidate call(Model model) throws Exception {
-                                    return new CompletionCandidate(model.get("value", String.class), sequence(model.getValues("forms", String.class)));
-                                }
-                            }));
+            Map<String, Object> model = map(Json.map(json));
+            return new CompletionResult(model.get("expression").toString(),
+                    Integer.valueOf(model.get("position").toString()),
+                    sequence((List<Map<String, Object>>)model.get("candidates"))
+                            .map(model1 -> new CompletionCandidate(model1.get("value").toString(), sequence((List<String>)model1.get("forms")))));
         }
     }
 }

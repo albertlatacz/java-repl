@@ -1,23 +1,11 @@
 package javarepl.reflection;
 
-import com.googlecode.totallylazy.Mapper;
-import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.predicates.LogicalPredicate;
 
-import java.lang.annotation.Annotation;
-
-import static com.googlecode.totallylazy.Predicates.instanceOf;
+import static com.googlecode.totallylazy.predicates.Predicates.instanceOf;
 import static java.lang.reflect.Modifier.*;
 
 public final class MemberReflections {
-
-    public static <T extends MemberReflection> Mapper<T, String> memberName() {
-        return new Mapper<T, String>() {
-            public String call(T member) throws Exception {
-                return member.name();
-            }
-        };
-    }
 
     public static <T extends MemberReflection> LogicalPredicate<T> modifier(final int modifier) {
         return new LogicalPredicate<T>() {
@@ -93,21 +81,5 @@ public final class MemberReflections {
 
     public static <T extends MemberReflection> LogicalPredicate<T> isConstructor() {
         return instanceOf(ConstructorReflection.class);
-    }
-
-    public static <T extends AnnotatedReflection> Mapper<T, Sequence<Annotation>> annotations() {
-        return new Mapper<T, Sequence<Annotation>>() {
-            public Sequence<Annotation> call(T member) throws Exception {
-                return member.annotations();
-            }
-        };
-    }
-
-    public static <T extends AnnotatedReflection> Mapper<T, Sequence<Annotation>> declaredAnnotations() {
-        return new Mapper<T, Sequence<Annotation>>() {
-            public Sequence<Annotation> call(T member) throws Exception {
-                return member.declaredAnnotations();
-            }
-        };
     }
 }

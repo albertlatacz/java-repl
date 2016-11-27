@@ -2,7 +2,6 @@ package javarepl;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
 import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 
@@ -10,11 +9,10 @@ import java.io.File;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.option;
-import static com.googlecode.totallylazy.Predicates.*;
 import static com.googlecode.totallylazy.Sequences.empty;
-import static com.googlecode.totallylazy.Sequences.join;
-import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.Result.functions.key;
+import static com.googlecode.totallylazy.Sequences.*;
+import static com.googlecode.totallylazy.predicates.Predicates.equalTo;
+import static com.googlecode.totallylazy.predicates.Predicates.*;
 import static javarepl.Utils.javaVersionAtLeast;
 import static javarepl.Utils.randomOutputDirectory;
 
@@ -65,7 +63,7 @@ public class EvaluationContext {
     public Sequence<Result> results() {
         return results
                 .reverse()
-                .unique(key())
+                .unique(Result::key)
                 .reverse();
     }
 
@@ -80,7 +78,7 @@ public class EvaluationContext {
     }
 
     public Option<Result> result(final String key) {
-        return results().filter(where(key(), equalTo(key))).headOption();
+        return results().filter(where(Result::key, equalTo(key))).headOption();
     }
 
     public String nextResultKey() {

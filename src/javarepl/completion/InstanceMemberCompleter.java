@@ -11,10 +11,9 @@ import java.lang.reflect.Type;
 
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
-import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.CompletionCandidate.functions.candidateValue;
+import static com.googlecode.totallylazy.predicates.Predicates.not;
+import static com.googlecode.totallylazy.predicates.Predicates.where;
 import static javarepl.completion.Completions.*;
 import static javarepl.reflection.ClassReflections.reflectionOf;
 import static javarepl.reflection.MemberReflections.isPublic;
@@ -49,7 +48,7 @@ public class InstanceMemberCompleter extends Completer {
                     .filter(isPublic().and(not(isStatic())))
                     .groupBy(candidateName())
                     .map(candidate())
-                    .filter(where(candidateValue(), startsWith(packagePart.substring(beginIndex))));
+                    .filter(where(CompletionCandidate::value, startsWith(packagePart.substring(beginIndex))));
 
             return new CompletionResult(expression, lastSeparator + beginIndex, candidates);
         } else {

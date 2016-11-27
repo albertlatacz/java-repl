@@ -3,8 +3,8 @@ package javarepl.console.commands;
 
 import com.googlecode.totallylazy.Either;
 import com.googlecode.totallylazy.Option;
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.match;
+import com.googlecode.totallylazy.predicates.Predicates;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.ExpressionCompilationException;
@@ -15,8 +15,8 @@ import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
 
-import static com.googlecode.totallylazy.Callables.asString;
 import static com.googlecode.totallylazy.Strings.blank;
+import static com.googlecode.totallylazy.functions.Callables.asString;
 
 public final class EvaluateExpression extends Command {
 

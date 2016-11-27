@@ -1,6 +1,6 @@
 package javarepl.console.rest;
 
-import com.googlecode.funclate.Model;
+import com.googlecode.totallylazy.json.Json;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -10,8 +10,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.googlecode.funclate.Model.persistent.model;
-import static com.googlecode.funclate.Model.persistent.parse;
+import java.util.Map;
+
+import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
 import static com.googlecode.utterlyidle.RequestBuilder.get;
 import static com.googlecode.utterlyidle.RequestBuilder.post;
 import static java.util.Arrays.asList;
@@ -47,9 +48,11 @@ public class RestConsoleTest {
 
         assertThat(response.status(), is(Status.OK));
         assertThat(body(response),
-                is(model()
-                        .add("expression", "life = 42")
-                        .add("logs", asList(model().add("message", "java.lang.Integer life = 42").add("type", "SUCCESS")))));
+                is(emptyMap(String.class, Object.class)
+                        .insert("expression", "life = 42")
+                        .insert("logs", asList(emptyMap(String.class, Object.class)
+                                .insert("message", "java.lang.Integer life = 42")
+                                .insert("type", "SUCCESS")))));
     }
 
     @Test
@@ -57,8 +60,8 @@ public class RestConsoleTest {
         Response response = client.handle(get(url("template")).query("expression", "life = 42").build());
 
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response).get("template", String.class),
-                containsString(body(response).get("token", String.class)));
+        assertThat(body(response).get("template").toString(),
+                containsString(body(response).get("token").toString()));
     }
 
     @Test
@@ -70,14 +73,14 @@ public class RestConsoleTest {
         Response response = client.handle(get(url("completions")).query("expression", "prefix expr_").build());
 
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model()
-                .add("expression", "prefix expr_")
-                .add("position", "7")
-                .add("candidates",
+        assertThat(body(response), is(emptyMap(String.class, Object.class)
+                .insert("expression", "prefix expr_")
+                .insert("position", "7")
+                .insert("candidates",
                         asList(
-                                model().add("value", "expr_1").add("forms", asList("expr_1")),
-                                model().add("value", "expr_2").add("forms", asList("expr_2")),
-                                model().add("value", "expr_3").add("forms", asList("expr_3")))
+                                emptyMap(String.class, Object.class).insert("value", "expr_1").insert("forms", asList("expr_1")),
+                                emptyMap(String.class, Object.class).insert("value", "expr_2").insert("forms", asList("expr_2")),
+                                emptyMap(String.class, Object.class).insert("value", "expr_3").insert("forms", asList("expr_3")))
                 )));
     }
 
@@ -89,7 +92,7 @@ public class RestConsoleTest {
         Response response = client.handle(get(url("history")).build());
 
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model().add("history", asList("life = 42", ":help"))));
+        assertThat(body(response), is(emptyMap(String.class, Object.class).insert("history", asList("life = 42", ":help"))));
     }
 
 
@@ -98,8 +101,8 @@ public class RestConsoleTest {
         Response response = client.handle(get(url("status")).build());
 
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model()
-                .add("status", Running.toString())));
+        assertThat(body(response), is(emptyMap(String.class, Object.class)
+                .insert("status", Running.toString())));
 
     }
 
@@ -108,8 +111,8 @@ public class RestConsoleTest {
         Response response = client.handle(get(url("version")).build());
 
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model()
-                .add("version", applicationVersion())));
+        assertThat(body(response), is(emptyMap(String.class, Object.class)
+                .insert("version", applicationVersion())));
 
     }
 
@@ -117,11 +120,11 @@ public class RestConsoleTest {
     public void shouldReadExpression() throws Exception {
         Response response = client.handle(post(url("readExpression")).form("line", "{").build());
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model()));
+        assertThat(body(response), is(emptyMap(String.class, Object.class)));
 
         response = client.handle(post(url("readExpression")).form("line", "}").build());
         assertThat(response.status(), is(Status.OK));
-        assertThat(body(response), is(model().add("expression", "{\n}")));
+        assertThat(body(response), is(emptyMap(String.class, Object.class).insert("expression", "{\n}")));
 
     }
 
@@ -129,7 +132,7 @@ public class RestConsoleTest {
         return prefixUrl + "/" + url;
     }
 
-    private Model body(Response response) {
-        return parse(response.entity().toString());
+    private Map<String, Object> body(Response response) {
+        return Json.map(response.entity().toString());
     }
 }

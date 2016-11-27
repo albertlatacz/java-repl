@@ -1,6 +1,5 @@
 package javarepl.rendering;
 
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.multi;
 
@@ -36,14 +35,7 @@ public class TypeRenderer {
     private static String renderType(ParameterizedType type) {
         return format("%s<%s>",
                 renderType(type.getRawType()),
-                sequence(type.getActualTypeArguments()).map(renderType()).toString(", "));
+                sequence(type.getActualTypeArguments()).map(TypeRenderer::renderType).toString(", "));
     }
 
-    public static Mapper<Type, String> renderType() {
-        return new Mapper<Type, String>() {
-            public String call(Type type) throws Exception {
-                return renderType(type);
-            }
-        };
-    }
 }

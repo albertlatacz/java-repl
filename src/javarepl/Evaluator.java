@@ -1,7 +1,9 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.annotations.multimethod;
+import com.googlecode.totallylazy.functions.Reducer;
 import javarepl.expressions.*;
 import javarepl.expressions.Value;
 
@@ -20,16 +22,15 @@ import static com.googlecode.totallylazy.Either.left;
 import static com.googlecode.totallylazy.Either.right;
 import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Option.*;
-import static com.googlecode.totallylazy.Predicates.equalTo;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.predicates.Not.not;
+import static com.googlecode.totallylazy.predicates.Predicates.equalTo;
+import static com.googlecode.totallylazy.predicates.Predicates.where;
 import static java.io.File.pathSeparator;
 import static javarepl.Evaluation.evaluation;
 import static javarepl.EvaluationClassLoader.evaluationClassLoader;
 import static javarepl.EvaluationContext.evaluationContext;
-import static javarepl.Result.functions.value;
 import static javarepl.Result.noResult;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.Utils.urlAsFilePath;
@@ -55,18 +56,16 @@ public class Evaluator {
 
     public Either<Throwable, Evaluation> evaluate(final String expr) {
         return parseExpression(expr).flatMap(
-                new Mapper<Expression, Either<Throwable, Evaluation>>() {
-                    public Either<Throwable, Evaluation> call(Expression expression) throws Exception {
-                        Either<Throwable, Evaluation> resultForValue = evaluate(expression);
-                        if (resultForValue.isLeft() && resultForValue.left() instanceof ExpressionCompilationException && expression instanceof Value) {
-                            Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
-                            return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
-                                    ? Left.<Throwable, Evaluation>left(new ExpressionCompilationException(sequence(resultForStatement.left().getMessage(), resultForValue.left().getMessage()).unique().toString("\n\n")))
-                                    : resultForStatement;
-                        }
-
-                        return resultForValue;
+                expression -> {
+                    Either<Throwable, Evaluation> resultForValue = evaluate(expression);
+                    if (resultForValue.isLeft() && resultForValue.left() instanceof ExpressionCompilationException && expression instanceof Value) {
+                        Either<Throwable, Evaluation> resultForStatement = evaluate(new Statement(expr));
+                        return resultForStatement.isLeft() && resultForStatement.left() instanceof ExpressionCompilationException
+                                ? left(new ExpressionCompilationException(sequence(resultForStatement.left().getMessage(), resultForValue.left().getMessage()).unique().toString("\n\n")))
+                                : resultForStatement;
                     }
+
+                    return resultForValue;
                 });
     }
 
@@ -306,7 +305,7 @@ public class Evaluator {
         return sequence(expressionInstance.getClass().getDeclaredFields())
                 .reduceLeft(new Reducer<Field, Sequence<Result>>() {
                     public Sequence<Result> call(Sequence<Result> results, Field field) throws Exception {
-                        Option<Result> result = result(field.getName()).filter(where(value(), not(equalTo(field.get(expressionInstance)))));
+                        Option<Result> result = result(field.getName()).filter(where(Result::value, not(equalTo(field.get(expressionInstance)))));
 
                         if (result.isEmpty())
                             return results;

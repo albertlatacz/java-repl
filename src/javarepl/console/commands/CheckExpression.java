@@ -1,7 +1,7 @@
 package javarepl.console.commands;
 
-import com.googlecode.totallylazy.Callables;
 import com.googlecode.totallylazy.Either;
+import com.googlecode.totallylazy.functions.Callables;
 import javarepl.Evaluation;
 import javarepl.Evaluator;
 import javarepl.completion.CommandCompleter;

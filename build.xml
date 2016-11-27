@@ -37,6 +37,7 @@
     <property name="runtime.dependencies.dir" value="lib/runtime"/>
     <property name="packaged.dependencies.dir" value="lib/packaged"/>
     <property name="optional.dependencies.dir" value="lib/optional"/>
+    <property name="manual.dependencies.dir" value="lib/manual"/>
 
     <import file="${build}/macros.xml"/>
     <import file="${build}/shavenmaven.xml"/>
@@ -46,6 +47,7 @@
         <fileset dir="${runtime.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${packaged.dependencies.dir}" includes="**/*.jar"/>
         <fileset dir="${optional.dependencies.dir}" includes="**/*.jar"/>
+        <fileset dir="${manual.dependencies.dir}" includes="**/*.jar"/>
     </path>
 
     <path id="all.jars">

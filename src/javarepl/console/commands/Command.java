@@ -1,6 +1,9 @@
 package javarepl.console.commands;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Pair;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.predicates.Predicate;
 import javarepl.completion.Completer;
 
 import static com.googlecode.totallylazy.Option.none;
@@ -57,13 +60,4 @@ public abstract class Command {
         }
     }
 
-    public static final class functions {
-        public static Mapper<Command, Completer> completer() {
-            return new Mapper<Command, Completer>() {
-                public Completer call(Command command) throws Exception {
-                    return command.completer;
-                }
-            };
-        }
-    }
 }

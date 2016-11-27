@@ -1,6 +1,10 @@
 package javarepl;
 
-import com.googlecode.totallylazy.*;
+import com.googlecode.totallylazy.Maps;
+import com.googlecode.totallylazy.Option;
+import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.functions.Function1;
 
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,9 +21,9 @@ public class ExpressionReader {
     final static Map<Character, Character> matchingBrackets = Maps.map(closedBrackets.zip(openBrackets));
     final static Sequence<Character> quotes = sequence('\'', '"');
 
-    private final Mapper<Sequence<String>, String> lineReader;
+    private final Function1<Sequence<String>, String> lineReader;
 
-    public ExpressionReader(Mapper<Sequence<String>, String> lineReader) {
+    public ExpressionReader(Function1<Sequence<String>, String> lineReader) {
         this.lineReader = lineReader;
     }
 
@@ -107,8 +111,8 @@ public class ExpressionReader {
         return lines.windowed(2).contains(sequence("", ""));
     }
 
-    public static Mapper<Sequence<String>, String> lines(final String... strings) {
-        return new Mapper<Sequence<String>, String>() {
+    public static Function1<Sequence<String>, String> lines(final String... strings) {
+        return new Function1<Sequence<String>, String>() {
             Sequence<String> toRead = sequence(strings);
 
             public String call(Sequence<String> lines) throws Exception {

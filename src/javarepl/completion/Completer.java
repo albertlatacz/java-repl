@@ -1,6 +1,6 @@
 package javarepl.completion;
 
-import com.googlecode.totallylazy.Mapper;
+import com.googlecode.totallylazy.functions.Function1;
 
-public abstract class Completer extends Mapper<String, CompletionResult> {
+public abstract class Completer implements Function1<String, CompletionResult> {
 }

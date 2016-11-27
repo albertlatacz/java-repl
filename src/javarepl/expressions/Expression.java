@@ -1,6 +1,6 @@
 package javarepl.expressions;
 
-import com.googlecode.totallylazy.Mapper;
+import com.googlecode.totallylazy.functions.Function1;
 
 public abstract class Expression {
     private final String source;
@@ -33,20 +33,12 @@ public abstract class Expression {
     }
 
     public static final class functions {
-        public static Mapper<Expression, String> source() {
-            return new Mapper<Expression, String>() {
-                public String call(Expression value) throws Exception {
-                    return value.source;
-                }
-            };
+        public static Function1<Expression, String> source() {
+            return value -> value.source;
         }
 
-        public static Mapper<Expression, String> key() {
-            return new Mapper<Expression, String>() {
-                public String call(Expression value) throws Exception {
-                    return value.key();
-                }
-            };
+        public static Function1<Expression, String> key() {
+            return Expression::key;
         }
     }
 

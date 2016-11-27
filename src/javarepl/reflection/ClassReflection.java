@@ -8,10 +8,6 @@ import java.lang.annotation.Annotation;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.reflection.ClassReflections.toClassReflection;
-import static javarepl.reflection.ConstructorReflections.toConstructorReflection;
-import static javarepl.reflection.FieldReflections.toFieldReflection;
-import static javarepl.reflection.MethodReflections.toMethodReflection;
 
 public final class ClassReflection extends MemberReflection<Class<?>> {
     public ClassReflection(Class<?> aClass) {
@@ -27,31 +23,31 @@ public final class ClassReflection extends MemberReflection<Class<?>> {
     }
 
     public Option<MethodReflection> enclosingMethod() {
-        return option(member().getEnclosingMethod()).map(toMethodReflection());
+        return option(member().getEnclosingMethod()).map(MethodReflection::new);
     }
 
     public Sequence<FieldReflection> declaredFields() {
-        return sequence(member().getDeclaredFields()).map(toFieldReflection());
+        return sequence(member().getDeclaredFields()).map(FieldReflection::new);
     }
 
     public Sequence<FieldReflection> fields() {
-        return sequence(member().getFields()).map(toFieldReflection());
+        return sequence(member().getFields()).map(FieldReflection::new);
     }
 
     public Sequence<MethodReflection> declaredMethods() {
-        return sequence(member().getDeclaredMethods()).map(toMethodReflection());
+        return sequence(member().getDeclaredMethods()).map(MethodReflection::new);
     }
 
     public Sequence<MethodReflection> methods() {
-        return sequence(member().getMethods()).map(toMethodReflection());
+        return sequence(member().getMethods()).map(MethodReflection::new);
     }
 
     public Sequence<ConstructorReflection> declaredConstructors() {
-        return sequence(member().getDeclaredConstructors()).map(toConstructorReflection());
+        return sequence(member().getDeclaredConstructors()).map(ConstructorReflection::new);
     }
 
     public Sequence<ConstructorReflection> constructors() {
-        return sequence(member().getConstructors()).map(toConstructorReflection());
+        return sequence(member().getConstructors()).map(ConstructorReflection::new);
     }
 
     public Sequence<Annotation> declaredAnnotations() {
@@ -63,15 +59,15 @@ public final class ClassReflection extends MemberReflection<Class<?>> {
     }
 
     private Sequence<ClassReflection> interfaces() {
-        return sequence(member().getInterfaces()).map(toClassReflection());
+        return sequence(member().getInterfaces()).map(ClassReflection::new);
     }
 
     private Sequence<ClassReflection> declaredClasses() {
-        return sequence(member().getDeclaredClasses()).map(toClassReflection());
+        return sequence(member().getDeclaredClasses()).map(ClassReflection::new);
     }
 
     private Sequence<ClassReflection> classes() {
-        return sequence(member().getClasses()).map(toClassReflection());
+        return sequence(member().getClasses()).map(ClassReflection::new);
     }
 
     public Sequence<MemberReflection> declaredMembers() {

@@ -7,7 +7,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
-import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
+import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
 
 public class CompleterTestHelper {
 

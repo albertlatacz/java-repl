@@ -1,23 +1,28 @@
 package javarepl.web;
 
-import com.googlecode.funclate.Model;
 import com.googlecode.totallylazy.Files;
-import com.googlecode.totallylazy.Mapper;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Strings;
-import com.googlecode.utterlyidle.*;
+import com.googlecode.totallylazy.collections.PersistentMap;
+import com.googlecode.totallylazy.functions.Function1;
+import com.googlecode.utterlyidle.BaseUri;
+import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Response;
+import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Map;
 import java.util.UUID;
 
-import static com.googlecode.funclate.Model.persistent.model;
 import static com.googlecode.totallylazy.Files.directory;
 import static com.googlecode.totallylazy.Files.workingDirectory;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.URLs.uri;
-import static com.googlecode.utterlyidle.Responses.response;
+import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
+import static com.googlecode.totallylazy.io.URLs.uri;
+import static com.googlecode.utterlyidle.Response.response;
+import static com.googlecode.utterlyidle.Response.seeOther;
 import static com.googlecode.utterlyidle.Status.*;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -38,8 +43,8 @@ public class WebConsoleResource {
     @Hidden
     @Path("create")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model create(@FormParam("expression") Option<String> expression,
-                        @FormParam("snap") Option<String> snap) throws Exception {
+    public Map<String, Object> create(@FormParam("expression") Option<String> expression,
+                      @FormParam("snap") Option<String> snap) throws Exception {
 
 
         Option<String> initial = snap.isDefined()
@@ -49,7 +54,7 @@ public class WebConsoleResource {
         Option<WebConsoleClientHandler> clientHandler = agent.createClient(initial);
 
         return clientHandler.map(clientHandlerToModel()).get()
-                .add("welcomeMessage", welcomeMessage());
+                .insert("welcomeMessage", welcomeMessage());
     }
 
     @POST
@@ -108,9 +113,9 @@ public class WebConsoleResource {
 
             return ResponseBuilder
                     .response()
-                    .entity(model()
-                            .add("snap", snapId)
-                            .add("uri", snapUri(snapId).toString())
+                    .entity(emptyMap(String.class, Object.class)
+                            .insert("snap", snapId)
+                            .insert("uri", snapUri(snapId).toString())
                     ).build();
 
         } else {
@@ -148,25 +153,22 @@ public class WebConsoleResource {
     @Hidden
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public Model list() {
-        return model().add("clients", agent.clients().map(clientHandlerToModel()));
+    public Map<String, Object> list() {
+        return emptyMap(String.class, Object.class)
+                .insert("clients", agent.clients().map(clientHandlerToModel()));
     }
 
 
     @GET
     @Path("")
     public Response main() {
-        return Responses.seeOther("term.html");
+        return seeOther("term.html");
     }
 
-    private Mapper<WebConsoleClientHandler, Model> clientHandlerToModel() {
-        return new Mapper<WebConsoleClientHandler, Model>() {
-            public Model call(WebConsoleClientHandler webConsoleClientHandler) throws Exception {
-                return model()
-                        .add("id", webConsoleClientHandler.id())
-                        .add("port", webConsoleClientHandler.port().getOrElse(-1));
-            }
-        };
+    private Function1<WebConsoleClientHandler, PersistentMap<String, Object>> clientHandlerToModel() {
+        return webConsoleClientHandler -> emptyMap(String.class, Object.class)
+                .insert("id", webConsoleClientHandler.id())
+                .insert("port", webConsoleClientHandler.port().getOrElse(-1));
     }
 
     private String welcomeMessage() {

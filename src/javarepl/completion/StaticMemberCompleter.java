@@ -4,16 +4,16 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.functions.Function1;
 import javarepl.Evaluator;
 
 import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Pair.pair;
-import static com.googlecode.totallylazy.Predicates.not;
-import static com.googlecode.totallylazy.Predicates.where;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.CompletionCandidate.functions.candidateValue;
+import static com.googlecode.totallylazy.predicates.Predicates.not;
+import static com.googlecode.totallylazy.predicates.Predicates.where;
 import static javarepl.completion.Completions.*;
 import static javarepl.reflection.ClassReflections.reflectionOf;
 import static javarepl.reflection.MemberReflections.*;
@@ -33,12 +33,13 @@ public class StaticMemberCompleter extends Completer {
         Option<Pair<Class<?>, String>> completion = completionFor(packagePart);
 
         if (!completion.isEmpty()) {
+            Function1<CompletionCandidate, String> value = CompletionCandidate::value;
             Sequence<CompletionCandidate> candidates = reflectionOf(completion.get().first())
                     .declaredMembers()
                     .filter(isStatic().and(isPublic()).and(not(isSynthetic())))
                     .groupBy(candidateName())
                     .map(candidate())
-                    .filter(where(candidateValue(), startsWith(completion.get().second())));
+                    .filter(where(value, startsWith(completion.get().second())));
 
             final int beginIndex = packagePart.lastIndexOf('.') + 1;
             return new CompletionResult(expression, lastSeparator + beginIndex, candidates);

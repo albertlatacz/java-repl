@@ -6,7 +6,7 @@ import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 import javarepl.expressions.Expression;
 
-import static com.googlecode.totallylazy.Predicates.equalTo;
+import static com.googlecode.totallylazy.predicates.Predicates.equalTo;
 import static javarepl.EvaluationContext.defaultExpressions;
 import static javarepl.console.commands.EvaluateExpression.evaluate;
 

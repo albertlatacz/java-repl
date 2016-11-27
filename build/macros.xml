@@ -13,9 +13,6 @@
                 <rule pattern="com.googlecode.totallylazy.*" result="javarepl.internal.totallylazy.@1"/>
                 <rule pattern="com.googlecode.totallylazy.**.*" result="javarepl.internal.totallylazy.@1.@2"/>
 
-                <rule pattern="com.googlecode.funclate.*" result="javarepl.internal.funclate.@1"/>
-                <rule pattern="com.googlecode.funclate.**.*" result="javarepl.internal.funclate.@1.@2"/>
-
                 <rule pattern="com.googlecode.lazyparsec.*" result="javarepl.internal.lazyparsec.@1"/>
                 <rule pattern="com.googlecode.lazyparsec.**.*" result="javarepl.internal.lazyparsec.@1.@2"/>
 
@@ -25,11 +22,11 @@
                 <rule pattern="com.googlecode.yadic.*" result="javarepl.internal.yadic.@1"/>
                 <rule pattern="com.googlecode.yadic.**.*" result="javarepl.internal.yadic.@1.@2"/>
 
-                <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.@2"/>
                 <rule pattern="jline.*" result="javarepl.internal.jline.@1"/>
+                <rule pattern="jline.**.*" result="javarepl.internal.jline.@1.@2"/>
 
-                <rule pattern="org.fusesource.**.*" result="org.fusesource.@1.@2"/>
                 <rule pattern="org.fusesource.*" result="org.fusesource.@1"/>
+                <rule pattern="org.fusesource.**.*" result="org.fusesource.@1.@2"/>
 
                 <rule pattern="antlr.*" result="javarepl.internal.antlr.@1"/>
 
@@ -53,7 +50,7 @@
         <sequential>
             <mkdir dir="@{classes}"/>
             <javac srcdir="@{src}" destdir="@{classes}" classpathref="@{classpathref}"
-                   target="1.6" source="1.6" debug="true"
+                   target="1.8" source="1.8" debug="true"
                    includeantruntime="false" encoding="UTF-8">
             </javac>
             <copy todir="@{classes}">

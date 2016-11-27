@@ -4,7 +4,7 @@ import com.googlecode.totallylazy.Sequence;
 
 import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
+import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
 
 public class CommandCompleter extends Completer {
     private final String command;

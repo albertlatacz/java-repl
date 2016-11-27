@@ -1,12 +1,12 @@
 package javarepl.console;
 
-import com.googlecode.totallylazy.Predicates;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.predicates.Predicates;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.URLs.packageUrl;
+import static com.googlecode.totallylazy.io.URLs.packageUrl;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;

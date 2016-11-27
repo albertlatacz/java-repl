@@ -3,7 +3,7 @@ package javarepl.completion;
 import com.googlecode.totallylazy.Sequence;
 
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static javarepl.completion.CompletionCandidate.functions.asCompletionCandidate;
+import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
 
 public class StringCompleter extends Completer {
     private final Sequence<String> candidates;

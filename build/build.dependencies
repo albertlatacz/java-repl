@@ -2,7 +2,5 @@ mvn:org.hamcrest:hamcrest-core:jar:1.3
 mvn:org.hamcrest:hamcrest-library:jar:1.3
 mvn:junit:junit-dep:jar:4.8.2
 
-mvn:com.googlecode.jarjar:jarjar:jar:1.1
-
 
 
