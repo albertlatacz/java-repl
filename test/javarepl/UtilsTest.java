@@ -13,9 +13,11 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.util.Arrays.asList;
 import static javarepl.Utils.*;
+import static javarepl.testclasses.Constructors.*;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 public class UtilsTest {
     @Test
@@ -33,8 +35,11 @@ public class UtilsTest {
     public void extractsTypeFromClass() {
         assertThat(extractType("".getClass()), hasFormOf("class java.lang.String"));
         assertThat(extractType(asList(1, 2, 3).getClass()), hasFormOf("java.util.AbstractList<E>"));
-        assertThat(extractType(anonymousInnerRunnable().getClass()), hasFormOf("interface java.lang.Runnable"));
-        assertThat(extractType(anonymousInnerArrayList().getClass()), hasFormOf("java.util.ArrayList<java.lang.Object>"));
+        assertThat(extractType(anonymousInnerGenericTestClass().getClass()), hasFormOf("javarepl.testclasses.GenericTestClass<javarepl.testclasses.BaseTestInterface>"));
+        assertThat(extractType(anonymousInnerBaseTestInterface().getClass()), hasFormOf("interface javarepl.testclasses.BaseTestInterface"));
+        assertThat(extractType(protectedAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.ProtectedAccessTestClass"));
+        assertThat(extractType(privateAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
+        assertThat(extractType(defaultAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
     }
 
     @Test
@@ -88,4 +93,5 @@ public class UtilsTest {
             }
         };
     }
+
 }

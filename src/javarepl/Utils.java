@@ -1,7 +1,6 @@
 package javarepl;
 
 import com.googlecode.totallylazy.*;
-import com.googlecode.totallylazy.numbers.Numbers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +24,7 @@ import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.URLs.url;
 import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isPublic;
 import static java.net.URLDecoder.decode;
 
 public class Utils {
@@ -40,7 +39,7 @@ public class Utils {
     public static Type extractType(Type type) {
         if (type instanceof Class) {
             Class clazz = (Class) type;
-            if (clazz.isAnonymousClass() || clazz.isSynthetic()) {
+            if (clazz.isAnonymousClass() || clazz.isSynthetic() || clazz.isMemberClass()) {
                 if (clazz.getGenericSuperclass().equals(Object.class)) {
                     return extractType(sequence(clazz.getGenericInterfaces())
                             .headOption()
@@ -50,7 +49,7 @@ public class Utils {
                 }
             }
 
-            if (isPrivate(clazz.getModifiers()))
+            if (!isPublic(clazz.getModifiers()))
                 return extractType(clazz.getGenericSuperclass());
 
             return clazz;
