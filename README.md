@@ -59,13 +59,6 @@ and then
 </dependencies>
 ```
 
-## Downloads
-
-[Latest version](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar)
-
-[Previous releases](http://albertlatacz.published.s3.amazonaws.com/index.html)
-
-
 ## Usage
 To run Java REPL you need to install **Java Development Kit (JDK) 6 or newer**. Download it from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow install instructions. Once JDK is installed and configured you can run:   
 
