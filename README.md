@@ -32,6 +32,33 @@ $ ant
 
 After this completes, the jar completed with bundled dependencies will be located at **build/artifacts/javarepl-dev.build.jar**
 
+## Releases
+
+Releases are automatically released to S3 Maven reposotory
+
+To configure specify repository 
+
+```xml
+<repositories>
+    <repository>
+        <id>albertlatacz.published</id>
+        <url>http://albertlatacz.published.s3.amazonaws.com/repo</url>
+    </repository>
+</repositories>
+```
+
+and then
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>javarepl</groupId>
+        <artifactId>javarepl</artifactId>
+        <version>SOME_VERSION</version>
+    </dependency>
+</dependencies>
+```
+
 ## Downloads
 
 [Latest version](http://albertlatacz.published.s3.amazonaws.com/javarepl/javarepl.jar)
