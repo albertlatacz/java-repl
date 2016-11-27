@@ -5,6 +5,7 @@ import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.annotations.multimethod;
 import com.googlecode.totallylazy.functions.Reducer;
 import javarepl.expressions.*;
+import javarepl.expressions.Type;
 import javarepl.expressions.Value;
 
 import javax.tools.DiagnosticCollector;
