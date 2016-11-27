@@ -1,4 +1,4 @@
-mvn:jline:jline:jar:2.12
+mvn:jline:jline:jar:2.14.2
 
 mvn:cglib:cglib:jar:3.1
 mvn:org.ow2.asm:asm-all:jar|sources:4.2
