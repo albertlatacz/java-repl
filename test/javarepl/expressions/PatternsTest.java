@@ -83,6 +83,9 @@ public class PatternsTest {
         MatchResult result = typePattern.match("package some.pack; public static final class SomeClass extends BaseClass{");
         assertThat(result.group(1), is("some.pack"));
         assertThat(result.group(2), is("SomeClass"));
+
+        result = typePattern.match("public class SomeClass {\n// comment with class word {\n}");
+        assertThat(result.group(2), is("SomeClass"));
     }
 
     @Test

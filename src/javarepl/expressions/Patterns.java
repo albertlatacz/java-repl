@@ -23,7 +23,7 @@ public class Patterns {
     public static final Regex typeExtensibilityModifiersPattern = oneOf("final +", "abstract +");
     public static final Regex typePrefixPattern = oneOf(regexPermutations(typeExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
     public static final Regex typeKindPattern = oneOf("class +", "interface +", "enum +");
-    public static final Regex typePattern = join(oneOf(packagePattern, ""), ".*", typePrefixPattern, typeKindPattern, identifierPattern, ".*\\{.*");
+    public static final Regex typePattern = join(oneOf(packagePattern, ""), ".*?", typePrefixPattern, typeKindPattern, identifierPattern, ".*\\{.*");
 
     public static final Regex methodExtensibilityModifiersPattern = oneOf("final +");
     public static final Regex methodPrefixPattern = oneOf(regexPermutations(methodExtensibilityModifiersPattern, staticModifierPattern, visibilityModifiersPattern), " *");
