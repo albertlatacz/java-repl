@@ -4,7 +4,6 @@ import com.googlecode.totallylazy.Pair;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.functions.Function1;
-import com.googlecode.totallylazy.reflection.Types;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,16 +18,13 @@ import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-import static com.googlecode.totallylazy.Characters.characters;
 import static com.googlecode.totallylazy.Files.*;
 import static com.googlecode.totallylazy.Randoms.takeFromValues;
-import static com.googlecode.totallylazy.Sequences.memorise;
-import static com.googlecode.totallylazy.Sequences.one;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.Sequences.*;
 import static com.googlecode.totallylazy.Strings.replace;
 import static com.googlecode.totallylazy.io.URLs.url;
-import static com.googlecode.totallylazy.predicates.Predicates.*;
-import static com.googlecode.totallylazy.reflection.Types.classOf;
+import static com.googlecode.totallylazy.predicates.Predicates.is;
+import static com.googlecode.totallylazy.predicates.Predicates.where;
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.net.URLDecoder.decode;
@@ -42,56 +38,26 @@ public class Utils {
         return prefix + "$" + takeFromValues(characters("abcdefghijklmnopqrstuvwxyz1234567890")).take(20).toString("");
     }
 
-    public static Type extractType1(Type type) {
+    public static Type extractType(Type type) {
         if (type instanceof Class) {
-            Class clazz = classOf(type);
+            Class clazz = (Class) type;
             if (clazz.isAnonymousClass() || clazz.isSynthetic() || clazz.isMemberClass()) {
                 if (clazz.getGenericSuperclass().equals(Object.class)) {
-                    return extractType1(sequence(clazz.getGenericInterfaces())
+                    return extractType(sequence(clazz.getGenericInterfaces())
                             .headOption()
                             .getOrElse(Object.class));
                 } else {
-                    return extractType1(clazz.getGenericSuperclass());
+                    return extractType(clazz.getGenericSuperclass());
                 }
             }
 
             if (!isPublic(clazz.getModifiers()))
-                return extractType1(clazz.getGenericSuperclass());
+                return extractType(clazz.getGenericSuperclass());
 
             return clazz;
         }
 
         return type;
-    }
-
-
-    public static Sequence<Type> foo(Sequence<Type> typeSeq) {
-
-        Sequence<Class> classes = typeSeq.flatMap(Types::classOption).filter(not(equalTo(Object.class))).unsafeCast();
-
-        if (classes.isEmpty())
-            return sequence();
-
-        return classes.safeCast(Type.class).join(classes
-                .flatMap(c ->
-                        foo(one(c.getGenericSuperclass()))
-                                .join(foo(sequence(c.getGenericInterfaces())))
-                )).unique();
-
-
-    }
-
-
-    public static Type extractType(Type type) {
-
-        Sequence<Class> foos = foo(one(type)).flatMap(Types::classOption).filter(x -> isPublic(x.getModifiers())).unsafeCast();
-
-
-
-        System.out.println(foos.toString("\n"));
-
-
-        return foos.headOption().getOrElse(Object.class);
     }
 
     public static Throwable unwrapException(Throwable e) {
@@ -195,7 +161,7 @@ public class Utils {
                         .map(ZipEntry::getName);
             } catch (Exception e) {
                 System.err.println("Couldn't load entries from jar " + file.toURI() + ". " + e.getLocalizedMessage());
-                return Sequences.empty();
+                return empty();
             }
         }
     }

@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
@@ -35,28 +34,12 @@ public class UtilsTest {
     @Test
     public void extractsTypeFromClass() {
         assertThat(extractType("".getClass()), hasFormOf("class java.lang.String"));
-        assertThat(extractType(asList(1, 2, 3).getClass()), hasFormOf("class java.util.AbstractList"));
-        assertThat(extractType(anonymousInnerGenericTestClass().getClass()), hasFormOf("class javarepl.testclasses.GenericTestClass"));
+        assertThat(extractType(asList(1, 2, 3).getClass()), hasFormOf("java.util.AbstractList<E>"));
+        assertThat(extractType(anonymousInnerGenericTestClass().getClass()), hasFormOf("javarepl.testclasses.GenericTestClass<javarepl.testclasses.BaseTestInterface>"));
         assertThat(extractType(anonymousInnerBaseTestInterface().getClass()), hasFormOf("interface javarepl.testclasses.BaseTestInterface"));
         assertThat(extractType(protectedAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.ProtectedAccessTestClass"));
         assertThat(extractType(privateAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
         assertThat(extractType(defaultAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
-    }
-
-    @Test
-    public void extractsTypeFromClassNew() {
-//        assertThat(extractType(Arrays.asList(1,2,3).stream().parallel().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
-//        assertThat(extractTypeNew(Arrays.asList(1,2,3).stream().parallel().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
-//        assertThat(extractTypeNew(privateAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
-//
-//
-//        assertThat(extractTypeNew("".getClass()), hasFormOf("class java.lang.String"));
-//        assertThat(extractTypeNew(asList(1, 2, 3).getClass()), hasFormOf("class java.util.AbstractList"));
-//        assertThat(extractTypeNew(anonymousInnerGenericTestClass().getClass()), hasFormOf("class javarepl.testclasses.GenericTestClass"));
-//        assertThat(extractTypeNew(anonymousInnerBaseTestInterface().getClass()), hasFormOf("interface javarepl.testclasses.BaseTestInterface"));
-//        assertThat(extractTypeNew(protectedAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.ProtectedAccessTestClass"));
-//        assertThat(extractTypeNew(privateAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
-//        assertThat(extractTypeNew(defaultAccessTestClass().getClass()), hasFormOf("class javarepl.testclasses.PublicBaseTestClass"));
     }
 
     @Test
