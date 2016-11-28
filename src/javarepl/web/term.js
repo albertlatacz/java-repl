@@ -1,5 +1,7 @@
 document.write('<div id="terminal" class="terminal-content"></div>');
 
+var session = {};
+
 // return a parameter value from the current URL
 function getParam(sname) {
     var params = location.search.substr(location.search.indexOf("?") + 1);
@@ -20,7 +22,7 @@ function getBaseURL() {
         (location.port && ":" + location.port) + location.pathname;
 }
 
-function greetings(session, term) {
+function greetings(term) {
     term.echo(session.welcomeMessage);
     term.echo(' ');
 }
@@ -44,20 +46,23 @@ function createNewSession(expression, snap) {
 
     newSession.requesting = false;
 
-    return newSession;
+    session = newSession;
 }
 
-function closeSession(session) {
-    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + session.clientId});
+function closeSession() {
+    $.ajax({type: 'POST', async: false, url: '/remove', data: 'id=' + session.clientId})
+        .fail(function (xhr, textStatus, errorThrown) {/* ignore failure when closing */ });
+
 }
 
 
-function restartSession(session) {
-    closeSession(session);
-    return createNewSession(session.expression, session.snap)
+function restartSession(term) {
+    term.echo("[[;#CC7832;black]Session terminated. Starting new session...]");
+    closeSession();
+    createNewSession(session.expression, session.snap)
 }
 
-function readExpressionLine(session, line) {
+function readExpressionLine(line, term) {
     var expression = null;
 
     $.ajax({type: 'POST', async: false, url: '/readExpression', data: {id: session.clientId, line: line}})
@@ -65,19 +70,19 @@ function readExpressionLine(session, line) {
             expression = data.expression;
         })
         .fail(function (xhr, textStatus, errorThrown) {
-            restartSession()
+            restartSession(term)
         });
 
     return expression;
 }
 
-function makeSnap(session) {
+function makeSnap(term) {
     var snapUrl = null;
     $.ajax({type: 'POST', async: false, url: '/snap', data: 'id=' + session.clientId})
         .done(function (data) {
             snapUrl = getBaseURL() + '?snap=' + data.snap;
         }).fail(function (xhr, textStatus, errorThrown) {
-        restartSession()
+        restartSession(term)
     });
 
     return snapUrl;
@@ -122,16 +127,16 @@ function echoCompletionCandidates(term, candidates) {
 
 $(document).ready(function () {
     jQuery(function ($, undefined) {
-        var session = createNewSession(getParam("expression"), getParam("snap"));
+        createNewSession(getParam("expression"), getParam("snap"));
         $('#terminal').terminal(function (command, term) {
 
             if (command == ":snap") {
-                var snapUri = makeSnap(session);
+                var snapUri = makeSnap(term);
                 term.echo("Created terminal snapshot [[!;;]" + snapUri + "]", messageStyle("terminal-message-success"));
                 return;
             }
 
-            var expression = readExpressionLine(session, command);
+            var expression = readExpressionLine(command, term);
 
             if (expression) {
                 $.ajax({
@@ -161,8 +166,7 @@ $(document).ready(function () {
 
                     session.requesting = false;
                 }).fail(function (xhr, textStatus, errorThrown) {
-                    term.echo("[[;#CC7832;black]Session terminated. Starting new session...]");
-                    session = restartSession(session)
+                    restartSession(term)
                 });
             } else {
                 term.echo(" ");
@@ -173,7 +177,7 @@ $(document).ready(function () {
             name: 'js_demo',
             prompt: '[[;white;black]java> ]',
             onInit: function (term) {
-                greetings(session, term);
+                greetings(term);
             },
 
             keydown: function (event, term) {
