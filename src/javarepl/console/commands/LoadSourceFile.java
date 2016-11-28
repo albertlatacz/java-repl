@@ -9,6 +9,7 @@ import javarepl.console.ConsoleLogger;
 import static com.googlecode.totallylazy.Files.asFile;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static java.lang.String.format;
+import static javarepl.Utils.throwException;
 
 public final class LoadSourceFile extends Command {
     private static final String COMMAND = ":load";
@@ -26,7 +27,9 @@ public final class LoadSourceFile extends Command {
 
         if (!path.isEmpty()) {
             try {
-                evaluator.evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"));
+                evaluator.evaluate(Strings.lines(path.map(asFile()).get()).toString("\n"))
+                        .leftOption()
+                        .forEach(throwException());
                 logger.success(format("Loaded source file from %s", path.get()));
             } catch (Exception e) {
                 logger.error(format("Could not load source file from %s.\n  %s", path.get(), e.getLocalizedMessage()));

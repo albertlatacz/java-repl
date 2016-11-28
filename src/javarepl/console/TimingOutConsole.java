@@ -53,11 +53,9 @@ public class TimingOutConsole extends DelegatingConsole {
     }
 
     private Callable<Object> exitWithCode(final int code) {
-        return new Callable<Object>() {
-            public Object call() throws Exception {
-                System.exit(code);
-                return null;
-            }
+        return () -> {
+            System.exit(code);
+            return null;
         };
     }
 

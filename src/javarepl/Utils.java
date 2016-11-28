@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
+import java.util.function.Consumer;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -164,5 +165,11 @@ public class Utils {
                 return empty();
             }
         }
+    }
+
+    public static Consumer<Throwable> throwException() {
+        return throwable -> {
+            throw new RuntimeException(throwable);
+        };
     }
 }
