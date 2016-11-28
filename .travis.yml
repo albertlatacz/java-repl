@@ -2,6 +2,7 @@ language: java
 env:
     global:
         - JAVAREPL_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+        - JAVAREPL_REPOSITORY="albertlatacz/java-repl"
         - secure: "bIFU+VgbcIJ5DmsXkoxTaLGI40uIyWdTFnco7FaJLoJLwLJSake4jemFv5SI\nJaSFVINBXA+Xn/qqHmFfWVr2fKsAevwRfkkIuTM1QMlN2TOMkCwOrz6mYA3f\nxjh+oKXUzNutZTHSyoCyZ72uHSJ33TlPWHU+OToS4AYxf8LrTYI="
         - secure: "O0xTkW+WBNWT0a44u7XRpm0vp0q04ZFv/ovmPX6nm3fRokuiHMoRaL1l7r1K\nLF9ow3n+Ncsl64XRJNv2rjKVrxb19GtZQjxnHqi6bW2FSnoTEJsfvIjgMOwh\nrOHL9MUP61idRqN15ki0qYsmZ8t3xN9rw04fJLGZn73Oy0uRSGI="
         - secure: "C5j0sZWXhfOoaVYyylyM7aJsjUSBbiIkW2GpAhODIrp/E5l297TymomFOCOTZSL1xF5V4RYt6jc7db+Qri5ryeHd0IIYMNWqcmni4rChtKp4b2F4qh+eqwre8RW5hONOcByZTQDvo+m3SCTuoTWcIM/UIhQIGovSPtYmqjQlSwI="
@@ -33,12 +34,11 @@ deploy:
     skip_cleanup: true
     on:
         branch: master
-        repo: albertlatacz/java-repl
+        repo: $JAVAREPL_REPOSITORY
 
 
 after_deploy:
-    - sh bin/push-to-docker-hub.sh $DOCKER_HUB_USERNAME $DOCKER_HUB_PASSWORD albertlatacz/java-repl $TRAVIS_BUILD_NUMBER
-
+    - sh bin/push-to-docker-hub.sh $DOCKER_HUB_USERNAME $DOCKER_HUB_PASSWORD $JAVAREPL_REPOSITORY $JAVAREPL_BUILD_NUMBER
 
 after_success:
     - sh bin/set-tags.sh
