@@ -27,6 +27,7 @@ services:
   - docker
 
 script:
+  - gradle --version
   - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean build shadowJar
 
 deploy:
