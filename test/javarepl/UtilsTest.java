@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 public class UtilsTest {
     @Test
     public void checksJavaVersionCorrectly() {
+        String javaVersion = System.getProperty("java.version");
         System.setProperty("java.version", "1.6.0");
         assertTrue(javaVersionAtLeast("1.5.0"));
         assertTrue(javaVersionAtLeast("1.6.0"));
@@ -29,6 +30,7 @@ public class UtilsTest {
         assertFalse(javaVersionAtLeast("1.6.1"));
         assertFalse(javaVersionAtLeast("1.7.0"));
         assertFalse(javaVersionAtLeast("1.7"));
+        System.setProperty("java.version", javaVersion);
     }
 
     @Test
