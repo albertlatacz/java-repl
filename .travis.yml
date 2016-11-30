@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 env:
     global:
         - JAVAREPL_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
@@ -8,8 +10,7 @@ env:
         - secure: "C5j0sZWXhfOoaVYyylyM7aJsjUSBbiIkW2GpAhODIrp/E5l297TymomFOCOTZSL1xF5V4RYt6jc7db+Qri5ryeHd0IIYMNWqcmni4rChtKp4b2F4qh+eqwre8RW5hONOcByZTQDvo+m3SCTuoTWcIM/UIhQIGovSPtYmqjQlSwI="
         - secure: "fpuaeSvHiDRtUGHRuCkaZOglaE8IujaCXjSShYP78kxaZUOkHCY6meGmk2YRB6nKTs80lpiQCGFOmtcdEOsCRt2kQXuzJR6NkcG8JEYbdD36G0zR/GpeZ38o3lZqd7Xy1FEGwTgMi0Wy699ZvSoBP1xtGz8A7f8G9ROV7E81gdw="
 
-jdk:
-  - oraclejdk8
+
 
 sudo: required
 
@@ -25,13 +26,14 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-    - ant -Ddeploy=true
+  - jdk_switcher use oraclejdk8
+  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean build shadowJar
 
 deploy:
     provider: releases
     api_key:
         secure: "Dlvp//L9a/9bHgtTZPWy+tTbsokq5f3fhobmR1tBtEQUiuOl0dl5nzVOq1tBb0AwPBmTudkBIwH1DW64WCnZnGUatiVznfEydGgCzaW8hNeg9S2iatNIjVjqWXrR/Id+Vg8gGoDomLltPL5qb5UBhdpiOT9Te/GH5/hRUw0NpvI="
-    file: "build/artifacts/*.jar"
+    file: "build/libs/*.jar"
     file_glob: true
     skip_cleanup: true
     on:

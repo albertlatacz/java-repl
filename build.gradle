@@ -1,0 +1,71 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "1.2.4"
+}
+
+apply plugin: 'java'
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+
+    }
+
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2" }
+    maven { url "http://repo.bodar.com" }
+}
+
+shadowJar {
+    classifier = null
+
+    relocate 'com.googlecode.totallylazy', 'javarepl.internal.totallylazy'
+    relocate 'com.googlecode.lazyparsec', 'javarepl.internal.lazyparsec'
+    relocate 'com.googlecode.utterlyidle', 'javarepl.internal.utterlyidle'
+    relocate 'com.googlecode.yadic', 'javarepl.internal.yadic'
+    relocate 'jline', 'javarepl.internal.jline'
+
+
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'javarepl.Main'
+        attributes 'Specification-Title': 'java-repl'
+        attributes 'Specification-Version': version
+        attributes 'Specification-Vendor': 'Albert Latacz'
+        attributes 'Implementation-Title': 'java-repl'
+        attributes 'Implementation-Version': version
+        attributes 'Implementation-Vendor': 'Albert Latacz'
+    }
+}
+
+dependencies {
+    compile "com.googlecode.totallylazy:totallylazy:2.249"
+    compile "com.googlecode.utterlyidle:utterlyidle:2.108"
+    compile "com.googlecode.yadic:yadic:2.48"
+    compile "jline:jline:2.14.2"
+
+    testCompile "org.hamcrest:hamcrest-core:1.3"
+    testCompile "org.hamcrest:hamcrest-library:1.3"
+    testCompile "junit:junit-dep:4.8.2"
+}
+
+
+
+
+
+
+
