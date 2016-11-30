@@ -6,7 +6,6 @@ import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import static com.googlecode.totallylazy.io.URLs.packageUrl;
 import static javarepl.console.ConsoleConfig.consoleConfig;
 import static javarepl.console.ConsoleLog.Type.ERROR;
 import static javarepl.console.ConsoleLog.Type.SUCCESS;
@@ -63,6 +62,7 @@ public class SimpleConsoleTest {
                         "    java.util.*\n" +
                         "    java.math.*\n" +
                         "    java.lang.Math.*\n" +
+                        "    java.util.function.*\n"+
                         "    java.io.*\n" +
                         "    java.net.*\n")));
     }
@@ -116,6 +116,7 @@ public class SimpleConsoleTest {
                         "    java.util.*\n" +
                         "    java.math.*\n" +
                         "    java.lang.Math.*\n" +
+                        "    java.util.function.*\n"+
                         "    java.net.*\n"),
                 success("Methods:\n" +
                         "    void method1()\n"));
@@ -192,7 +193,7 @@ public class SimpleConsoleTest {
 
     @Test
     public void supportsEvaluatingFileWithExpressions() {
-        String path = packageUrl(SimpleConsoleTest.class) + "expressions.txt";
+        String path = "test/resources/expressions.txt";
 
         assertThat(
                 executing(":eval " + path),
