@@ -31,7 +31,6 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - jdk_switcher use oraclejdk8
   - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean build shadowJar
 
 deploy:
