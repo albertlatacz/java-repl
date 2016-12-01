@@ -15,6 +15,18 @@ repositories {
     maven { url "http://repo.bodar.com" }
 }
 
+task javadocsJar(type: Jar, dependsOn: shadowJar) {
+    from javadoc
+    baseName = 'javarepl'
+    classifier = 'javadoc'
+}
+
+task sourcesJar(type: Jar, dependsOn: shadowJar) {
+    baseName = 'javarepl'
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 publishing {
     repositories {
         jcenter()
@@ -28,10 +40,18 @@ publishing {
     }
 }
 
+artifacts {
+    archives javadocsJar
+    archives sourcesJar
+}
+
+
+
 bintray {
     user = System.getenv("BINTRAY_USERNAME")
     key = System.getenv("BINTRAY_API_KEY")
     publications = ['shadow']
+    configurations = ['archives']
     publish = true
 
     pkg {
