@@ -36,14 +36,34 @@ bintray {
 
     pkg {
         repo = 'maven'
-        name = 'javarepl'
-        licenses = ['Apache-2.0']
+        name = 'java-repl'
+        desc = 'Java REPL is a simple Read-Eval-Print-Loop for Java language.'
+        websiteUrl = 'https://github.com/bintray/gradle-bintray-plugin'
+        issueTrackerUrl = 'https://github.com/albertlatacz/java-repl/issues'
         vcsUrl = 'https://github.com/albertlatacz/java-repl.git'
+        licenses = ['Apache-2.0']
+        labels = ['java', 'repl']
+        publicDownloadNumbers = true
+        githubRepo = 'albertlatacz/java-repl'
+        githubReleaseNotesFile = 'README.md'
 
         version {
             name = projectVersion
             desc = 'Auto-releasing Java REPL v.' + projectVersion +'!'
             vcsTag = projectVersion
+
+//            gpg {
+//                sign = true
+////                passphrase = 'passphrase' //Optional. The passphrase for GPG signing'
+//            }
+//
+//            //Optional configuration for Maven Central sync of the version
+//            mavenCentralSync {
+//                sync = false //[Default: true] Determines whether to sync the version to Maven Central.
+//                user = System.getenv("MAVEN_CENTRAL_USERNAME") //OSS user token: mandatory
+//                password = System.getenv("MAVEN_CENTRAL_PASSWORD") //OSS user password: mandatory
+//                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+//            }
         }
     }
 }
