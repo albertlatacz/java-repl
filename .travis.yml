@@ -14,11 +14,6 @@ env:
 
 sudo: required
 
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
-
 branches:
     only:
         - master
@@ -31,8 +26,7 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - gradle --version
-  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean build shadowJar
+  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean check shadowJar
 
 deploy:
     provider: releases
