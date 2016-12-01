@@ -38,7 +38,7 @@ bintray {
         repo = 'maven'
         name = 'java-repl'
         desc = 'Java REPL is a simple Read-Eval-Print-Loop for Java language.'
-        websiteUrl = 'https://github.com/bintray/gradle-bintray-plugin'
+        websiteUrl = 'http://www.javarepl.com'
         issueTrackerUrl = 'https://github.com/albertlatacz/java-repl/issues'
         vcsUrl = 'https://github.com/albertlatacz/java-repl.git'
         licenses = ['Apache-2.0']
