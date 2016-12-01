@@ -1,9 +1,52 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "1.2.4"
+    id "com.jfrog.bintray" version "1.7"
 }
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
+
+def projectVersion = version
+
+repositories {
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2" }
+    maven { url "http://repo.bodar.com" }
+}
+
+publishing {
+    repositories {
+        jcenter()
+    }
+    publications {
+        shadow(MavenPublication) {
+            groupId 'org.javarepl'
+            artifactId 'javarepl'
+            from components.shadow
+        }
+    }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USERNAME")
+    key = System.getenv("BINTRAY_API_KEY")
+    publications = ['shadow']
+    publish = true
+
+    pkg {
+        repo = 'maven'
+        name = 'javarepl'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/albertlatacz/java-repl.git'
+
+        version {
+            name = projectVersion
+            desc = 'Auto-releasing Java REPL v.' + projectVersion +'!'
+            vcsTag = projectVersion
+        }
+    }
+}
 
 sourceSets {
     main {
@@ -24,12 +67,6 @@ sourceSets {
     }
 }
 
-
-repositories {
-    mavenCentral()
-    maven { url "https://plugins.gradle.org/m2" }
-    maven { url "http://repo.bodar.com" }
-}
 
 shadowJar {
     baseName = "javarepl"

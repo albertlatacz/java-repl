@@ -9,6 +9,8 @@ env:
         - secure: "O0xTkW+WBNWT0a44u7XRpm0vp0q04ZFv/ovmPX6nm3fRokuiHMoRaL1l7r1K\nLF9ow3n+Ncsl64XRJNv2rjKVrxb19GtZQjxnHqi6bW2FSnoTEJsfvIjgMOwh\nrOHL9MUP61idRqN15ki0qYsmZ8t3xN9rw04fJLGZn73Oy0uRSGI="
         - secure: "C5j0sZWXhfOoaVYyylyM7aJsjUSBbiIkW2GpAhODIrp/E5l297TymomFOCOTZSL1xF5V4RYt6jc7db+Qri5ryeHd0IIYMNWqcmni4rChtKp4b2F4qh+eqwre8RW5hONOcByZTQDvo+m3SCTuoTWcIM/UIhQIGovSPtYmqjQlSwI="
         - secure: "fpuaeSvHiDRtUGHRuCkaZOglaE8IujaCXjSShYP78kxaZUOkHCY6meGmk2YRB6nKTs80lpiQCGFOmtcdEOsCRt2kQXuzJR6NkcG8JEYbdD36G0zR/GpeZ38o3lZqd7Xy1FEGwTgMi0Wy699ZvSoBP1xtGz8A7f8G9ROV7E81gdw="
+        - secure: "bxZ+/YMNG5guSA4R62wsIODwvslnqh4YwzaZjCuSO8FsXzEFkRLbZlgNTJYthcKEOZK0Oq+7d0nr0Dh2hKSgOx/FM2nCNzL3kMc/D4gAi54OET8wOv21PgiZQomPlZd5v62uTdw8XDrSzdEG8tzjrA21GDGNFF+Uuz3KPfoQfc0="
+        - secure: "KdWNLW5VYhvGUMIB0Q4OwPfPAFLhVNi9hLRw2ZapBq245iVf7ayMXZznyOpSYgOjuXRqx/24ww+LSBFGM/rFetIiP2mA1A4RpxYpyRzJmfhxz3e4Rj71bE1JrLynY/MLIuH4NERMRdH1kZjQaY+IFkXqas5C+FD8Msj0owzlwLE="
 
 
 
@@ -26,7 +28,7 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean check shadowJar
+  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean check shadowJar bintrayUpload
 
 deploy:
     provider: releases

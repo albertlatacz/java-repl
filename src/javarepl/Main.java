@@ -184,24 +184,7 @@ public class Main {
 
     /**
      * Copied from JLine sourcecode and heavily modified
-     * <p/>
      * Original sources: https://raw.github.com/jline/jline2/master/src/main/java/jline/console/completer/CandidateListCompletionHandler.java
-     * <p/>
-     * Copyright (c) 2002-2012, the original author or authors.
-     * <p/>
-     * This software is distributable under the BSD license. See the terms of the
-     * BSD license in the documentation provided with this software.
-     * <p/>
-     * http://www.opensource.org/licenses/bsd-license.php
-     * <p/>
-     * A {@link jline.console.completer.CompletionHandler} that deals with multiple distinct completions
-     * by outputting the complete list of possibilities to the console. This
-     * mimics the behavior of the
-     * <a href="http://www.gnu.org/directory/readline.html">readline</a> library.
-     *
-     * @author <a href="mailto:mwp1@cornell.edu">Marc Prud'hommeaux</a>
-     * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
-     * @since 2.3
      */
     public static class JlineCompletionHandler implements CompletionHandler {
         // TODO: handle quotes and escaped quotes && enable automatic escaping of whitespace
