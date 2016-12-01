@@ -1,11 +1,5 @@
-build/artifacts
-lib/build
-lib/optional
-lib/runtime
-lib/packaged
+build
 .idea
 .DS_Store
-target
-java-repl-intellij-plugin.zip
 out
 
