@@ -11,6 +11,10 @@ sourceSets {
             srcDirs = ['src']
         }
 
+        resources {
+            srcDirs = ['src']
+        }
+
     }
 
     test {

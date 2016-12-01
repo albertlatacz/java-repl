@@ -26,7 +26,7 @@ install:
   - export PATH=$PATH:$HOME/.local/bin
 
 script:
-  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean check shadowJar
+  - gradle -Pversion=$JAVAREPL_BUILD_NUMBER clean check  shadowJar
 
 deploy:
     provider: releases
