@@ -21,7 +21,7 @@ publishing {
     }
     publications {
         shadow(MavenPublication) {
-            groupId 'org.javarepl'
+            groupId 'com.javarepl'
             artifactId 'javarepl'
             from components.shadow
         }
