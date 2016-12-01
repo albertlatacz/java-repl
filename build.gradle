@@ -28,6 +28,7 @@ repositories {
 }
 
 shadowJar {
+    baseName = "javarepl"
     classifier = null
 
     relocate 'com.googlecode.totallylazy', 'javarepl.internal.totallylazy'
