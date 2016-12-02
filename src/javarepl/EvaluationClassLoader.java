@@ -1,6 +1,7 @@
 package javarepl;
 
-import java.io.File;
+import com.googlecode.totallylazy.Sequence;
+
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -8,19 +9,28 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.io.URLs.toURL;
 
 public class EvaluationClassLoader extends URLClassLoader {
-    private EvaluationClassLoader(URL[] urls) {
-        super(urls);
+    private Sequence<URL> registeredUrls = sequence();
+
+    private EvaluationClassLoader(EvaluationContext context) {
+        super(new URL[]{toURL().apply(context.outputDirectory())});
     }
 
-    public static EvaluationClassLoader evaluationClassLoader(File outputDirectory) {
-        return new EvaluationClassLoader(new URL[]{toURL().apply(outputDirectory)});
+    public static EvaluationClassLoader evaluationClassLoader(EvaluationContext context) {
+        return new EvaluationClassLoader(context);
     }
 
-    @Override
-    public void addURL(URL url) {
-        if (!sequence(getURLs()).contains(url))
-            super.addURL(url);
+    public void registerURL(URL url) {
+        if (!sequence(getURLs()).contains(url)) {
+            addURL(url);
+            registeredUrls = registeredUrls.append(url);
+        }
     }
+
+    public Sequence<URL> registeredUrls() {
+        return registeredUrls;
+    }
+
+
 
     public boolean isClassLoaded(String name) {
         return findLoadedClass(name) != null;

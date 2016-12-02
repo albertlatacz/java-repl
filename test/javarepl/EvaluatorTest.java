@@ -9,6 +9,8 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Option.none;
+import static javarepl.EvaluationClassLoader.evaluationClassLoader;
+import static javarepl.EvaluationContext.evaluationContext;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -64,16 +66,21 @@ public class EvaluatorTest {
 
     @Test
     public void shouldReturnTypeOfExpression() {
-        assertThat(new Evaluator().typeOfExpression("\"hello\""), is(Option.<java.lang.reflect.Type>some(String.class)));
-        assertThat(new Evaluator().typeOfExpression("12"), is(Option.<java.lang.reflect.Type>some(Integer.class)));
-        assertThat(new Evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(java.lang.reflect.Type.class)));
+        assertThat(evaluator().typeOfExpression("\"hello\""), is(Option.<java.lang.reflect.Type>some(String.class)));
+        assertThat(evaluator().typeOfExpression("12"), is(Option.<java.lang.reflect.Type>some(Integer.class)));
+        assertThat(evaluator().typeOfExpression("System.out.println(\"hello\")"), is(none(java.lang.reflect.Type.class)));
     }
 
     @Test
     public void shouldReturnClassFromExpression() {
-        assertThat(new Evaluator().classFrom("String"), is(Option.<Class>some(String.class)));
-        assertThat(new Evaluator().classFrom("java.util.Map.Entry"), is(Option.<Class>some(java.util.Map.Entry.class)));
-        assertThat(new Evaluator().classFrom("invalid"), is(none(Class.class)));
+        assertThat(evaluator().classFrom("String"), is(Option.<Class>some(String.class)));
+        assertThat(evaluator().classFrom("java.util.Map.Entry"), is(Option.<Class>some(java.util.Map.Entry.class)));
+        assertThat(evaluator().classFrom("invalid"), is(none(Class.class)));
+    }
+
+    private static Evaluator evaluator() {
+        EvaluationContext context = evaluationContext();
+        return new Evaluator(context, evaluationClassLoader(context));
     }
 
     private static Matcher<Either<? extends Throwable, Evaluation>> hasNoResult() {
@@ -114,7 +121,7 @@ public class EvaluatorTest {
     }
 
     private static Either<? extends Throwable, Evaluation> evaluating(String... expressions) {
-        Evaluator evaluator = new Evaluator();
+        Evaluator evaluator = evaluator();
 
         Either<? extends Throwable, Evaluation> result = null;
         for (String expression : expressions) {

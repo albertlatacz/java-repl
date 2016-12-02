@@ -1,12 +1,15 @@
 package javarepl.completion;
 
 import com.googlecode.totallylazy.Sequence;
+import javarepl.EvaluationContext;
 import javarepl.Evaluator;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import static com.googlecode.totallylazy.Sequences.sequence;
+import static javarepl.EvaluationClassLoader.evaluationClassLoader;
+import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
 
 public class CompleterTestHelper {
@@ -39,7 +42,8 @@ public class CompleterTestHelper {
     }
 
     public static Evaluator evaluator(String... expressions) {
-        Evaluator evaluator = new Evaluator();
+        EvaluationContext context = evaluationContext();
+        Evaluator evaluator = new Evaluator(context, evaluationClassLoader(context));
         for (String expression : expressions) {
             evaluator.evaluate(expression);
         }

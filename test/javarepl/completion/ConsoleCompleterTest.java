@@ -1,10 +1,13 @@
 package javarepl.completion;
 
+import javarepl.EvaluationContext;
 import javarepl.Evaluator;
 import org.junit.Test;
 
 import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.functions.Functions.returns;
+import static javarepl.EvaluationClassLoader.evaluationClassLoader;
+import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.completion.CompleterTestHelper.*;
 import static org.junit.Assert.assertThat;
 
@@ -52,7 +55,8 @@ public class ConsoleCompleterTest {
     }
 
     private void givenConsoleThatExecuted(String... expressions) {
-        evaluator = new Evaluator();
+        EvaluationContext context = evaluationContext();
+        evaluator = new Evaluator(context, evaluationClassLoader(context));
 
         for (String expression : expressions) {
             evaluator.evaluate(expression);

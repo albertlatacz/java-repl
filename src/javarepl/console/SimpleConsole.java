@@ -5,6 +5,8 @@ import com.googlecode.totallylazy.Rules;
 import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.yadic.Container;
 import com.googlecode.yadic.SimpleContainer;
+import javarepl.EvaluationClassLoader;
+import javarepl.EvaluationContext;
 import javarepl.Evaluator;
 import javarepl.completion.*;
 import javarepl.console.commands.Command;
@@ -18,9 +20,11 @@ import static com.googlecode.totallylazy.functions.Callables.returns1;
 import static com.googlecode.totallylazy.predicates.Predicates.always;
 import static com.googlecode.totallylazy.predicates.Predicates.notNullValue;
 import static java.lang.Runtime.getRuntime;
+import static javarepl.EvaluationContext.evaluationContext;
 import static javarepl.Utils.randomIdentifier;
 import static javarepl.completion.Completers.javaKeywordCompleter;
 import static javarepl.completion.TypeResolver.functions.defaultPackageResolver;
+import static javarepl.completion.TypeResolver.functions.evaluationClassLoaderResolver;
 import static javarepl.console.ConsoleHistory.historyFromFile;
 import static javarepl.console.ConsoleResult.emptyResult;
 import static javarepl.console.ConsoleStatus.*;
@@ -39,7 +43,9 @@ public final class SimpleConsole implements Console {
         context.addInstance(Console.class, this);
         context.addInstance(ConsoleHistory.class, historyFromFile(startsWith(":h!").or(blank()), config.historyFile));
         context.addInstance(ConsoleConfig.class, config);
-        context.addInstance(Evaluator.class, config.evaluator);
+        context.addInstance(EvaluationContext.class, evaluationContext());
+        context.add(EvaluationClassLoader.class);
+        context.add(Evaluator.class);
         context.addInstance(ConsoleLogger.class, config.logger);
         context.addInstance(TypeResolver.class, new TypeResolver(defaultPackageResolver()));
         context.add(Commands.class);
@@ -47,6 +53,7 @@ public final class SimpleConsole implements Console {
                 .append(javaKeywordCompleter())
                 .append(new ConsoleCompleter(context.get(Evaluator.class), context.get(TypeResolver.class)))
                 .append(new TypeCompleter(context.get(TypeResolver.class)))
+                .append(new TypeCompleter(new TypeResolver(evaluationClassLoaderResolver(context.get(EvaluationClassLoader.class)))))
                 .append(new StaticMemberCompleter(context.get(Evaluator.class)))
                 .append(new InstanceMemberCompleter(context.get(Evaluator.class)))
 

@@ -43,16 +43,11 @@ import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Evaluator {
-
     private EvaluationClassLoader classLoader;
     private EvaluationContext context;
 
-    public Evaluator() {
-        initializeEvaluator(evaluationContext());
-    }
-
-    private Evaluator(EvaluationContext context) {
-        initializeEvaluator(context);
+    public Evaluator(EvaluationContext context, EvaluationClassLoader classLoader) {
+        initializeEvaluator(context, classLoader);
     }
 
     public Either<Throwable, Evaluation> evaluate(final String expr) {
@@ -147,16 +142,17 @@ public class Evaluator {
 
     public void reset() {
         clearOutputDirectory();
-        initializeEvaluator(evaluationContext());
+        EvaluationContext evaluationContext = evaluationContext();
+        initializeEvaluator(evaluationContext, evaluationClassLoader(evaluationContext));
     }
 
-    private void initializeEvaluator(EvaluationContext evaluationContext) {
+    private void initializeEvaluator(EvaluationContext evaluationContext, EvaluationClassLoader evaluationClassLoader) {
         context = evaluationContext;
-        classLoader = evaluationClassLoader(context.outputDirectory());
+        classLoader = evaluationClassLoader;
     }
 
     public final Either<Throwable, Evaluation> tryEvaluate(String expression) {
-        Evaluator localEvaluator = new Evaluator(context);
+        Evaluator localEvaluator = new Evaluator(context, evaluationClassLoader(context));
         return localEvaluator.evaluate(expression);
     }
 
@@ -188,7 +184,7 @@ public class Evaluator {
     }
 
     public void addClasspathUrl(URL classpathUrl) {
-        classLoader.addURL(classpathUrl);
+        classLoader.registerURL(classpathUrl);
     }
 
     public File outputDirectory() {

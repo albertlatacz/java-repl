@@ -5,8 +5,10 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.functions.Callables;
 import com.googlecode.totallylazy.functions.Function0;
 import com.googlecode.totallylazy.functions.Function1;
+import javarepl.EvaluationClassLoader;
 
 import java.io.File;
+import java.net.URL;
 
 import static com.googlecode.totallylazy.Files.asFile;
 import static com.googlecode.totallylazy.Sequences.memorise;
@@ -35,6 +37,10 @@ public final class TypeResolver {
     public static class functions {
         public static Function0<Sequence<ResolvedPackage>> defaultPackageResolver() {
             return packagesResolver(classpathJars().join(runtimeJars()));
+        }
+
+        public static Function0<Sequence<ResolvedPackage>> evaluationClassLoaderResolver(final EvaluationClassLoader classLoader) {
+            return () -> packagesFromFiles(classLoader.registeredUrls().map(URL::getFile).map(asFile()));
         }
 
         public static Function0<Sequence<ResolvedPackage>> packagesResolver(final Sequence<File> files) {
