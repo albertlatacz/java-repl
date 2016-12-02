@@ -1,5 +1,8 @@
-# Java REPL
+<p align="center">
+  <img src="bin/javarepl-icon.png">
+</p>
 
+# Java REPL
 [![Travis](https://img.shields.io/travis/albertlatacz/java-repl.svg)](https://travis-ci.org/albertlatacz/java-repl)
 [![GitHub](https://img.shields.io/github/release/albertlatacz/java-repl.svg)](https://github.com/albertlatacz/java-repl/releases/latest)
 [![Docker Pulls](https://img.shields.io/docker/pulls/albertlatacz/java-repl.svg)](https://hub.docker.com/r/albertlatacz/java-repl/)
@@ -25,9 +28,7 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
-<p align="center">
-  <img src="bin/javarepl-icon.png">
-</p>
+
 
 ## Build
 Building Java REPL requires the [gradle](https://gradle.org/).
