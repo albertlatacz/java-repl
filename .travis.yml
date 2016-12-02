@@ -14,6 +14,8 @@ env:
         - secure: "KdWNLW5VYhvGUMIB0Q4OwPfPAFLhVNi9hLRw2ZapBq245iVf7ayMXZznyOpSYgOjuXRqx/24ww+LSBFGM/rFetIiP2mA1A4RpxYpyRzJmfhxz3e4Rj71bE1JrLynY/MLIuH4NERMRdH1kZjQaY+IFkXqas5C+FD8Msj0owzlwLE="
         - secure: "Z5wmAFWOUv1fV3A/iCDrz9J59vZVzAn1tQigpYKdCTsvuZMHvk7SP3+3Aak2NEtuRzzu09WuBmCE6pfES3HbvD2W0jR2iqiv0bECnt5pCptC9QjlAw9vvGhm0Tz/aR4dJwzAjWBREU4LTgjN65416jclKV1HxhJcw90CZbYBmNo="
         - secure: "fovLGO44v27+u6dYAtT9zqpm/pJImgl6Bb4YqJ6VGSqx87axro3bkoeqlrw8aTThCqNxBCtoOPx7iPmQVi2l8fB5Dh7G8P50CYtT6fb9p8e7GHh9vZDBRk/UQmm5XALBX2dna1dN/UOKTyN/NFAajfCt6lAah5d9HvDpqw9E7Xs="
+        - secure: "BhPDDFZqVLPx5g2Tu4n2AMT9MhmnFKmK9g+D+jmOkkn9CEMPByWoJDqOZghUE/1Dw0f8wv6wmjK6WfolmxT0lTTmybN9+b/K9yTULldx1tIQ+bXToaf+cSjw+ZBkY8WSgBa5h3tHSRLpjp+zgERuJR1erWsIpU6UDVfx2RgVHeg="
+        - secure: "AZAE6aWnJyQvNsEL/9PFweOyVNnUxgWhdPHD4OONHr3y3D+uT7kZn6GJx0C0f4bvQGCX5ENGbDqh/NSEplD+85kwQrhW9Qi3G+zZbrENHygQUVaHi6OC+JmsIvkLS6WFe013jGAJeP3+dt8aE+VRIECtA7RvpHGS+ONCUh7YBVs="
 
 sudo: required
 
