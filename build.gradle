@@ -29,6 +29,8 @@ task sourceJar(type: Jar, dependsOn: shadowJar) {
 }
 
 def pomConfig = {
+    url 'https://github.com/albertlatacz/java-repl'
+    name 'Java REPL'
     licenses {
         license {
             name "The Apache Software License, Version 2.0"
@@ -43,6 +45,12 @@ def pomConfig = {
             email "albert.latacz@gmail.com"
         }
     }
+
+    scm {
+        url 'git@github.com:albertlatacz/java-repl.git'
+        connection 'scm:git@github.com:albertlatacz/java-repl.git'
+    }
+
 }
 
 publishing {
