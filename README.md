@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="bin/javarepl-icon.png">
-</p>
-
 # Java REPL
 [![Travis](https://img.shields.io/travis/albertlatacz/java-repl.svg)](https://travis-ci.org/albertlatacz/java-repl)
 [![GitHub](https://img.shields.io/github/release/albertlatacz/java-repl.svg)](https://github.com/albertlatacz/java-repl/releases/latest)
