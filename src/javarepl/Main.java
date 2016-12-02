@@ -229,12 +229,7 @@ public class Main {
             reader.setCursorPosition(offset + value.length());
         }
 
-        /**
-         * Print out the candidates. If the size of the candidates is greater than the
-         * {@link ConsoleReader#getAutoprintThreshold}, they prompt with a warning.
-         *
-         * @param candidates the list of candidates to print
-         */
+
         public static void printCandidates(final ConsoleReader reader, Collection<CharSequence> candidates) throws
                 IOException {
             Set<CharSequence> distinct = new HashSet<CharSequence>(candidates);

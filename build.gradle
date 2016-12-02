@@ -16,10 +16,12 @@ repositories {
 
 
 task javadocJar(type: Jar, dependsOn: shadowJar) {
+    baseName "javarepl"
     from javadoc
 }
 
 task sourceJar(type: Jar, dependsOn: shadowJar) {
+    baseName "javarepl"
     from sourceSets.main.allSource
 }
 
