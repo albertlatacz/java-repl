@@ -47,6 +47,27 @@ publishing {
                 classifier "javadoc"
             }
 
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Java REPL is a simple Read-Eval-Print-Loop for Java language.')
+                root.children().last() + {
+                    licenses {
+                        license {
+                            name "The Apache Software License, Version 2.0"
+                            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            distribution "repo"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id "albertlatacz"
+                            name "Albert Latacz"
+                            email "albert.latacz@gmail.com"
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
@@ -90,11 +111,10 @@ bintray {
             desc = 'Auto-releasing Java REPL v.' + projectVersion +'!'
             vcsTag = projectVersion
 
-//            gpg {
-//                sign = true
-////                passphrase = 'passphrase' //Optional. The passphrase for GPG signing'
-//            }
-//
+            gpg {
+                sign = true
+            }
+
             //Optional configuration for Maven Central sync of the version
             mavenCentralSync {
                 sync = true//[Default: true] Determines whether to sync the version to Maven Central.
