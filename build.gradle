@@ -28,6 +28,23 @@ task sourceJar(type: Jar, dependsOn: shadowJar) {
     from sourceSets.main.allSource
 }
 
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "albertlatacz"
+            name "Albert Latacz"
+            email "albert.latacz@gmail.com"
+        }
+    }
+}
+
 publishing {
     repositories {
         jcenter()
@@ -50,22 +67,7 @@ publishing {
             pom.withXml {
                 def root = asNode()
                 root.appendNode('description', 'Java REPL is a simple Read-Eval-Print-Loop for Java language.')
-                root.children().last() + {
-                    licenses {
-                        license {
-                            name "The Apache Software License, Version 2.0"
-                            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                            distribution "repo"
-                        }
-                    }
-                    developers {
-                        developer {
-                            id "albertlatacz"
-                            name "Albert Latacz"
-                            email "albert.latacz@gmail.com"
-                        }
-                    }
-                }
+                root.children().last() + pomConfig
             }
 
         }
@@ -112,7 +114,7 @@ bintray {
             vcsTag = projectVersion
 
             gpg {
-                sign = true
+                    sign = true
             }
 
             //Optional configuration for Maven Central sync of the version
