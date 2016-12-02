@@ -113,10 +113,6 @@ bintray {
             desc = 'Auto-releasing Java REPL v.' + projectVersion +'!'
             vcsTag = projectVersion
 
-            gpg {
-                    sign = true
-            }
-
             //Optional configuration for Maven Central sync of the version
             mavenCentralSync {
                 sync = true//[Default: true] Determines whether to sync the version to Maven Central.
