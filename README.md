@@ -73,14 +73,14 @@ Download latest Java REPL release from [GitHub](https://github.com/albertlatacz/
 
 
 ```
-$ java -jar javarepl-VERSION.jar
+$ java -jar javarepl-SOME_VERSION.jar
 ```
 
 If this doesn't work try to run pointing directly to *java* executable within JDK, like so
 
 
 ```
-$ <PATH_TO_JDK>/bin/java -jar javarepl.jar
+$ <PATH_TO_JDK>/bin/java -jar javarepl-SOME_VERSION.jar
 ```
 
 
