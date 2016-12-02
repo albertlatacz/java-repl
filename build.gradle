@@ -6,14 +6,14 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-
-def projectVersion = version
+def projectVersion = System.getenv('JAVAREPL_BUILD_NUMBER') != null ? System.getenv('JAVAREPL_BUILD_NUMBER') : 'dev'
 
 repositories {
     mavenCentral()
     maven { url "https://plugins.gradle.org/m2" }
     maven { url "http://repo.bodar.com" }
 }
+
 
 task javadocJar(type: Jar, dependsOn: shadowJar) {
     from javadoc
@@ -92,6 +92,7 @@ bintray {
 shadowJar {
     baseName = "javarepl"
     classifier = null
+    version = projectVersion
 
     relocate 'com.googlecode.totallylazy', 'javarepl.internal.totallylazy'
     relocate 'com.googlecode.lazyparsec', 'javarepl.internal.lazyparsec'
@@ -125,10 +126,10 @@ jar {
     manifest {
         attributes 'Main-Class': 'javarepl.Main'
         attributes 'Specification-Title': 'java-repl'
-        attributes 'Specification-Version': version
+        attributes 'Specification-Version': projectVersion
         attributes 'Specification-Vendor': 'Albert Latacz'
         attributes 'Implementation-Title': 'java-repl'
-        attributes 'Implementation-Version': version
+        attributes 'Implementation-Version': projectVersion
         attributes 'Implementation-Vendor': 'Albert Latacz'
     }
 }
@@ -143,10 +144,3 @@ dependencies {
     testCompile "org.hamcrest:hamcrest-library:1.3"
     testCompile "junit:junit-dep:4.8.2"
 }
-
-
-
-
-
-
-

@@ -27,7 +27,7 @@ Building Java REPL requires the [gradle](https://gradle.org/).
 After cloning the git repository, navigate over to it and run:
 
 ```
-$ gradle -Pversion=dev shadowJar
+$ gradle shadowJar
 ```
 
 After this completes, the jar completed with bundled dependencies will be located at **build/libs/javarepl-dev.jar**
