@@ -29,7 +29,7 @@ task sourceJar(type: Jar, dependsOn: shadowJar) {
 }
 
 def pomConfig = {
-    url 'https://github.com/albertlatacz/java-repl'
+    url 'http://www.javarepl.com'
     name 'Java REPL'
     licenses {
         license {
