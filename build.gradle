@@ -15,15 +15,11 @@ repositories {
     maven { url "http://repo.bodar.com" }
 }
 
-task javadocsJar(type: Jar, dependsOn: shadowJar) {
+task javadocJar(type: Jar, dependsOn: shadowJar) {
     from javadoc
-    baseName = 'javarepl'
-    classifier = 'javadoc'
 }
 
-task sourcesJar(type: Jar, dependsOn: shadowJar) {
-    baseName = 'javarepl'
-    classifier = 'sources'
+task sourceJar(type: Jar, dependsOn: shadowJar) {
     from sourceSets.main.allSource
 }
 
@@ -36,22 +32,24 @@ publishing {
             groupId 'com.javarepl'
             artifactId 'javarepl'
             from components.shadow
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+
         }
     }
 }
-
-artifacts {
-    archives javadocsJar
-    archives sourcesJar
-}
-
 
 
 bintray {
     user = System.getenv("BINTRAY_USERNAME")
     key = System.getenv("BINTRAY_API_KEY")
     publications = ['shadow']
-    configurations = ['archives']
     publish = true
 
     pkg {
@@ -88,6 +86,22 @@ bintray {
     }
 }
 
+
+
+
+shadowJar {
+    baseName = "javarepl"
+    classifier = null
+
+    relocate 'com.googlecode.totallylazy', 'javarepl.internal.totallylazy'
+    relocate 'com.googlecode.lazyparsec', 'javarepl.internal.lazyparsec'
+    relocate 'com.googlecode.utterlyidle', 'javarepl.internal.utterlyidle'
+    relocate 'com.googlecode.yadic', 'javarepl.internal.yadic'
+    relocate 'jline', 'javarepl.internal.jline'
+
+
+}
+
 sourceSets {
     main {
         java {
@@ -105,20 +119,6 @@ sourceSets {
             srcDirs = ['test']
         }
     }
-}
-
-
-shadowJar {
-    baseName = "javarepl"
-    classifier = null
-
-    relocate 'com.googlecode.totallylazy', 'javarepl.internal.totallylazy'
-    relocate 'com.googlecode.lazyparsec', 'javarepl.internal.lazyparsec'
-    relocate 'com.googlecode.utterlyidle', 'javarepl.internal.utterlyidle'
-    relocate 'com.googlecode.yadic', 'javarepl.internal.yadic'
-    relocate 'jline', 'javarepl.internal.jline'
-
-
 }
 
 jar {
