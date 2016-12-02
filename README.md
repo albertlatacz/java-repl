@@ -3,7 +3,6 @@
 
 [![Travis](https://img.shields.io/travis/albertlatacz/java-repl.svg)](https://travis-ci.org/albertlatacz/java-repl)
 [![GitHub](https://img.shields.io/github/release/albertlatacz/java-repl.svg)](https://github.com/albertlatacz/java-repl/releases/latest)
-[![Bintray](https://img.shields.io/bintray/v/albertlatacz/maven/java-repl.svg)](https://bintray.com/albertlatacz/maven/java-repl/_latestVersion)
 [![Docker Pulls](https://img.shields.io/docker/pulls/albertlatacz/java-repl.svg)](https://hub.docker.com/r/albertlatacz/java-repl/)
 
 
