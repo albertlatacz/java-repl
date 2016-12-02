@@ -118,8 +118,9 @@ shadowJar {
     relocate 'com.googlecode.utterlyidle', 'javarepl.internal.utterlyidle'
     relocate 'com.googlecode.yadic', 'javarepl.internal.yadic'
     relocate 'jline', 'javarepl.internal.jline'
-
-
+    relocate 'org.mozilla', 'javarepl.internal.mozilla'
+    relocate 'com.yahoo', 'javarepl.internal.yahoo'
+    relocate 'jargs', 'javarepl.internal.jargs'
 }
 
 sourceSets {
