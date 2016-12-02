@@ -52,7 +52,7 @@ To configure specify repository
 ```xml
 <repositories>
     <repository>
-        <id>Albert Latacz's Maven</id>
+        <id>Java REPL Maven Repository</id>
         <url>https://dl.bintray.com/albertlatacz/maven</url>
     </repository>
 </repositories>
