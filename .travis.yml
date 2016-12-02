@@ -15,8 +15,6 @@ env:
         - secure: "Z5wmAFWOUv1fV3A/iCDrz9J59vZVzAn1tQigpYKdCTsvuZMHvk7SP3+3Aak2NEtuRzzu09WuBmCE6pfES3HbvD2W0jR2iqiv0bECnt5pCptC9QjlAw9vvGhm0Tz/aR4dJwzAjWBREU4LTgjN65416jclKV1HxhJcw90CZbYBmNo="
         - secure: "fovLGO44v27+u6dYAtT9zqpm/pJImgl6Bb4YqJ6VGSqx87axro3bkoeqlrw8aTThCqNxBCtoOPx7iPmQVi2l8fB5Dh7G8P50CYtT6fb9p8e7GHh9vZDBRk/UQmm5XALBX2dna1dN/UOKTyN/NFAajfCt6lAah5d9HvDpqw9E7Xs="
 
-
-
 sudo: required
 
 branches:
@@ -29,23 +27,5 @@ services:
 script:
   - gradle clean check shadowJar bintrayUpload githubRelease
 
-#deploy:
-#    provider: releases
-#    api_key:
-#        secure: "Dlvp//L9a/9bHgtTZPWy+tTbsokq5f3fhobmR1tBtEQUiuOl0dl5nzVOq1tBb0AwPBmTudkBIwH1DW64WCnZnGUatiVznfEydGgCzaW8hNeg9S2iatNIjVjqWXrR/Id+Vg8gGoDomLltPL5qb5UBhdpiOT9Te/GH5/hRUw0NpvI="
-#    file: "build/libs/*.jar"
-#    file_glob: true
-#    skip_cleanup: true
-#    on:
-#        branch: master
-#        repo: $PROJECT_REPOSITORY
-
-
 after_success:
     - sh bin/push-to-docker-hub.sh
-
-#after_success:
-#    - sh bin/set-tags.sh
-
-
-
