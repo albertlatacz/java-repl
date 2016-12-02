@@ -3,6 +3,7 @@
 
 [![Travis](https://img.shields.io/travis/albertlatacz/java-repl.svg)](https://travis-ci.org/albertlatacz/java-repl)
 [![Bintray](https://img.shields.io/bintray/v/albertlatacz/maven/java-repl.svg)](https://bintray.com/albertlatacz/maven/java-repl/_latestVersion)
+[![License](https://img.shields.io/github/license/albertlatacz/java-repl.svg)]()
 
 Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
