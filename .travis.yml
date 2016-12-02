@@ -25,10 +25,6 @@ branches:
 services:
   - docker
 
-#install:
-#  - pip install --user awscli
-#  - export PATH=$PATH:$HOME/.local/bin
-
 script:
   - gradle clean check shadowJar bintrayUpload
 
