@@ -34,15 +34,15 @@ After this completes, the jar completed with bundled dependencies will be locate
 
 ## Releases
 
-Releases are automatically released to S3 Maven reposotory
+Releases are automatically released to Bintray Maven repository
 
 To configure specify repository 
 
 ```xml
 <repositories>
     <repository>
-        <id>albertlatacz.published</id>
-        <url>http://albertlatacz.published.s3.amazonaws.com/repo</url>
+        <id>Albert Latacz's Maven</id>
+        <url>https://dl.bintray.com/albertlatacz/maven</url>
     </repository>
 </repositories>
 ```
@@ -52,7 +52,7 @@ and then
 ```xml
 <dependencies>
     <dependency>
-        <groupId>javarepl</groupId>
+        <groupId>com.javarepl</groupId>
         <artifactId>javarepl</artifactId>
         <version>SOME_VERSION</version>
     </dependency>
@@ -61,6 +61,9 @@ and then
 
 ## Usage
 To run Java REPL you need to install **Java Development Kit (JDK) 6 or newer**. Download it from [here](http://www.oracle.com/technetwork/java/javase/downloads/index.html) and follow install instructions. Once JDK is installed and configured you can run:   
+
+
+Download latest Java REPL release from [GitHub](https://github.com/albertlatacz/java-repl/releases/latest) or [Bintray](https://bintray.com/albertlatacz/maven/java-repl/_latestVersion) then run
 
 
 ```
