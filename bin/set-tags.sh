@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-BRANCH="master"
-
 # Are we on the right branch?
-if [ "$TRAVIS_BRANCH" = "$BRANCH" ]; then
+if [ "$TRAVIS_BRANCH" = "master" ]; then
 
   # Is this not a Pull Request?
   if [ "$TRAVIS_PULL_REQUEST" = false ]; then

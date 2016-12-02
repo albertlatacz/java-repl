@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-def projectVersion = System.getenv('JAVAREPL_BUILD_NUMBER') != null ? System.getenv('JAVAREPL_BUILD_NUMBER') : 'dev'
+def projectVersion = System.getenv('PROJECT_VERSION') != null ? System.getenv('PROJECT_VERSION') : 'dev'
 
 repositories {
     mavenCentral()
