@@ -17,11 +17,13 @@ repositories {
 
 task javadocJar(type: Jar, dependsOn: shadowJar) {
     baseName "javarepl"
+    version projectVersion
     from javadoc
 }
 
 task sourceJar(type: Jar, dependsOn: shadowJar) {
     baseName "javarepl"
+    version projectVersion
     from sourceSets.main.allSource
 }
 
