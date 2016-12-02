@@ -3,6 +3,7 @@ package javarepl.completion;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.reflection.Types;
 import javarepl.Evaluator;
 import javarepl.reflection.ClassReflection;
 import javarepl.reflection.MemberReflection;
@@ -33,16 +34,17 @@ public class InstanceMemberCompleter extends Completer {
         final Boolean canComplete = packagePart.matches("[a-zA-Z0-9\\$_\\\\.\\(\\[\\]]*") && packagePart.contains(".");
 
         final int beginIndex = packagePart.lastIndexOf('.') + 1;
-        Option<Type> aClass = canComplete
-                ? evaluator.typeOfExpression(packagePart.substring(0, beginIndex - 1))
-                : none(Type.class);
+        Option<Class<?>> aClass = canComplete
+                ? evaluator.typeOfExpression(packagePart.substring(0, beginIndex - 1)).map(Types::classOf)
+                : none();
 
         if (aClass.isDefined()) {
             ClassReflection classReflection = reflectionOf(aClass.get());
 
             Sequence<MemberReflection> join = Sequences.empty(MemberReflection.class)
                     .join(classReflection.declaredFields())
-                    .join(classReflection.declaredMethods());
+                    .join(classReflection.declaredMethods())
+                    .unique();
 
             Sequence<CompletionCandidate> candidates = join
                     .filter(isPublic().and(not(isStatic())))

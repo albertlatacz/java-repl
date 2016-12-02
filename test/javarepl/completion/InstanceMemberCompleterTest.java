@@ -1,20 +1,25 @@
 package javarepl.completion;
 
+import javarepl.completion.helpers.SimpleCompletionInstance;
 import org.junit.Test;
 
+import static com.googlecode.totallylazy.Sequences.sequence;
 import static javarepl.completion.CompleterTestHelper.*;
 import static org.junit.Assert.assertThat;
 
 public class InstanceMemberCompleterTest {
 
     @Test
-    public void shouldCompleteStaticMembers() {
-        InstanceMemberCompleter completer = new InstanceMemberCompleter(evaluator());
-        String expression = TestOuterClass.class.getCanonicalName() + ".staticField.";
+    public void shouldCompleteInstance() {
+        String expression = "ci.over";
+        String instanceClassName = SimpleCompletionInstance.class.getCanonicalName();
+        InstanceMemberCompleter completer = new InstanceMemberCompleter(evaluator("ci = new "+instanceClassName+"()"));
 
-//        CompletionResult result = completer.apply(expression);
-//        assertThat(result,
-//                completesTo(candidates("staticField", "staticMethod("), position(expression.length())));
+        CompletionResult result = completer.apply(expression);
+
+        assertThat(result,
+                completesTo(candidates(new CompletionCandidate("overloadedMethod(", sequence("int overloadedMethod()", "int overloadedMethod(int)", "int overloadedMethod(int, int)"))),
+                position(3)));
 
         assertThat(completer.apply("invalid"), completesTo(candidatesValues(), position(0)));
     }
