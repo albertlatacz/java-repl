@@ -26,6 +26,7 @@ public class AggregateCompleter extends Completer {
 
     private Option<Group<Integer, CompletionResult>> completeGroup(String expression) {
         return completers.map(complete(expression))
+                .unique()
                 .groupBy(CompletionResult::position)
                 .sortBy(groupKey(Integer.class))
                 .reverse()
