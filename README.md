@@ -45,20 +45,7 @@ $ java -jar build/libs/javarepl-dev.jar
 
 ## Releases
 
-Releases are automatically released to Bintray Maven repository
-
-To configure specify repository 
-
-```xml
-<repositories>
-    <repository>
-        <id>Java REPL Maven Repository</id>
-        <url>https://dl.bintray.com/albertlatacz/maven</url>
-    </repository>
-</repositories>
-```
-
-and then
+Releases are automatically released to [Bintray JCenter](https://jcenter.bintray.com/) and [Sonatype Central](http://repo1.maven.org/maven2)repositories. Configure repository of your choice and then add Java REPL as dependency:
 
 ```xml
 <dependencies>
