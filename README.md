@@ -25,7 +25,9 @@ Java REPL is a simple Read-Eval-Print-Loop for Java language.
 
 Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
-[![Java REPL](bin/javarepl-icon.png)](http://www.javarepl.com)  
+<p align="center">
+  <img src="bin/javarepl-icon.png">
+</p>
 
 ## Build
 Building Java REPL requires the [gradle](https://gradle.org/).
