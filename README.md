@@ -22,15 +22,21 @@ Web version is available at [www.javarepl.com](http://www.javarepl.com/).
 
 
 ## Build
-Building Java REPL requires the [ant build tool](http://ant.apache.org/).
+Building Java REPL requires the [gradle](https://gradle.org/).
 
 After cloning the git repository, navigate over to it and run:
 
 ```
-$ ant
+$ gradle -Pversion=dev shadowJar
 ```
 
-After this completes, the jar completed with bundled dependencies will be located at **build/artifacts/javarepl-dev.build.jar**
+After this completes, the jar completed with bundled dependencies will be located at **build/libs/javarepl-dev.jar**
+
+Type the following to run
+
+```
+$ java -jar build/libs/javarepl-dev.jar
+```
 
 ## Releases
 
@@ -67,7 +73,7 @@ Download latest Java REPL release from [GitHub](https://github.com/albertlatacz/
 
 
 ```
-$ java -jar javarepl.jar
+$ java -jar javarepl-VERSION.jar
 ```
 
 If this doesn't work try to run pointing directly to *java* executable within JDK, like so
