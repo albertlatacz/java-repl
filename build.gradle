@@ -38,6 +38,7 @@ def pomConfig = {
             distribution "repo"
         }
     }
+
     developers {
         developer {
             id "albertlatacz"
