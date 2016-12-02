@@ -1,6 +1,7 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "1.2.4"
     id "com.jfrog.bintray" version "1.7"
+    id "co.riiid.gradle" version "0.4.2"
 }
 
 apply plugin: 'java'
@@ -48,6 +49,19 @@ publishing {
 
         }
     }
+}
+
+github {
+    owner = 'albertlatacz'
+    repo = 'java-repl'
+    token = System.getenv('GITHUB_TOKEN')
+    tagName = projectVersion
+    targetCommitish = 'master'
+    assets = [
+            "build/libs/javarepl-${projectVersion}.jar",
+            "build/libs/javarepl-${projectVersion}-sources.jar",
+            "build/libs/javarepl-${projectVersion}-javadoc.jar"
+    ]
 }
 
 

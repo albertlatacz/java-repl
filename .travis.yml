@@ -5,6 +5,7 @@ env:
     global:
         - PROJECT_REPOSITORY="albertlatacz/java-repl"
         - PROJECT_VERSION=$TRAVIS_BUILD_NUMBER
+        - secure: "GgktdD6R+usYtITrqJcpcgU0MjwZXI0kcL1MVwqJVH7+6dAxt2i4ddHj62lT2zjPah1EqL/OXVw3WrhI3kDgljSuG4kcFsTj/ZBDpzhFtFL6aF5SR49tHUykL5nSaIp53TVnHFnk5CuRUUVxAnlUxNLWDCNyYfD3GB2vxJnicMs="
         - secure: "bIFU+VgbcIJ5DmsXkoxTaLGI40uIyWdTFnco7FaJLoJLwLJSake4jemFv5SI\nJaSFVINBXA+Xn/qqHmFfWVr2fKsAevwRfkkIuTM1QMlN2TOMkCwOrz6mYA3f\nxjh+oKXUzNutZTHSyoCyZ72uHSJ33TlPWHU+OToS4AYxf8LrTYI="
         - secure: "O0xTkW+WBNWT0a44u7XRpm0vp0q04ZFv/ovmPX6nm3fRokuiHMoRaL1l7r1K\nLF9ow3n+Ncsl64XRJNv2rjKVrxb19GtZQjxnHqi6bW2FSnoTEJsfvIjgMOwh\nrOHL9MUP61idRqN15ki0qYsmZ8t3xN9rw04fJLGZn73Oy0uRSGI="
         - secure: "C5j0sZWXhfOoaVYyylyM7aJsjUSBbiIkW2GpAhODIrp/E5l297TymomFOCOTZSL1xF5V4RYt6jc7db+Qri5ryeHd0IIYMNWqcmni4rChtKp4b2F4qh+eqwre8RW5hONOcByZTQDvo+m3SCTuoTWcIM/UIhQIGovSPtYmqjQlSwI="
@@ -26,25 +27,25 @@ services:
   - docker
 
 script:
-  - gradle clean check shadowJar bintrayUpload
+  - gradle clean check shadowJar bintrayUpload githubRelease
 
-deploy:
-    provider: releases
-    api_key:
-        secure: "Dlvp//L9a/9bHgtTZPWy+tTbsokq5f3fhobmR1tBtEQUiuOl0dl5nzVOq1tBb0AwPBmTudkBIwH1DW64WCnZnGUatiVznfEydGgCzaW8hNeg9S2iatNIjVjqWXrR/Id+Vg8gGoDomLltPL5qb5UBhdpiOT9Te/GH5/hRUw0NpvI="
-    file: "build/libs/*.jar"
-    file_glob: true
-    skip_cleanup: true
-    on:
-        branch: master
-        repo: $PROJECT_REPOSITORY
+#deploy:
+#    provider: releases
+#    api_key:
+#        secure: "Dlvp//L9a/9bHgtTZPWy+tTbsokq5f3fhobmR1tBtEQUiuOl0dl5nzVOq1tBb0AwPBmTudkBIwH1DW64WCnZnGUatiVznfEydGgCzaW8hNeg9S2iatNIjVjqWXrR/Id+Vg8gGoDomLltPL5qb5UBhdpiOT9Te/GH5/hRUw0NpvI="
+#    file: "build/libs/*.jar"
+#    file_glob: true
+#    skip_cleanup: true
+#    on:
+#        branch: master
+#        repo: $PROJECT_REPOSITORY
 
-
-after_deploy:
-    - sh bin/push-to-docker-hub.sh
 
 after_success:
-    - sh bin/set-tags.sh
+    - sh bin/push-to-docker-hub.sh
+
+#after_success:
+#    - sh bin/set-tags.sh
 
 
 
