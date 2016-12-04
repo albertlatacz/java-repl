@@ -13,23 +13,18 @@ import java.lang.reflect.ReflectPermission;
 import java.net.SocketPermission;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Permissions;
 import java.security.Policy;
-import java.util.List;
 import java.util.PropertyPermission;
 
-import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Files.temporaryDirectory;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
-import static com.googlecode.totallylazy.collections.PersistentList.constructors.empty;
 import static com.googlecode.totallylazy.functions.Callables.compose;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
@@ -56,9 +51,7 @@ public class Repl {
                     getProperty("java.version")));
         }
 
-        String[] expressions = sequence(initialExpressions(args))
-                .union(sequence(initialExpressionsFromFile()))
-                .toArray(new String[0]);
+        String[] expressions = sequence(initialExpressions(args)).toArray(new String[0]);
 
         ConsoleConfig consoleConfig = consoleConfig()
                 .historyFile(historyFile(!sandboxed))
@@ -80,19 +73,6 @@ public class Repl {
         } while (true);
     }
 
-    private static List<String> initialExpressionsFromFile() {
-        return fileOption(new File("."), "javarepl.init")
-            .map(readFile())
-            .getOrElse(empty(String.class));
-    }
-
-    private static Function1<File, List<String>> readFile() {
-        return f -> {
-            List<String> l = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
-            System.out.println(l);
-            return l;
-        };
-    }
 
     private static boolean ignoreConsole(String[] args) {
         return sequence(args).contains("--ignoreConsole");

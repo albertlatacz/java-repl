@@ -30,7 +30,7 @@ public class TimingOutConsole extends DelegatingConsole {
         scheduleInactivityTimeout();
 
         ScheduledFuture<Object> timedOut = null;
-        if (!expressionTimeout.isEmpty()) {
+        if (expressionTimeout.isDefined()) {
             timedOut = scheduler.schedule(exitWithCode(EXPRESSION_TIMEOUT), expressionTimeout.get(), SECONDS);
         }
 
@@ -43,7 +43,7 @@ public class TimingOutConsole extends DelegatingConsole {
     }
 
     private void scheduleInactivityTimeout() {
-        if (!inactivityTimeout.isEmpty()) {
+        if (inactivityTimeout.isDefined()) {
             if (inactivityFuture != null) {
                 inactivityFuture.cancel(true);
             }

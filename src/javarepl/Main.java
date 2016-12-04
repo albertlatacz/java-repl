@@ -2,7 +2,7 @@ package javarepl;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
-import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.functions.Function1;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
@@ -15,17 +15,23 @@ import jline.console.completer.CompletionHandler;
 import jline.console.history.MemoryHistory;
 import org.fusesource.jansi.AnsiConsole;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
+import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
+import static com.googlecode.totallylazy.Sequences.empty;
 import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.Strings.replaceAll;
 import static com.googlecode.totallylazy.Strings.startsWith;
 import static com.googlecode.totallylazy.functions.Callables.compose;
 import static com.googlecode.totallylazy.numbers.Numbers.intValue;
 import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
+import static com.googlecode.totallylazy.predicates.Not.not;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
@@ -43,8 +49,9 @@ public class Main {
     public static void main(String... args) throws Exception {
         console = new ResultPrinter(printColors(args));
 
+        Sequence<String> initialExpressions = initialExpressionsFromFile().join(initialExpressionsFromArgs(args));
         JavaREPLClient client = clientFor(hostname(args), port(args));
-        ExpressionReader expressionReader = expressionReaderFor(client);
+        ExpressionReader expressionReader = expressionReaderFor(client, initialExpressions);
 
         Option<String> expression = none();
         Option<EvaluationResult> result = none();
@@ -129,6 +136,23 @@ public class Main {
         return false;
     }
 
+    private static Sequence<String> initialExpressionsFromArgs(String[] args) {
+        return sequence(args)
+                .find(startsWith("--expression="))
+                .map(replaceAll("--expression=", ""))
+                .toSequence();
+    }
+
+    private static Sequence<String> initialExpressionsFromFile() {
+        return fileOption(new File("."), "javarepl.init")
+                .map(readExpressionsFile())
+                .getOrElse(empty(String.class));
+    }
+
+    private static Function1<File, Sequence<String>> readExpressionsFile() {
+        return f -> sequence(Files.readAllLines(f.toPath(), StandardCharsets.UTF_8)).filter(not(Strings::isBlank));
+    }
+
     private static Option<Integer> port(String[] args) {
         return sequence(args).find(startsWith("--port=")).map(compose(replaceAll("--port=", ""), compose(valueOf, intValue)));
     }
@@ -141,9 +165,10 @@ public class Main {
         return !sequence(args).contains("--noColors");
     }
 
-    private static ExpressionReader expressionReaderFor(final JavaREPLClient client) throws IOException {
+    private static ExpressionReader expressionReaderFor(final JavaREPLClient client, Sequence<String> initialExpressions) throws IOException {
         return new ExpressionReader(new Function1<Sequence<String>, String>() {
             private final ConsoleReader consoleReader;
+            private Sequence<String> expressions = initialExpressions;
 
             {
                 consoleReader = new ConsoleReader(System.in, AnsiConsole.out);
@@ -156,7 +181,17 @@ public class Main {
             public String call(Sequence<String> lines) throws Exception {
                 consoleReader.setPrompt(console.ansiColored(lines.isEmpty() ? "\u001B[1mjava> \u001B[0m" : "    \u001B[1m| \u001B[0m"));
                 consoleReader.setHistory(clientHistory());
-                return consoleReader.readLine();
+                return readExpression();
+            }
+
+            private String readExpression() throws IOException {
+                String expressionLine = null;
+                if (!expressions.isEmpty()) {
+                    expressionLine = expressions.head();
+                    expressions = expressions.tail();
+
+                }
+                return expressionLine != null ? expressionLine : consoleReader.readLine();
             }
 
             private MemoryHistory clientHistory() throws Exception {
@@ -192,7 +227,7 @@ public class Main {
         public boolean complete(final ConsoleReader reader, final List<CharSequence> candidatesJson, final int pos) throws IOException {
             CursorBuffer buf = reader.getCursorBuffer();
             CompletionResult completionResult = fromJson(sequence(candidatesJson).head().toString());
-            Sequence<String> candidatesToPrint = Sequences.empty(String.class);
+            Sequence<String> candidatesToPrint = empty(String.class);
 
             // if there is only one completion, then fill in the buffer
             if (completionResult.candidates().size() == 1) {
