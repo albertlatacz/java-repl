@@ -87,7 +87,7 @@ publishing {
 github {
     owner = 'albertlatacz'
     repo = 'java-repl'
-    token = System.getenv('GITHUB_TOKEN')
+    token = System.getenv('GITHUB_TOKEN')  == null ? "UNSPECIFIED" : System.getenv('GITHUB_TOKEN')
     tagName = projectVersion
     targetCommitish = 'master'
     assets = [
