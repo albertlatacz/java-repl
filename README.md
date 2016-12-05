@@ -45,7 +45,7 @@ $ java -jar build/libs/javarepl-dev.jar
 
 ## Releases
 
-Releases are automatically released to [Bintray JCenter](https://jcenter.bintray.com/) and [Sonatype Central](http://repo1.maven.org/maven2) repositories. Configure repository of your choice and then add Java REPL as dependency:
+Releases are automatically released to [![Maven Central](https://img.shields.io/maven-central/v/com.javarepl/javarepl.svg)](http://repo1.maven.org/maven2). Configure repository and then add Java REPL as dependency:
 
 ```xml
 <dependencies>
