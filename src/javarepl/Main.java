@@ -1,5 +1,6 @@
 package javarepl;
 
+import com.googlecode.totallylazy.Exceptions;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -8,6 +9,8 @@ import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
+import jline.Terminal;
+import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
 import jline.console.completer.CandidateListCompletionHandler;
@@ -21,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
+import static com.googlecode.totallylazy.Exceptions.captureException;
 import static com.googlecode.totallylazy.Files.fileOption;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
@@ -167,6 +171,8 @@ public class Main {
 
     private static ExpressionReader expressionReaderFor(final JavaREPLClient client, Sequence<String> initialExpressions) throws IOException {
         return new ExpressionReader(new Function1<Sequence<String>, String>() {
+            private static final char CTRL_C = (char) 3;
+            private static final char CTRL_D = (char) 4;
             private final ConsoleReader consoleReader;
             private Sequence<String> expressions = initialExpressions;
 
@@ -176,6 +182,7 @@ public class Main {
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
                 consoleReader.addCompleter(clientCompleter());
+                consoleReader.addTriggeredAction(CTRL_D, e -> System.exit(0));
             }
 
             public String call(Sequence<String> lines) throws Exception {
