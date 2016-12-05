@@ -23,12 +23,6 @@ class ResultPrinter {
         AnsiConsole.out.println(ansiColored(message));
     }
 
-    public void printEvaluationResult(EvaluationResult result) {
-        for (EvaluationLog log : result.logs()) {
-            printEvaluationLog(log);
-        }
-    }
-
     public void printEvaluationLog(EvaluationLog log) {
         switch (log.type()) {
             case INFO:

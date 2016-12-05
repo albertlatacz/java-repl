@@ -48,7 +48,7 @@ public class RestConsoleResource {
 
         return emptyMap(String.class, Object.class)
                 .insert("expression", result.expression())
-                .insert("logs", result.logs().map(commandResultToModel()));
+                .insert("logs", result.logs().map(toCommandResultMap()));
     }
 
     @POST
@@ -86,7 +86,7 @@ public class RestConsoleResource {
                 .insert("history", console.history().items().toList());
     }
 
-    private static Function1<ConsoleLog, Map<String, Object>> commandResultToModel() {
+    private static Function1<ConsoleLog, Map<String, Object>> toCommandResultMap() {
         return consoleLog -> emptyMap(String.class, Object.class)
                 .insert("type", consoleLog.type())
                 .insert("message", consoleLog.message());

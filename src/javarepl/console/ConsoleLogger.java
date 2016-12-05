@@ -29,6 +29,10 @@ public final class ConsoleLogger {
         log(ConsoleLog.info(message));
     }
 
+    public void control(String message) {
+        log(ConsoleLog.control(message));
+    }
+
     public void success(String message) {
         log(ConsoleLog.success(message));
     }

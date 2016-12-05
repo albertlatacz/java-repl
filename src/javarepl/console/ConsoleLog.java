@@ -4,7 +4,7 @@ import static javarepl.console.ConsoleLog.Type.*;
 
 public class ConsoleLog {
     public static enum Type {
-        INFO, SUCCESS, ERROR
+        INFO, SUCCESS, ERROR, CONTROL
     }
 
     private final Type type;
@@ -13,6 +13,10 @@ public class ConsoleLog {
     private ConsoleLog(Type type, String message) {
         this.type = type;
         this.message = message;
+    }
+
+    public static ConsoleLog control(String message) {
+        return consoleLog(CONTROL, message);
     }
 
     public static ConsoleLog success(String message) {

@@ -1,16 +1,15 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Exceptions;
+import com.googlecode.totallylazy.Lists;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.functions.Function1;
+import javarepl.client.EvaluationLog;
 import javarepl.client.EvaluationResult;
 import javarepl.client.JavaREPLClient;
 import javarepl.completion.CompletionCandidate;
 import javarepl.completion.CompletionResult;
-import jline.Terminal;
-import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
 import jline.console.completer.CandidateListCompletionHandler;
@@ -24,8 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
-import static com.googlecode.totallylazy.Exceptions.captureException;
 import static com.googlecode.totallylazy.Files.fileOption;
+import static com.googlecode.totallylazy.Lists.list;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.empty;
@@ -38,11 +37,13 @@ import static com.googlecode.totallylazy.numbers.Numbers.valueOf;
 import static com.googlecode.totallylazy.predicates.Not.not;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.Utils.randomServerPort;
+import static javarepl.client.EvaluationLog.Type.CONTROL;
 import static javarepl.completion.CompletionResult.methods.fromJson;
 import static javarepl.completion.CompletionResult.methods.toJson;
+import static javarepl.console.commands.ClearScreen.CLEAR_SCREEN_CMD;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 public class Main {
@@ -53,9 +54,10 @@ public class Main {
     public static void main(String... args) throws Exception {
         console = new ResultPrinter(printColors(args));
 
-        Sequence<String> initialExpressions = initialExpressionsFromFile().join(initialExpressionsFromArgs(args));
+        ConsoleReader consoleReader = new ConsoleReader(System.in, AnsiConsole.out);
         JavaREPLClient client = clientFor(hostname(args), port(args));
-        ExpressionReader expressionReader = expressionReaderFor(client, initialExpressions);
+        Sequence<String> initialExpressions = initialExpressionsFromFile().join(initialExpressionsFromArgs(args));
+        ExpressionReader expressionReader = expressionReaderFor(consoleReader, client, initialExpressions);
 
         Option<String> expression = none();
         Option<EvaluationResult> result = none();
@@ -64,17 +66,48 @@ public class Main {
 
             if (!expression.isEmpty()) {
                 result = client.execute(expression.get());
-                if (!result.isEmpty())
-                    console.printEvaluationResult(result.get());
+                if (!result.isEmpty()) {
+                    for (EvaluationLog log : result.get().logs()) {
+                        if (!handleTerminalCommand(log)) {
+                            handleTerminalMessage(log);
+                        }
+                    }
+                }
             }
         }
     }
 
-    private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
-        console.printInfo(format("Welcome to JavaREPL version %s (%s, Java %s)",
+    private static void handleTerminalMessage(EvaluationLog log) {
+        console.printEvaluationLog(log);
+    }
+
+    private static boolean handleTerminalCommand(EvaluationLog log) {
+        if (log.type().equals(CONTROL)){
+            switch (log.message()) {
+                case CLEAR_SCREEN_CMD: {
+                    console.printInfo("\033c");
+                    console.printInfo(welcomeMessage());
+                    console.printInfo(welcomeInstructions());
+                } break;
+
+                default: return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+
+    private static String welcomeMessage() {
+        return format("Welcome to JavaREPL version %s (%s, Java %s)",
                 applicationVersion(),
                 getProperty("java.vm.name"),
-                getProperty("java.version")));
+                getProperty("java.version"));
+    }
+
+    private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
+        console.printInfo(welcomeMessage());
 
         if (hostname.isEmpty() && port.isEmpty()) {
             return startNewLocalInstance("localhost", randomServerPort());
@@ -108,7 +141,7 @@ public class Main {
             System.exit(0);
         }
 
-        console.printInfo("Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.");
+        console.printInfo(welcomeInstructions());
 
         ProcessBuilder builder = new ProcessBuilder("java", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(), "--port=" + port);
         builder.redirectErrorStream(true);
@@ -128,6 +161,10 @@ public class Main {
         }
 
         return replClient;
+    }
+
+    private static String welcomeInstructions() {
+        return "Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.";
     }
 
     private static boolean waitUntilInstanceStarted(JavaREPLClient client) throws Exception {
@@ -169,15 +206,13 @@ public class Main {
         return !sequence(args).contains("--noColors");
     }
 
-    private static ExpressionReader expressionReaderFor(final JavaREPLClient client, Sequence<String> initialExpressions) throws IOException {
+    private static ExpressionReader expressionReaderFor(ConsoleReader consoleReader, final JavaREPLClient client, Sequence<String> initialExpressions) throws IOException {
         return new ExpressionReader(new Function1<Sequence<String>, String>() {
             private static final char CTRL_C = (char) 3;
             private static final char CTRL_D = (char) 4;
-            private final ConsoleReader consoleReader;
             private Sequence<String> expressions = initialExpressions;
 
             {
-                consoleReader = new ConsoleReader(System.in, AnsiConsole.out);
                 consoleReader.setCompletionHandler(new JlineCompletionHandler());
                 consoleReader.setHistoryEnabled(true);
                 consoleReader.setExpandEvents(false);
@@ -213,7 +248,7 @@ public class Main {
                 return (expression, cursor, candidates) -> {
                     try {
                         CompletionResult result = client.completions(expression);
-                        candidates.addAll(asList(toJson(result)));
+                        candidates.addAll(singletonList(toJson(result)));
                         return result.candidates().isEmpty() ? -1 : result.position();
                     } catch (Exception e) {
                         return -1;

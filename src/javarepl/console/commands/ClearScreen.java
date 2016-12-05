@@ -1,24 +1,22 @@
 package javarepl.console.commands;
 
-import javarepl.Evaluator;
 import javarepl.completion.CommandCompleter;
 import javarepl.console.ConsoleLogger;
 
-import static com.googlecode.totallylazy.predicates.Predicates.equalTo;
+import static com.googlecode.totallylazy.Strings.startsWith;
 
 public final class ClearScreen extends Command {
+    public static final String CLEAR_SCREEN_CMD = "CLEAR_SCREEN";
     private static final String COMMAND = ":cls";
-    private final Evaluator evaluator;
     private final ConsoleLogger logger;
 
-    public ClearScreen(Evaluator evaluator, ConsoleLogger logger) {
-        super(COMMAND + " - clear screen", equalTo(COMMAND).or(equalTo(null)), new CommandCompleter(COMMAND));
-        this.evaluator = evaluator;
+    public ClearScreen(ConsoleLogger logger) {
+        super(COMMAND + " - clears screen", startsWith(COMMAND), new CommandCompleter(COMMAND));
         this.logger = logger;
     }
 
     public void execute(String expression) {
         this.logger.reset();
-        this.logger.info("\033[2J");
+        this.logger.control(CLEAR_SCREEN_CMD);
     }
 }

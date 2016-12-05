@@ -125,6 +125,30 @@ function echoCompletionCandidates(term, candidates) {
     term.echo(layoutCompletions(candidates, term.width() / 8));
 }
 
+function handleTerminalCommand(log, term) {
+    if (log.type == "CONTROL") {
+        switch (log.message) {
+            case "CLEAR_SCREEN":
+                term.clear();
+                term.echo(session.welcomeMessage);
+                term.echo(' ');
+                break;
+        }
+        return true;
+    }
+    return false;
+}
+
+function handleTerminalMessage(log, term) {
+    if (log.type != "CONTROL") {
+        var style = log.type == "ERROR" ? "terminal-message-error" : "terminal-message-success";
+        term.echo(log.message, messageStyle(style))
+        return log.type == "ERROR";
+    }
+    return false;
+}
+
+
 $(document).ready(function () {
     jQuery(function ($, undefined) {
         createNewSession(getParam("expression"), getParam("snap"));
@@ -146,16 +170,11 @@ $(document).ready(function () {
                     data: {id: session.clientId, expression: expression}
                 }).done(function (data) {
                     var hadError = false;
-
                     for (var i = 0; i < data.logs.length; i++) {
-                        var style = data.logs[i].type == "ERROR" ? "terminal-message-error" : "terminal-message-success";
-
-                        if (data.logs[i].type == "ERROR") {
-                            hadError = true;
-
+                        var log = data.logs[i];
+                        if (!handleTerminalCommand(log, term)) {
+                            hadError = handleTerminalMessage(log, term) || hadError;
                         }
-
-                        term.echo(data.logs[i].message, messageStyle(style))
                     }
 
                     if (!hadError) {
