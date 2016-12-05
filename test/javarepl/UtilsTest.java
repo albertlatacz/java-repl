@@ -52,12 +52,14 @@ public class UtilsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void returnsPowerSetPermutations() {
         assertThat(powerSetPermutations(sequence(1, 2)),
                 containsInAnyOrder(sequence(1), sequence(2), sequence(1, 2), sequence(2, 1), empty(Integer.class)));
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void returnsAllPermutationsOfTheSet() {
         assertThat(permutations(sequence(1, 2, 3)),
                 containsInAnyOrder(

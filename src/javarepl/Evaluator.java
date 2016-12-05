@@ -170,7 +170,7 @@ public class Evaluator {
         return expressionType;
     }
 
-    public final Option<Class> classFrom(String expression) {
+    public final Option<Class<?>> classFrom(String expression) {
         try {
             return some(detectClass(expression));
         } catch (Throwable e) {
@@ -247,7 +247,7 @@ public class Evaluator {
         return expressionClass.getDeclaredMethods()[0];
     }
 
-    private Class detectClass(String expression) throws Exception {
+    private Class<?> detectClass(String expression) throws Exception {
         final String className = randomIdentifier("Class");
         final File outputJavaFile = file(context.outputDirectory(), className + ".java");
 
@@ -256,7 +256,7 @@ public class Evaluator {
 
         compile(outputJavaFile);
 
-        Class expressionClass = classLoader.loadClass(className);
+        Class<?> expressionClass = classLoader.loadClass(className);
 
         return expressionClass.getDeclaredMethods()[0].getReturnType();
     }

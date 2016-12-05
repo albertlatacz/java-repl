@@ -22,12 +22,12 @@ public class TypeRenderer {
     }
 
     @multimethod
-    private static String renderType(Class type) {
+    private static String renderType(Class<?> type) {
         return type.getCanonicalName();
     }
 
     @multimethod
-    private static String renderType(TypeVariable typeVariable) {
+    private static String renderType(TypeVariable<?> typeVariable) {
         return "Object";
     }
 

@@ -13,6 +13,7 @@ import java.io.File;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.option;
 import static com.googlecode.totallylazy.Sequences.empty;
+import static com.googlecode.totallylazy.Sequences.one;
 import static com.googlecode.totallylazy.Sequences.sequence;
 
 public final class ConsoleConfig {
@@ -53,8 +54,10 @@ public final class ConsoleConfig {
         return new ConsoleConfig(historyFile, sequence(expressions), logger, commands, results, sandboxed);
     }
 
-    public ConsoleConfig commands(Class... cmds) {
-        return new ConsoleConfig(historyFile, expressions, logger, sequence(cmds).<Class<? extends Command>>unsafeCast(), results, sandboxed);
+    @SafeVarargs
+    @SuppressWarnings("varargs")
+    public final ConsoleConfig commands(Class<? extends Command>... cmds) {
+        return new ConsoleConfig(historyFile, expressions, logger, sequence(cmds).unsafeCast(), results, sandboxed);
     }
 
     public ConsoleConfig results(Result... results) {

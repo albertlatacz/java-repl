@@ -2,7 +2,11 @@ package javarepl.client;
 
 public class EvaluationLog {
     public static enum Type {
-        INFO, SUCCESS, ERROR
+        INFO, SUCCESS, ERROR;
+
+        public static Type type(String type) {
+            return valueOf(type);
+        }
     }
 
     private final Type type;

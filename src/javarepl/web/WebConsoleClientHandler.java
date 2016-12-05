@@ -5,7 +5,6 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.Strings;
 import com.googlecode.totallylazy.json.Json;
-import com.googlecode.utterlyidle.RequestBuilder;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.Status;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
@@ -17,7 +16,8 @@ import java.util.UUID;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.utterlyidle.RequestBuilder.get;
+import static com.googlecode.utterlyidle.Request.get;
+import static com.googlecode.utterlyidle.Request.post;
 import static com.googlecode.utterlyidle.Response.response;
 import static com.googlecode.utterlyidle.Status.GATEWAY_TIMEOUT;
 import static com.googlecode.utterlyidle.Status.INTERNAL_SERVER_ERROR;
@@ -62,7 +62,7 @@ public final class WebConsoleClientHandler {
 
     private ConsoleStatus status() {
         try {
-            return ConsoleStatus.valueOf(Json.map(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status").build()).entity().toString())
+            return ConsoleStatus.valueOf(Json.map(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/status")).entity().toString())
                     .get("status").toString());
 
         } catch (Exception e) {
@@ -91,7 +91,7 @@ public final class WebConsoleClientHandler {
         createProcess();
 
         try {
-            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port.get() + "/" + "execute").form("expression", expression).build()));
+            return reportProcessError(new ClientHttpHandler().handle(post("http://localhost:" + port.get() + "/" + "execute").form("expression", expression)));
         } catch (Exception e) {
             e.printStackTrace();
             return response(INTERNAL_SERVER_ERROR);
@@ -102,7 +102,7 @@ public final class WebConsoleClientHandler {
         createProcess();
 
         try {
-            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.post("http://localhost:" + port.get() + "/" + "readExpression").form("line", line).build()));
+            return reportProcessError(new ClientHttpHandler().handle(post("http://localhost:" + port.get() + "/" + "readExpression").form("line", line)));
         } catch (Exception e) {
             e.printStackTrace();
             return response(INTERNAL_SERVER_ERROR);
@@ -113,7 +113,7 @@ public final class WebConsoleClientHandler {
         createProcess();
 
         try {
-            return reportProcessError(new ClientHttpHandler().handle(RequestBuilder.get("http://localhost:" + port.get() + "/" + "completions").query("expression", expression).build()));
+            return reportProcessError(new ClientHttpHandler().handle(get("http://localhost:" + port.get() + "/" + "completions").query("expression", expression)));
         } catch (Exception e) {
             e.printStackTrace();
             return response(INTERNAL_SERVER_ERROR);

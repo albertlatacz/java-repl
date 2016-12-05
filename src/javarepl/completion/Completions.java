@@ -16,12 +16,8 @@ import static com.googlecode.totallylazy.numbers.Numbers.maximum;
 
 public class Completions {
 
-    public static Function1<Character, Integer> lastIndexOf(final String string) {
-        return character -> string.lastIndexOf(character);
-    }
-
-    public static Function1<MemberReflection, String> candidateName() {
-        return memberReflection -> new match<MemberReflection, String>() {
+    public static Function1<MemberReflection<?>, String> candidateName() {
+        return memberReflection -> new match<MemberReflection<?>, String>() {
             String value(MethodReflection expr) {
                 return expr.name() + "(";
             }
@@ -30,15 +26,15 @@ public class Completions {
                 return expr.member().getSimpleName();
             }
 
-            String value(MemberReflection expr) {
+            String value(MemberReflection<?> expr) {
                 return expr.name();
             }
         }.apply(memberReflection).get();
     }
 
 
-    public static Function1<MemberReflection, String> candidateForm() {
-        return memberReflection -> new match<MemberReflection, String>() {
+    public static Function1<MemberReflection<?>, String> candidateForm() {
+        return memberReflection -> new match<MemberReflection<?>, String>() {
             String value(MethodReflection expr) {
                 return genericMethodSignature(expr.member());
             }
@@ -47,29 +43,23 @@ public class Completions {
                 return expr.member().getSimpleName();
             }
 
-            String value(MemberReflection expr) {
+            String value(MemberReflection<?> expr) {
                 return expr.name();
             }
         }.apply(memberReflection).get();
     }
 
-
-    public static Function1<Group<String, MemberReflection>, CompletionCandidate> candidate() {
+    public static Function1<Group<String, MemberReflection<?>>, CompletionCandidate> candidate() {
         return group -> new CompletionCandidate(group.key(), group.map(candidateForm()).sort(Comparators.ascending(String.class)));
     }
-
-    private static Function1<Type, String> asSimpleGenericTypeSignature() {
-        return type -> renderSimpleGenericType(type);
-    }
-
 
     private static String renderSimpleGenericType(Type type) {
         return new match<Type, String>() {
             String value(ParameterizedType t) {
-                return renderSimpleGenericType(t.getRawType()) + sequence(t.getActualTypeArguments()).map(asSimpleGenericTypeSignature()).toString("<", ", ", ">");
+                return renderSimpleGenericType(t.getRawType()) + sequence(t.getActualTypeArguments()).map(Completions::renderSimpleGenericType).toString("<", ", ", ">");
             }
 
-            String value(TypeVariable t) {
+            String value(TypeVariable<?> t) {
                 return t.getName();
             }
 
@@ -77,7 +67,7 @@ public class Completions {
                 return renderSimpleGenericType(t.getGenericComponentType()) + "[]";
             }
 
-            String value(Class t) {
+            String value(Class<?> t) {
                 return t.getSimpleName();
             }
 
@@ -93,17 +83,17 @@ public class Completions {
                 method.getName() +
 
                 sequence(method.getGenericParameterTypes())
-                        .map(asSimpleGenericTypeSignature())
+                        .map(Completions::renderSimpleGenericType)
                         .toString("(", ", ", ")") +
 
                 sequence(method.getGenericExceptionTypes())
-                        .map(asSimpleGenericTypeSignature())
+                        .map(Completions::renderSimpleGenericType)
                         .toString(method.getGenericExceptionTypes().length > 0 ? " throws " : "", ", ", "");
     }
 
     public static int lastIndexOfSeparator(Sequence<Character> characters, String expression) {
         return characters
-                .map(lastIndexOf(expression))
+                .map(expression::lastIndexOf)
                 .reduce(maximum())
                 .intValue();
     }

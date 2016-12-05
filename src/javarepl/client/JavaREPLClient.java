@@ -2,7 +2,11 @@ package javarepl.client;
 
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
+import com.googlecode.totallylazy.collections.Keyword;
 import com.googlecode.totallylazy.functions.Function1;
+import com.googlecode.totallylazy.numbers.Integers;
+import com.googlecode.totallylazy.numbers.Numbers;
 import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.handlers.ClientHttpHandler;
 import javarepl.completion.CompletionResult;
@@ -14,15 +18,33 @@ import java.util.Map;
 
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
-import static com.googlecode.totallylazy.Sequences.sequence;
+import static com.googlecode.totallylazy.collections.Keyword.keyword;
 import static com.googlecode.totallylazy.json.Json.map;
-import static com.googlecode.utterlyidle.RequestBuilder.get;
-import static com.googlecode.utterlyidle.RequestBuilder.post;
-import static javarepl.client.EvaluationLog.Type;
+import static com.googlecode.totallylazy.reflection.Types.classOf;
+import static com.googlecode.totallylazy.reflection.Types.parameterizedType;
+import static com.googlecode.utterlyidle.Request.get;
+import static com.googlecode.utterlyidle.Request.post;
+import static javarepl.client.EvaluationLog.Type.type;
 import static javarepl.completion.CompletionResult.methods.fromJson;
 import static javarepl.console.ConsoleStatus.Idle;
+import static javarepl.console.ConsoleStatus.consoleStatus;
 
 public final class JavaREPLClient {
+
+    public static final Keyword<String> EXPRESSION = keyword("expression", String.class);
+    public static final Keyword<String> TEMPLATE = keyword("template", String.class);
+    public static final Keyword<String> TOKEN = keyword("token", String.class);
+    public static final Keyword<String> TYPE = keyword("type", String.class);
+    public static final Keyword<String> MESSAGE = keyword("message", String.class);
+    public static final Keyword<String> STATUS = keyword("status", String.class);
+    public static final Keyword<String> VERSION = keyword("version", String.class);
+    public static final Keyword<String> VALUE = keyword("value", String.class);
+    public static final Keyword<String> POSITION = keyword("position", String.class);
+    public static final Keyword<List<String>> HISTORY = keyword("history", classOf(parameterizedType(List.class, String.class)));
+    public static final Keyword<List<String>> FORMS = keyword("forms", classOf(parameterizedType(List.class, String.class)));
+    public static final Keyword<List<Map<String, Object>>> LOGS = keyword("logs", classOf(parameterizedType(List.class, parameterizedType(Map.class, String.class, Object.class))));
+    public static final Keyword<List<Map<String, Object>>> CANDIDATES = keyword("candidates", classOf(parameterizedType(List.class, parameterizedType(Map.class, String.class, Object.class))));
+
     private final String hostname;
     private final Integer port;
     private final ClientHttpHandler client;
@@ -34,31 +56,34 @@ public final class JavaREPLClient {
     }
 
     public synchronized ExpressionTemplate template(String expression) throws Exception {
-        Map<String, Object> model = map(client.handle(get(url("template")).query("expression", expression).build()).entity().toString());
-        return new ExpressionTemplate(model.get("template").toString(), model.get("token").toString());
+        Map<String, Object> response = map(client.handle(get(url("template")).query("expression", expression)).entity().toString());
+        String template = TEMPLATE.call(response);
+        String token = TOKEN.call(response);
+        return new ExpressionTemplate(template, token);
     }
 
 
     public synchronized Option<EvaluationResult> execute(String expr) throws Exception {
-        String json = client.handle(post(url("execute")).form("expression", expr).build()).entity().toString();
+        String json = client.handle(post(url("execute")).form("expression", expr)).entity().toString();
 
         if (json.isEmpty())
             return none();
 
-        Map<String, Object> model = map(json);
-        Sequence<Map<String, Object>> logs = sequence((List<Object>)model.get("logs")).unsafeCast();
-        String expression = model.get("expression").toString();
+        Map<String, Object> response = map(json);
+        Sequence<Map<String, Object>> logs = LOGS.map(Sequences::sequence).call(response);
+        String expression = EXPRESSION.call(response);
 
         return some(new EvaluationResult(expression, logs.map(modelToEvaluationLog())));
     }
 
     public synchronized CompletionResult completions(String expr) throws Exception {
-        return fromJson(client.handle(get(url("completions")).query("expression", expr).build()).entity().toString());
+        return fromJson(client.handle(get(url("completions")).query("expression", expr)).entity().toString());
     }
 
     public synchronized ConsoleStatus status() {
         try {
-            return ConsoleStatus.valueOf(map(client.handle(get(url("status")).build()).entity().toString()).get("status").toString());
+            Map<String, Object> response = map(client.handle(get(url("status"))).entity().toString());
+            return consoleStatus(STATUS.call(response));
         } catch (Exception e) {
             return Idle;
         }
@@ -66,20 +91,21 @@ public final class JavaREPLClient {
 
     public synchronized String version() {
         try {
-            return map(client.handle(get(url("version")).build()).entity().toString()).get("version").toString();
+            Map<String, Object> response = map(client.handle(get(url("version"))).entity().toString());
+            return VERSION.call(response);
         } catch (Exception e) {
             return "[unknown]";
         }
     }
 
     public synchronized Sequence<String> history() throws Exception {
-        Response history = client.handle(get(url("history")).build());
-        Map<String, Object> model = map(history.entity().toString());
-        return sequence((List<Object>)model.get("history")).safeCast(String.class);
+        Response history = client.handle(get(url("history")));
+        Map<String, Object> response = map(history.entity().toString());
+        return HISTORY.map(Sequences::sequence).call(response);
     }
 
     private Function1<Map<String, Object>, EvaluationLog> modelToEvaluationLog() {
-        return model -> new EvaluationLog(Type.valueOf(model.get("type").toString()), model.get("message").toString());
+        return response -> new EvaluationLog(type(TYPE.call(response)), MESSAGE.call(response));
     }
 
     private String url(String path) {

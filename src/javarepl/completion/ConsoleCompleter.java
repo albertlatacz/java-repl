@@ -4,6 +4,7 @@ import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.functions.Function1;
 import javarepl.Evaluator;
 import javarepl.Result;
+import javarepl.expressions.Expression;
 import javarepl.expressions.Import;
 import javarepl.expressions.Method;
 import javarepl.expressions.Type;
@@ -12,7 +13,6 @@ import static com.googlecode.totallylazy.Strings.*;
 import static com.googlecode.totallylazy.predicates.Predicates.in;
 import static com.googlecode.totallylazy.predicates.Predicates.where;
 import static javarepl.completion.CompletionCandidate.asCompletionCandidate;
-import static javarepl.expressions.Expression.functions.key;
 
 public class ConsoleCompleter extends Completer {
     private final Evaluator evaluator;
@@ -44,7 +44,7 @@ public class ConsoleCompleter extends Completer {
     }
 
     private Sequence<String> types() {
-        return evaluator.expressionsOfType(Type.class).map(key());
+        return evaluator.expressionsOfType(Type.class).map(Expression::key);
     }
 
     private Sequence<String> imports() {

@@ -4,7 +4,7 @@ public abstract class MemberReflection<T> implements AnnotatedReflection {
 
     private final T member;
 
-    protected MemberReflection(T member) {
+    MemberReflection(T member) {
         this.member = member;
     }
 

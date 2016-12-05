@@ -102,6 +102,6 @@ public class EvaluationContext {
     }
 
     public EvaluationContext removeExpressionWithKey(String key) {
-        return new EvaluationContext(outputDirectory, expressions.filter(where(Expression.functions.key(), not(key))), results, lastSource);
+        return new EvaluationContext(outputDirectory, expressions.filter(where(Expression::key, not(key))), results, lastSource);
     }
 }

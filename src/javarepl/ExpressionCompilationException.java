@@ -16,7 +16,7 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class ExpressionCompilationException extends Exception {
 
-    public ExpressionCompilationException(File file, Iterable<? extends Diagnostic> diagnostics) {
+    public ExpressionCompilationException(File file, Iterable<? extends Diagnostic<?>> diagnostics) {
         this(diagnosticsAsMessage(file, diagnostics));
     }
 
@@ -24,14 +24,14 @@ public class ExpressionCompilationException extends Exception {
         super(message);
     }
 
-    private static String diagnosticsAsMessage(final File file, final Iterable<? extends Diagnostic> diagnostics) {
+    private static String diagnosticsAsMessage(final File file, final Iterable<? extends Diagnostic<?>> diagnostics) {
         return sequence(diagnostics)
                 .filter(isError())
                 .map(diagnosticToMessage(file))
                 .toString("\n");
     }
 
-    private static Function1<Diagnostic, String> diagnosticToMessage(final File file) {
+    private static Function1<Diagnostic<?>, String> diagnosticToMessage(final File file) {
         return diagnostic -> {
             String line = lines(file).drop((int) diagnostic.getLineNumber() - 1).head();
             String marker = repeat(' ').take((int) diagnostic.getColumnNumber() - 1).toString("", "", "^");
@@ -42,7 +42,7 @@ public class ExpressionCompilationException extends Exception {
         };
     }
 
-    private static Predicate<Diagnostic> isError() {
+    private static Predicate<Diagnostic<?>> isError() {
         return diagnostic -> diagnostic.getKind() == ERROR;
     }
 }

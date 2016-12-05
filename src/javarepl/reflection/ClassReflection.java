@@ -70,21 +70,23 @@ public final class ClassReflection extends MemberReflection<Class<?>> {
         return sequence(member().getClasses()).map(ClassReflection::new);
     }
 
-    public Sequence<MemberReflection> declaredMembers() {
-        return empty(MemberReflection.class)
+    public Sequence<MemberReflection<?>> declaredMembers() {
+        return empty()
                 .join(declaredClasses())
                 .join(declaredConstructors())
                 .join(declaredFields())
                 .join(declaredMethods())
-                .unique();
+                .unique()
+                .unsafeCast();
     }
 
-    public Sequence<MemberReflection> members() {
-        return empty(MemberReflection.class)
+    public Sequence<MemberReflection<?>> members() {
+        return empty()
                 .join(classes())
                 .join(constructors())
                 .join(fields())
                 .join(methods())
-                .unique();
+                .unique()
+                .unsafeCast();
     }
 }

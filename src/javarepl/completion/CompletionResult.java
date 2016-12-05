@@ -1,7 +1,9 @@
 package javarepl.completion;
 
 import com.googlecode.totallylazy.Sequence;
+import com.googlecode.totallylazy.Sequences;
 import com.googlecode.totallylazy.json.Json;
+import javarepl.client.JavaREPLClient;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import static com.googlecode.totallylazy.Sequences.sequence;
 import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
 import static com.googlecode.totallylazy.collections.PersistentMap.constructors.map;
 import static com.googlecode.totallylazy.json.Json.json;
+import static javarepl.client.JavaREPLClient.*;
 
 
 public class CompletionResult {
@@ -68,11 +71,15 @@ public class CompletionResult {
         }
 
         public static CompletionResult fromJson(String json) {
-            Map<String, Object> model = map(Json.map(json));
-            return new CompletionResult(model.get("expression").toString(),
-                    Integer.valueOf(model.get("position").toString()),
-                    sequence((List<Map<String, Object>>)model.get("candidates"))
-                            .map(model1 -> new CompletionCandidate(model1.get("value").toString(), sequence((List<String>)model1.get("forms")))));
+            Map<String, Object> jsonMap = map(Json.map(json));
+
+            Sequence<Map<String, Object>> candidates = CANDIDATES.map(Sequences::sequence).apply(jsonMap);
+
+            return new CompletionResult(
+                    EXPRESSION.apply(jsonMap),
+                    POSITION.map(Integer::valueOf).apply(jsonMap),
+                    candidates.map(candidate -> new CompletionCandidate(VALUE.apply(candidate), FORMS.map(Sequences::sequence).apply(candidate)))
+            );
         }
     }
 }

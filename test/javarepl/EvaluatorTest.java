@@ -73,8 +73,8 @@ public class EvaluatorTest {
 
     @Test
     public void shouldReturnClassFromExpression() {
-        assertThat(evaluator().classFrom("String"), is(Option.<Class>some(String.class)));
-        assertThat(evaluator().classFrom("java.util.Map.Entry"), is(Option.<Class>some(java.util.Map.Entry.class)));
+        assertThat(evaluator().classFrom("String"), is(Option.<Class<?>>some(String.class)));
+        assertThat(evaluator().classFrom("java.util.Map.Entry"), is(Option.<Class<?>>some(java.util.Map.Entry.class)));
         assertThat(evaluator().classFrom("invalid"), is(none(Class.class)));
     }
 
@@ -99,6 +99,7 @@ public class EvaluatorTest {
         };
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> Matcher<Either<? extends Throwable, Evaluation>> hasResult(T value) {
         return new FeatureMatcher<Either<? extends Throwable, Evaluation>, T>(is(value), "result value", "result value") {
             protected T featureValueOf(Either<? extends Throwable, Evaluation> evaluation) {

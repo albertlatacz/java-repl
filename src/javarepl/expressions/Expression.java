@@ -34,13 +34,9 @@ public abstract class Expression {
 
     public static final class functions {
         public static Function1<Expression, String> source() {
-            return value -> value.source;
+            return Expression::source;
         }
 
-        public static Function1<Expression, String> key() {
-            return Expression::key;
-        }
     }
-
 
 }

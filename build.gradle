@@ -8,6 +8,16 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 def projectVersion = System.getenv('PROJECT_VERSION') != null ? System.getenv('PROJECT_VERSION') : 'dev'
+def projectCompilerArgs = ["-Xlint:all", "-Xlint:-processing", "-Xlint:-serial", "-Werror"]
+
+
+compileJava {
+    options.compilerArgs = projectCompilerArgs
+}
+
+compileTestJava {
+    options.compilerArgs = projectCompilerArgs
+}
 
 repositories {
     mavenCentral()

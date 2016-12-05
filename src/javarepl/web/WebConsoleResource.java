@@ -8,7 +8,6 @@ import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.utterlyidle.BaseUri;
 import com.googlecode.utterlyidle.MediaType;
 import com.googlecode.utterlyidle.Response;
-import com.googlecode.utterlyidle.ResponseBuilder;
 import com.googlecode.utterlyidle.annotations.*;
 
 import java.io.File;
@@ -21,6 +20,7 @@ import static com.googlecode.totallylazy.Files.workingDirectory;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
 import static com.googlecode.totallylazy.io.URLs.uri;
+import static com.googlecode.utterlyidle.Response.ok;
 import static com.googlecode.utterlyidle.Response.response;
 import static com.googlecode.utterlyidle.Response.seeOther;
 import static com.googlecode.utterlyidle.Status.*;
@@ -44,7 +44,7 @@ public class WebConsoleResource {
     @Path("create")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> create(@FormParam("expression") Option<String> expression,
-                      @FormParam("snap") Option<String> snap) throws Exception {
+                                      @FormParam("snap") Option<String> snap) throws Exception {
 
 
         Option<String> initial = snap.isDefined()
@@ -111,12 +111,11 @@ public class WebConsoleResource {
 
             Files.write(clientHandler.get().history().toString("\n").getBytes(), snapFile(snapId));
 
-            return ResponseBuilder
-                    .response()
+            return ok()
                     .entity(emptyMap(String.class, Object.class)
                             .insert("snap", snapId)
                             .insert("uri", snapUri(snapId).toString())
-                    ).build();
+                    );
 
         } else {
             return response(BAD_REQUEST);
@@ -130,9 +129,9 @@ public class WebConsoleResource {
     public Response getSnap(@PathParam("id") String id) {
         File snap = snapFile(id);
         if (snap.exists()) {
-            return ResponseBuilder.response().entity(Strings.lines(snap).toString("\n")).build();
+            return ok().entity(Strings.lines(snap).toString("\n"));
         } else {
-            return ResponseBuilder.response(NOT_FOUND).build();
+            return response(NOT_FOUND);
         }
     }
 

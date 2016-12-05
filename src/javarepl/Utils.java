@@ -40,8 +40,8 @@ public class Utils {
     }
 
     public static Type extractType(Type type) {
-        if (type instanceof Class) {
-            Class clazz = (Class) type;
+        if (type instanceof Class<?>) {
+            Class<?> clazz = (Class<?>) type;
             if (clazz.isAnonymousClass() || clazz.isSynthetic() || clazz.isMemberClass()) {
                 if (clazz.getGenericSuperclass().equals(Object.class)) {
                     return extractType(sequence(clazz.getGenericInterfaces())

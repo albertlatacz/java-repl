@@ -41,10 +41,11 @@ public class InstanceMemberCompleter extends Completer {
         if (aClass.isDefined()) {
             ClassReflection classReflection = reflectionOf(aClass.get());
 
-            Sequence<MemberReflection> join = Sequences.empty(MemberReflection.class)
+            Sequence<MemberReflection<?>> join = Sequences.empty()
                     .join(classReflection.declaredFields())
                     .join(classReflection.declaredMethods())
-                    .unique();
+                    .unique()
+                    .unsafeCast();
 
             Sequence<CompletionCandidate> candidates = join
                     .filter(isPublic().and(not(isStatic())))

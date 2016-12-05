@@ -63,7 +63,7 @@ public class StaticMemberCompleter extends Completer {
 
 
     private Option<Pair<String, Sequence<String>>> parseExpression(Pair<String, Sequence<String>> expression) {
-        Option<Class> expressionClass = evaluator.classFrom(expression.first());
+        Option<Class<?>> expressionClass = evaluator.classFrom(expression.first());
 
         if (!expressionClass.isEmpty()) {
             return some(expression);
