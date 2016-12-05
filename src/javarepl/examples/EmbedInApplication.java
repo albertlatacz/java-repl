@@ -32,6 +32,6 @@ public class EmbedInApplication {
                         result("date", new Date()),
                         result("num", 42));
 
-        new RestConsole(new SimpleConsole(config), 8001);
+        new RestConsole(new SimpleConsole(config), 8001).start();
     }
 }

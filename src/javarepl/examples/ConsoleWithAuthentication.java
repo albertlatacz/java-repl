@@ -21,7 +21,8 @@ import static javarepl.console.commands.Command.parseStringCommand;
 public class ConsoleWithAuthentication {
 
     public static void main(String... args) throws Exception {
-        new RestConsole(new AuthConsole(new SimpleConsole(consoleConfig()), "password"), 8001);
+        new RestConsole(new AuthConsole(new SimpleConsole(consoleConfig()), "password"), 8001)
+                .start();
     }
 
     public static class AuthConsole extends DelegatingConsole {
