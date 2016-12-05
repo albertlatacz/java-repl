@@ -97,13 +97,15 @@ public class Main {
         return false;
     }
 
-
-
     private static String welcomeMessage() {
         return format("Welcome to JavaREPL version %s (%s, Java %s)",
                 applicationVersion(),
                 getProperty("java.vm.name"),
                 getProperty("java.version"));
+    }
+
+    private static String welcomeInstructions() {
+        return "Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.";
     }
 
     private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
@@ -146,6 +148,8 @@ public class Main {
         ProcessBuilder builder = new ProcessBuilder("java", "-cp", System.getProperty("java.class.path"), Repl.class.getCanonicalName(), "--port=" + port);
         builder.redirectErrorStream(true);
 
+        console.printInfo("Connected to local instance at http://" + hostname + ":" + port);
+
         process = some(builder.start());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -161,10 +165,6 @@ public class Main {
         }
 
         return replClient;
-    }
-
-    private static String welcomeInstructions() {
-        return "Type expression to evaluate, \u001B[32m:help\u001B[0m for more options or press \u001B[32mtab\u001B[0m to auto-complete.";
     }
 
     private static boolean waitUntilInstanceStarted(JavaREPLClient client) throws Exception {

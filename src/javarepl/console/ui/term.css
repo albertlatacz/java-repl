@@ -39,7 +39,7 @@ body {
     height: 72px;
     margin: 20px 10px 20px;
     line-height: 72px;
-    background: url(javarepl-icon.png) no-repeat;
+    background: url(/ui/javarepl-icon.png) no-repeat;
     padding: 0;
     padding-left: 75px;
 

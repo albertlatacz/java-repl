@@ -3,6 +3,7 @@ package javarepl.console.rest;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.functions.Function1;
 import com.googlecode.utterlyidle.MediaType;
+import com.googlecode.utterlyidle.Response;
 import com.googlecode.utterlyidle.annotations.*;
 import javarepl.console.ConsoleLog;
 import javarepl.console.ConsoleResult;
@@ -11,6 +12,9 @@ import javarepl.rendering.ExpressionTemplate;
 import java.util.Map;
 
 import static com.googlecode.totallylazy.collections.PersistentMap.constructors.emptyMap;
+import static com.googlecode.utterlyidle.Response.seeOther;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static javarepl.Utils.applicationVersion;
 import static javarepl.completion.CompletionResult.methods.toJson;
 
@@ -21,6 +25,21 @@ public class RestConsoleResource {
     public RestConsoleResource(RestConsole console, RestConsoleExpressionReader expressionReader) {
         this.console = console;
         this.expressionReader = expressionReader;
+    }
+
+    @GET
+    @Path("")
+    public Response main() {
+        return seeOther("/ui/console.html");
+    }
+
+    @POST
+    @Path("create")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, Object> create() throws Exception {
+        return emptyMap(String.class, Object.class)
+                .insert("id", this.hashCode()+"")
+                .insert("welcomeMessage", welcomeMessage()+"\n"+welcomeInstructions());
     }
 
     @GET
@@ -90,5 +109,16 @@ public class RestConsoleResource {
         return consoleLog -> emptyMap(String.class, Object.class)
                 .insert("type", consoleLog.type())
                 .insert("message", consoleLog.message());
+    }
+
+    private String welcomeMessage() {
+        return format("Welcome to JavaREPL version %s (%s, Java %s)",
+                applicationVersion(),
+                getProperty("java.vm.name"),
+                getProperty("java.version"));
+    }
+
+    private String welcomeInstructions() {
+        return "Type expression to evaluate, :help for more options or press tab to auto-complete.";
     }
 }

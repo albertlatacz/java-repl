@@ -2,6 +2,7 @@ package javarepl.web;
 
 import com.googlecode.utterlyidle.BasePath;
 import com.googlecode.utterlyidle.RestApplication;
+import javarepl.console.ui.ConsoleUiModule;
 
 import static com.googlecode.utterlyidle.annotations.AnnotatedBindings.annotatedClass;
 import static com.googlecode.utterlyidle.modules.Modules.applicationInstance;
@@ -14,6 +15,7 @@ public class WebConsoleApplication extends RestApplication {
                 applicationInstance(new WebConsole())
         );
 
+        add(new ConsoleUiModule());
         add(new WebConsoleModule());
     }
 }

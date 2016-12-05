@@ -1,7 +1,7 @@
 define( [
 	"../core",
 	"../var/document",
-	"../core/init",
+	"./init",
 	"../deferred"
 ], function( jQuery, document ) {
 
