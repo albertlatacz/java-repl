@@ -1,6 +1,5 @@
 package javarepl;
 
-import com.googlecode.totallylazy.Lists;
 import com.googlecode.totallylazy.Option;
 import com.googlecode.totallylazy.Sequence;
 import com.googlecode.totallylazy.Strings;
@@ -24,7 +23,6 @@ import java.nio.file.Files;
 import java.util.*;
 
 import static com.googlecode.totallylazy.Files.fileOption;
-import static com.googlecode.totallylazy.Lists.list;
 import static com.googlecode.totallylazy.Option.none;
 import static com.googlecode.totallylazy.Option.some;
 import static com.googlecode.totallylazy.Sequences.empty;
@@ -112,7 +110,7 @@ public class Main {
         console.printInfo(welcomeMessage());
 
         if (hostname.isDefined() && port.isDefined()) {
-            return connectToRemoteInstance(hostname.get(), port.getOrElse(randomServerPort()));
+            return connectToRemoteInstance(hostname.get(), port.get());
         } else {
             return startNewLocalInstance("localhost", port.getOrElse(randomServerPort()));
         }
