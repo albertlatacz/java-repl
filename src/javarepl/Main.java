@@ -111,10 +111,10 @@ public class Main {
     private static JavaREPLClient clientFor(Option<String> hostname, Option<Integer> port) throws Exception {
         console.printInfo(welcomeMessage());
 
-        if (hostname.isEmpty() && port.isEmpty()) {
-            return startNewLocalInstance("localhost", randomServerPort());
+        if (hostname.isDefined() && port.isDefined()) {
+            return connectToRemoteInstance(hostname.get(), port.getOrElse(randomServerPort()));
         } else {
-            return connectToRemoteInstance(hostname.getOrElse("localhost"), port.getOrElse(randomServerPort()));
+            return startNewLocalInstance("localhost", port.getOrElse(randomServerPort()));
         }
     }
 
