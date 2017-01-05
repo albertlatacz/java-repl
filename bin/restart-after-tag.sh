@@ -14,18 +14,18 @@ function getTags() {
 
 function restartContainer() {
     REPOSITORY=$1
-    PORTS=$2
+    COMMAND="$2"
     echo "New version of ${REPOSITORY} available. Deploying..."
     docker stop $(docker ps -q --filter ancestor=${REPOSITORY})
     docker rm $(docker ps -q -f status=exited)
     docker rmi $(docker images -q -f dangling=true)
     docker pull ${REPOSITORY}
-    docker run --restart=always -d -p ${PORTS} ${REPOSITORY}
+    eval "${COMMAND} ${REPOSITORY}"
 }
 
 function checkForNewVersion() {
     REPOSITORY=$1
-    PORTS=$2
+    COMMAND="$2"
     CURRENT_TAGS_FILE=`tagsFile ${REPOSITORY} "current"`
     NEW_TAGS_FILE=`tagsFile ${REPOSITORY} "new"`
     if [ -f ${CURRENT_TAGS_FILE} ];
@@ -36,27 +36,19 @@ function checkForNewVersion() {
        if [ "${FILES_DIFF}" != "" ];
        then
           getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
-          restartContainer ${REPOSITORY} ${PORTS}
+          restartContainer "${REPOSITORY}" "${COMMAND}"
        fi
     else
        getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
-       restartContainer ${REPOSITORY} ${PORTS}
+       restartContainer "${REPOSITORY}" "${COMMAND}"
     fi
 }
 
 
 DOCKER_HUB_REPOSITORY=$1
-EXPOSED_PORTS=$2
+COMMAND="$2"
 
-checkForNewVersion ${DOCKER_HUB_REPOSITORY} ${EXPOSED_PORTS}
-
-
-
-
-
-
-
-
+checkForNewVersion ${DOCKER_HUB_REPOSITORY} "${COMMAND}"
 
 
 
