@@ -17,8 +17,8 @@ function restartContainer() {
     COMMAND="$2"
     echo "New version of ${REPOSITORY} available. Deploying..."
     docker stop $(docker ps -q --filter ancestor=${REPOSITORY})
-    docker rm $(docker ps -q -f status=exited)
-    docker rmi $(docker images -q -f dangling=true)
+    docker rm $(docker ps -q --filter status=exited --filter ancestor=${REPOSITORY})
+    docker rmi $(docker images -q --filter dangling=true --filter ancestor=${REPOSITORY})
     docker pull ${REPOSITORY}
     eval "${COMMAND} ${REPOSITORY}"
 }
