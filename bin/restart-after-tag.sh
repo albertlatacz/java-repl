@@ -12,20 +12,27 @@ function getTags() {
     curl -s "https://registry.hub.docker.com/v2/repositories/${REPOSITORY}/tags/" | jq ".results[].name" > "${TAGS_FILE}"
 }
 
+function extractName() {
+    REPOSITORY=$1
+    PROJECT=${REPOSITORY##*/}
+    echo "${PROJECT/[-]/_}"
+}
+
 function restartContainer() {
     REPOSITORY=$1
-    COMMAND="$2"
+    DOCKER_OPTIONS="$2"
+    NAME=`extractName ${REPOSITORY}`
     echo "New version of ${REPOSITORY} available. Deploying..."
-    docker stop $(docker ps -q --filter ancestor=${REPOSITORY})
-    docker rm $(docker ps -q --filter status=exited --filter ancestor=${REPOSITORY})
-    docker rmi $(docker images -q --filter dangling=true --filter ancestor=${REPOSITORY})
+    docker stop $(docker ps -q --filter name=${NAME})
+    docker rm $(docker ps -q --filter status=exited --filter name=${NAME})
+    docker rmi $(docker images -q --filter dangling=true --filter name=${NAME})
     docker pull ${REPOSITORY}
-    eval "${COMMAND} ${REPOSITORY}"
+    eval "docker run --restart=always -d --name=${NAME} ${DOCKER_OPTIONS} ${REPOSITORY}"
 }
 
 function checkForNewVersion() {
     REPOSITORY=$1
-    COMMAND="$2"
+    DOCKER_OPTIONS="$2"
     CURRENT_TAGS_FILE=`tagsFile ${REPOSITORY} "current"`
     NEW_TAGS_FILE=`tagsFile ${REPOSITORY} "new"`
     if [ -f ${CURRENT_TAGS_FILE} ];
@@ -36,19 +43,19 @@ function checkForNewVersion() {
        if [ "${FILES_DIFF}" != "" ];
        then
           getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
-          restartContainer "${REPOSITORY}" "${COMMAND}"
+          restartContainer "${REPOSITORY}" "${DOCKER_OPTIONS}"
        fi
     else
        getTags ${REPOSITORY} ${CURRENT_TAGS_FILE}
-       restartContainer "${REPOSITORY}" "${COMMAND}"
+       restartContainer "${REPOSITORY}" "${DOCKER_OPTIONS}"
     fi
 }
 
 
 DOCKER_HUB_REPOSITORY=$1
-COMMAND="$2"
+DOCKER_OPTIONS="$2"
 
-checkForNewVersion ${DOCKER_HUB_REPOSITORY} "${COMMAND}"
+checkForNewVersion ${DOCKER_HUB_REPOSITORY} "${DOCKER_OPTIONS}"
 
 
 
