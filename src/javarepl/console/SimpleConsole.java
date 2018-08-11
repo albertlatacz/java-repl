@@ -31,14 +31,19 @@ import static javarepl.console.ConsoleStatus.*;
 import static javarepl.rendering.EvaluationClassRenderer.renderExpressionClass;
 import static javarepl.rendering.ExpressionTokenRenderer.EXPRESSION_TOKEN;
 
-public final class SimpleConsole implements Console {
+public class SimpleConsole implements Console {
     private final Container context;
     private ConsoleStatus status = Idle;
 
     public SimpleConsole(ConsoleConfig config) {
+        this(config, null);
+    }
+
+    public SimpleConsole(ConsoleConfig config, ClassLoader parentCL) {
         registerShutdownHook();
 
         context = new SimpleContainer();
+        context.addInstance(ClassLoader.class, parentCL != null ? parentCL : getDefaultClassLoader(config, context));
         context.addInstance(Container.class, context);
         context.addInstance(Console.class, this);
         context.addInstance(ConsoleHistory.class, historyFromFile(startsWith(":h!").or(blank()), config.historyFile));
@@ -60,6 +65,11 @@ public final class SimpleConsole implements Console {
         ));
 
         context.get(Evaluator.class).addResults(config.results);
+    }
+
+    protected ClassLoader getDefaultClassLoader(ConsoleConfig config, Container context)
+    {
+        return context.getClass().getClassLoader();
     }
 
     public ConsoleResult execute(String expression) {

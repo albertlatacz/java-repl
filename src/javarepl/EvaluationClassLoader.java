@@ -11,12 +11,16 @@ import static com.googlecode.totallylazy.io.URLs.toURL;
 public class EvaluationClassLoader extends URLClassLoader {
     private Sequence<URL> registeredUrls = sequence();
 
-    private EvaluationClassLoader(EvaluationContext context) {
-        super(new URL[]{toURL().apply(context.outputDirectory())});
+    private EvaluationClassLoader(EvaluationContext context, ClassLoader parentCL) {
+        super(new URL[]{toURL().apply(context.outputDirectory())}, parentCL);
+    }
+
+    public static EvaluationClassLoader evaluationClassLoader(EvaluationContext context, ClassLoader parentCL) {
+        return new EvaluationClassLoader(context, parentCL);
     }
 
     public static EvaluationClassLoader evaluationClassLoader(EvaluationContext context) {
-        return new EvaluationClassLoader(context);
+        return new EvaluationClassLoader(context, context.getClass().getClassLoader());
     }
 
     public void registerURL(URL url) {
